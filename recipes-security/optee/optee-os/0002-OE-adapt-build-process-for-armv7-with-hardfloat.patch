@@ -1,0 +1,50 @@
+From 8d63130ff8eefeab781313253867d43e5c72f8bc Mon Sep 17 00:00:00 2001
+From: Christophe Priouzeau <christophe.priouzeau@linaro.org>
+Date: Mon, 26 Jan 2015 18:07:45 +0100
+Subject: [PATCH 2/2] OE: adapt build process for armv7 with hardfloat
+
+Signed-off-by: Christophe Priouzeau <christophe.priouzeau@linaro.org>
+---
+ core/arch/arm32/plat-stm/platform_flags.mk |  2 +-
+ mk/gcc.mk                                  | 14 +++++++-------
+ 2 files changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/core/arch/arm32/plat-stm/platform_flags.mk b/core/arch/arm32/plat-stm/platform_flags.mk
+index ad1736e..9cde25f 100644
+--- a/core/arch/arm32/plat-stm/platform_flags.mk
++++ b/core/arch/arm32/plat-stm/platform_flags.mk
+@@ -4,7 +4,7 @@ platform-cpuarch = cortex-a9
+ platform-cflags	 = -mcpu=$(platform-cpuarch) -mthumb
+ platform-cflags	+= -pipe -mthumb-interwork -mlong-calls
+ platform-cflags += -fno-short-enums -mno-apcs-float -fno-common
+-platform-cflags += -mfloat-abi=soft
++#platform-cflags += -mfloat-abi=soft
+ platform-aflags	 = -mcpu=$(platform-cpuarch)
+ 
+ platform-cflags += -ffunction-sections -fdata-sections
+diff --git a/mk/gcc.mk b/mk/gcc.mk
+index f6fccf4..7b84b4b 100644
+--- a/mk/gcc.mk
++++ b/mk/gcc.mk
+@@ -1,11 +1,11 @@
+ 
+-CC	= $(CROSS_COMPILE)gcc
+-LD	= $(CROSS_COMPILE)ld
+-AR	= $(CROSS_COMPILE)ar
+-NM	= $(CROSS_COMPILE)nm
+-OBJCOPY	= $(CROSS_COMPILE)objcopy
+-OBJDUMP	= $(CROSS_COMPILE)objdump
+-READELF = $(CROSS_COMPILE)readelf
++# CC	= $(CROSS_COMPILE)gcc
++# LD	= $(CROSS_COMPILE)ld
++# AR	= $(CROSS_COMPILE)ar
++# NM	= $(CROSS_COMPILE)nm
++# OBJCOPY	= $(CROSS_COMPILE)objcopy
++# OBJDUMP	= $(CROSS_COMPILE)objdump
++# READELF = $(CROSS_COMPILE)readelf
+ 
+ nostdinc	:= -nostdinc -isystem $(shell $(CC) -print-file-name=include \
+ 			2> /dev/null)
+-- 
+1.9.1
+

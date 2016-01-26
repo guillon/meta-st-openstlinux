@@ -1,0 +1,181 @@
+From ec1b927d604930c897b1b219a47fb99cd215efa4 Mon Sep 17 00:00:00 2001
+From: Christophe Priouzeau <christophe.priouzeau@linaro.org>
+Date: Wed, 21 Jan 2015 16:49:09 +0100
+Subject: [PATCH 2/2] Runtime init and load fmw
+
+Signed-off-by: Christophe Priouzeau <christophe.priouzeau@linaro.org>
+---
+ core/armv7/tee_tz.c | 128 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 128 insertions(+)
+
+diff --git a/core/armv7/tee_tz.c b/core/armv7/tee_tz.c
+index b4666b6..0c7fe0a 100644
+--- a/core/armv7/tee_tz.c
++++ b/core/armv7/tee_tz.c
+@@ -26,7 +26,12 @@
+ #include <linux/moduleparam.h>
+ #include <linux/sched.h>
+ #include <linux/jiffies.h>
++#include <linux/firmware.h>
++#include <linux/workqueue.h>
++#include <linux/semaphore.h>
++#include <linux/completion.h>
+ 
++#include <asm/smp_plat.h>
+ #include <asm/pgtable.h>
+ 
+ #include "tee-op.h"
+@@ -41,6 +46,20 @@
+ 
+ #define DEV	(tee_tz_miscdev.this_device)
+ 
++/* FIXME: these setting shall move to the device tree */
++#define CFG_TEE_INIT_FILE	"tee-init-armv7.bin"
++#define CFG_TEE_INIT_ADDR	0x06058080
++#define CFG_TEE_CORE_FILE	"tee-armv7.bin"
++#ifndef CFG_TEE_CORE_ADDR
++#define CFG_TEE_CORE_ADDR	0xBF800000
++#endif
++
++/* work for sequential inits of each cpu */
++static void smc_call_wf(struct work_struct *work);
++static DECLARE_WORK(work_inits, smc_call_wf);
++static DECLARE_COMPLETION(smc_completion);
++static TEEC_Result result_wq;
++
+ /* Shared Memory data (config loaded from secure world) */
+ static unsigned long shm_paddr;
+ static size_t shm_size;
+@@ -846,6 +865,26 @@ struct tee_targetop TZop = {
+  * Starting TEE support
+  *******************************************************************/
+ 
++static bool teesmc_api_is_tee(void)
++{
++	struct smc_param param = { .a0 = TEESMC32_CALLS_REVISION };
++
++	tee_smc_call(&param);
++
++	switch (param.a0) {
++	case TEESMC_REVISION_MAJOR:
++		break;
++	default:
++		return false;
++	}
++	switch (param.a1) {
++	case TEESMC_REVISION_MINOR:
++		return true;
++	default:
++		return false;
++	}
++}
++
+ static bool teesmc_api_uid_is_st(void)
+ {
+ 	struct smc_param param = { .a0 = TEESMC32_CALLS_UID };
+@@ -875,6 +914,88 @@ static bool teesmc_os_uuid_is_optee(void)
+ 	return false;
+ }
+ 
++static int tee_install_firmware(unsigned long pa, char *s)
++{
++	const struct firmware *fw;
++	void *bin;
++
++	if(request_firmware(&fw, s, DEV))
++		return 1;
++
++	bin = ioremap(pa, fw->size);
++	if (bin == NULL)
++		return 1;
++
++	memcpy_toio(bin, fw->data, fw->size);
++	iounmap(bin);
++
++	return 0;
++}
++
++static void smc_call_wf(struct work_struct *work)
++{
++	struct smc_param param;
++
++	memset(&param, 0, sizeof(param));
++	result_wq = ~TEEC_SUCCESS;
++
++	dev_dbg(DEV, "inits cpu#%d\n", smp_processor_id());
++	tee_smc_call(&param);
++	dev_dbg(DEV, "inits cpu#%d done\n", smp_processor_id());
++
++	result_wq = TEEC_SUCCESS;
++	complete(&smc_completion);
++}
++
++/*
++ * Load TEE firmware in RAM and init TEE for each core.
++ */
++static int load_init_tee_core(void)
++{
++	int ret = 0;
++	int n;
++	unsigned int to = 10000;
++
++	ret = tee_install_firmware(CFG_TEE_CORE_ADDR, CFG_TEE_CORE_FILE);
++	if (ret)
++		goto out;
++
++	ret = tee_install_firmware(CFG_TEE_INIT_ADDR, CFG_TEE_INIT_FILE);
++	if (ret)
++		goto out;
++
++	for (n = 0; n < num_present_cpus(); n++) {
++
++		if (!cpu_online(n)) {
++			// inits requires all cpus to be online
++			ret = -EINVAL;
++			goto out;
++		}
++
++		if (!schedule_work_on(n, &work_inits)) {
++			ret = -EINVAL;
++			goto out;
++		}
++
++		ret = wait_for_completion_interruptible_timeout(&smc_completion,
++							msecs_to_jiffies(to));
++		if ((ret <= 0) || (result_wq != TEEC_SUCCESS)) {
++			if (ret == 0)
++				ret = -ETIMEDOUT;
++			else
++				ret = -EINVAL;
++		        flush_work(&work_inits);
++		        cancel_work_sync(&work_inits);
++			goto out;
++		}
++		flush_work(&work_inits);
++		cancel_work_sync(&work_inits);
++		ret = 0;
++	}
++out:
++	return ret;
++}
++
+ static int start_tz_world(void)
+ {
+ 	int ret;
+@@ -883,6 +1004,13 @@ static int start_tz_world(void)
+ 	mutex_lock(&g_mutex_teez);
+ 	tee_tz_ready = true;
+ 
++	/* no valid TEE => load firmware */
++	if(!teesmc_api_is_tee()) {
++		ret = load_init_tee_core();
++		if (ret)
++			goto out;
++	}
++
+ 	/* Check that we're talking to the expected TEE */
+ 	if (!teesmc_api_uid_is_st() || !teesmc_os_uuid_is_optee()) {
+ 		ret = -EINVAL;
+-- 
+1.9.1
+

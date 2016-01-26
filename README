@@ -1,0 +1,18 @@
+Meta-opensdk
+============
+
+Meta-OpenSDK is a layer containing the framework metadata for current versions
+of OpenSDK.
+
+This layer relies on OpenEmbedded build system that is provided through
+Bitbake and OpenEmbedded-Core layers or Poky layer all part of the Yocto Project
+
+The Yocto Project has extensive documentation about OE including a reference manual
+which can be found at:
+    http://yoctoproject.org/documentation
+
+For information about OpenEmbedded, see the OpenEmbedded website:
+    http://www.openembedded.org/
+
+
+

@@ -1,0 +1,26 @@
+From 890f5306f913f8f0aa0dcf4773ebfd4fee321878 Mon Sep 17 00:00:00 2001
+From: Christophe Priouzeau <christophe.priouzeau@linaro.org>
+Date: Tue, 10 Feb 2015 09:01:33 +0100
+Subject: [PATCH] OE adapt build process
+
+Signed-off-by: Christophe Priouzeau <christophe.priouzeau@linaro.org>
+---
+ flags.mk | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/flags.mk b/flags.mk
+index 92e1853..3c8b728 100644
+--- a/flags.mk
++++ b/flags.mk
+@@ -3,7 +3,7 @@
+ #########################################################################
+ 
+ CROSS_COMPILE   ?= arm-linux-gnueabihf-
+-CC              := $(CROSS_COMPILE)gcc
++CC              ?= $(CROSS_COMPILE)gcc
+ 
+ CFLAGS          := -Wall -Wbad-function-cast -Wcast-align \
+ 		   -Werror-implicit-function-declaration -Wextra \
+-- 
+1.9.1
+
