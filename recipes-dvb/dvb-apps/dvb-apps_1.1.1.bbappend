@@ -28,6 +28,13 @@ do_configure() {
     sed -i -e s:[^\ ]*/usr/include:${STAGING_INCDIR}:g util/av7110_loadkeys/generate-keynames.sh
 }
 
+do_compile_prepend() {
+    # When using local source code, build directory may contains already build objects done for another machine
+    # configuration, leading to build error (mainly wrong path to sysroots in object and/or lib)
+    # To avoid this kind of issue, clean first build directory
+    oe_runmake clean
+}
+
 do_clean_dvbapps() {
     cd ${S}
     git status --porcelain | grep \?\? | cut -d ' ' -f 2 | xargs rm -rf
