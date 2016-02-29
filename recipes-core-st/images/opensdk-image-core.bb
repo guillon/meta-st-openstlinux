@@ -1,6 +1,9 @@
-require opensdk-image-minimal.bb
+SUMMARY = "OpenSDK core image with basic Wayland support (if enable in distro)."
+LICENSE = "MIT"
 
-SUMMARY = "OpenSDK core image with basic Wayland support."
+inherit core-image
+
+IMAGE_LINGUAS = "en-gb"
 
 IMAGE_FEATURES += "package-management ssh-server-dropbear hwcodecs"
 
