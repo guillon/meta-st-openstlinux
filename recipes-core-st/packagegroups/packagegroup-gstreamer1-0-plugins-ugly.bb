@@ -70,7 +70,7 @@ RDEPENDS_packagegroup-gstreamer1-0-plugins-ugly = "\
 # selected by PACKAGECONFIG
 # \
 # others
-RDEPENDS_packagegroup-gstreamer1-0-plugins-good-all = "\
+RDEPENDS_packagegroup-gstreamer1-0-plugins-ugly-all = "\
     gstreamer1.0-plugins-ugly-meta \
     \
     gstreamer1.0-plugins-ugly \
