@@ -16,6 +16,11 @@ do_configure_prepend() {
     srcdir=${S} NOCONFIGURE=1 ${S}/autogen.sh
 }
 
+do_install_append () {
+    install -d ${D}/usr/share/gstreamer-1.0/validate/scenarios
+    install -m 0555 -C ${S}/data/scenarios/*.scenario ${D}/usr/share/gstreamer-1.0/validate/scenarios
+}
+
 FILES_${PN} += "/usr/share/gstreamer-1.0/* /usr/lib/gstreamer-1.0/validate/* /usr/lib/gst-validate-launcher"
 FILES_${PN}-dbg += "${libdir}/gstreamer-1.0/validate/.debug"
 
