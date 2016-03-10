@@ -118,7 +118,6 @@ RDEPENDS_packagegroup-gstreamer1-0-plugins-bad = "\
     \
     gstreamer1.0-plugins-bad-curl \
     gstreamer1.0-plugins-bad-faac \
-    gstreamer1.0-plugins-bad-uvch264 \
     gstreamer1.0-plugins-bad-neonhttpsrc \
     gstreamer1.0-plugins-bad-fragmented \
     gstreamer1.0-plugins-bad-dashdemux \
@@ -142,7 +141,6 @@ RDEPENDS_packagegroup-gstreamer1-0-plugins-bad = "\
     gstreamer1.0-plugins-bad-segmentclip \
     gstreamer1.0-plugins-bad-shm \
     gstreamer1.0-plugins-bad-smooth \
-    gstreamer1.0-plugins-bad-smoothstreaming \
     gstreamer1.0-plugins-bad-speed \
     gstreamer1.0-plugins-bad-subenc \
     gstreamer1.0-plugins-bad-videofiltersbad \
@@ -162,7 +160,6 @@ RDEPENDS_packagegroup-gstreamer1-0-plugins-bad-all = "\
     \
     gstreamer1.0-plugins-bad-curl \
     gstreamer1.0-plugins-bad-faac \
-    gstreamer1.0-plugins-bad-uvch264 \
     gstreamer1.0-plugins-bad-neonhttpsrc \
     gstreamer1.0-plugins-bad-fragmented \
     gstreamer1.0-plugins-bad-dashdemux \
@@ -198,7 +195,6 @@ RDEPENDS_packagegroup-gstreamer1-0-plugins-bad-all = "\
     gstreamer1.0-plugins-bad-shm \
     gstreamer1.0-plugins-bad-siren \
     gstreamer1.0-plugins-bad-smooth \
-    gstreamer1.0-plugins-bad-smoothstreaming \
     gstreamer1.0-plugins-bad-speed \
     gstreamer1.0-plugins-bad-subenc \
     gstreamer1.0-plugins-bad-videofiltersbad \
@@ -225,4 +221,3 @@ RDEPENDS_packagegroup-gstreamer1-0-plugins-bad-all = "\
     gstreamer1.0-plugins-bad-mxf \
     gstreamer1.0-plugins-bad-pnm \
 "
-
