@@ -9,7 +9,7 @@ LIC_FILES_CHKSUM = "file://${S}/COPYING;md5=b31d8f53b6aaf2b4985d7dd7810a70d1"
 
 EXTERNALSRC_pn-wayland ?= "${ST_LOCAL_SRC}wayland"
 
-inherit autotools pkgconfig externalsrc
+inherit autotools pkgconfig stm-externalsrc
 
 # We need wayland-native for the wayland-scanner utility
 BBCLASSEXTEND = "native"

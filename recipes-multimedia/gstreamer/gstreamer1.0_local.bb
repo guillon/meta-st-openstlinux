@@ -1,5 +1,5 @@
 include recipes-multimedia/gstreamer/gstreamer1.0.inc
-inherit externalsrc
+inherit stm-externalsrc
 
 EXTERNALSRC_pn-gstreamer1.0 ?= "${ST_LOCAL_SRC}gstreamer"
 

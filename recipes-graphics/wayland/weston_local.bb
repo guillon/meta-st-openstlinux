@@ -1,7 +1,7 @@
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d79ee9e66bb0f95d3386a7acae780b70 "
 
-inherit autotools pkgconfig useradd externalsrc
+inherit autotools pkgconfig useradd stm-externalsrc
 
 EXTERNALSRC_pn-weston ?= "${ST_LOCAL_SRC}weston"
 

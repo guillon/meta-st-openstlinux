@@ -8,9 +8,10 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=73a5855a8119deb017f5f13cf327095d \
                     file://COPYING.LIB;md5=21682e4e8fea52413fd26c60acb907e5 \
                     file://gst/tta/crc32.h;beginline=12;endline=29;md5=27db269c575d1e5317fffca2d33b3b50"
 
-inherit externalsrc
+inherit stm-externalsrc
 
 #for local source
+SRC_URI = ""
 EXTERNALSRC_pn-gstreamer1.0-plugins-bad ?= "${ST_LOCAL_SRC}gst-plugins-bad"
 
 PACKAGECONFIG ??= " \

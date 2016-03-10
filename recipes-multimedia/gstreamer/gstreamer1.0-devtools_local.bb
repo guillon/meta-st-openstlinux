@@ -7,7 +7,7 @@ LICENSE = "LGPLv2.1"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=a6f89e2100d9b6cdffcea4f398e37343"
 
-inherit autotools gettext externalsrc
+inherit autotools gettext stm-externalsrc
 
 #for local source
 EXTERNALSRC_pn-gstreamer1.0-devtools ?= "${ST_LOCAL_SRC}gst-devtools/validate"

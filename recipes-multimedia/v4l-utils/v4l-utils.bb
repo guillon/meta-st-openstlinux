@@ -9,7 +9,7 @@ PV="1.0+local"
 DEPENDS = "jpeg gstreamer1.0-plugins-base"
 DEPENDS += " ${@base_contains('DISTRO_FEATURES', 'x11', 'virtual/libx11', '', d)} "
 
-inherit autotools gettext externalsrc pkgconfig
+inherit autotools gettext stm-externalsrc pkgconfig
 
 EXTERNALSRC_pn-v4l-utils ?= "${ST_LOCAL_SRC}v4l-utils"
 

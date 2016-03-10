@@ -2,7 +2,7 @@ DEFAULT_PREFERENCE = "-1"
 
 include recipes-multimedia/gstreamer/gstreamer1.0-plugins-base.inc
 
-inherit externalsrc
+inherit stm-externalsrc
 
 EXTERNALSRC_pn-gstreamer1.0-plugins-base ?= "${ST_LOCAL_SRC}gst-plugins-base"
 

@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = "file://${ST_LOCAL_SRC}szap-s2/README;md5=a3d05bdcbaa2eb6db17
 PR = "r0"
 PV = "1.0"
 
-inherit externalsrc
+inherit stm-externalsrc
 
 EXTERNALSRC_pn-szap-s2 ?= "${ST_LOCAL_SRC}szap-s2"
 

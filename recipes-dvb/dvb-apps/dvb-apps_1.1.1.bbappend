@@ -1,4 +1,4 @@
-inherit externalsrc
+inherit stm-externalsrc
 
 EXTERNALSRC_pn-dvb-apps ?= "${ST_LOCAL_SRC}dvb-apps"
 EXTERNALSRC_BUILD_pn-dvb-apps ?= "${ST_LOCAL_SRC}dvb-apps"
