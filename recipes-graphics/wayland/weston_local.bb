@@ -7,7 +7,7 @@ EXTERNALSRC_pn-weston ?= "${ST_LOCAL_SRC}weston"
 
 S = "${WORKDIR}/build"
 
-DEPENDS = "libxkbcommon gdk-pixbuf pixman cairo glib-2.0 jpeg"
+DEPENDS = "libxkbcommon gdk-pixbuf pixman libdrm cairo glib-2.0 jpeg"
 DEPENDS += "wayland libinput pango"
 
 EXTRA_OECONF = "--enable-setuid-install \
@@ -22,7 +22,6 @@ EXTRA_OECONF = "--enable-setuid-install \
 #EXTRA_OECONF += "--enable-vaapi-recorder "
 #EXTRA_OECONF += "--enable-screen-sharing "
 
-
 WAYLAND_EXTRA_OECONF ="WAYLAND_SCANNER_CFLAGS=' ' WAYLAND_SCANNER_LIBS=' ' "
 EXTRA_OECONF += " ${@base_contains("DISTRO_FEATURES", "wayland", "${WAYLAND_EXTRA_OECONF}", "", d)} "
 
@@ -30,7 +29,7 @@ PACKAGECONFIG ??= "${@base_contains('DISTRO_FEATURES', 'wayland', 'kms wayland',
                    ${@base_contains('DISTRO_FEATURES', 'x11', 'x11', '', d)} \
                    ${@base_contains('DISTRO_FEATURES', 'opengl', 'egl', '', d)} \
                    ${@base_contains('DISTRO_FEATURES', 'pam', 'launch', '', d)} \
-                   ${@base_contains('DISTRO_FEATURES', 'systemd', 'systemd', '', d)}\
+                   ${@base_contains('DISTRO_FEATURES', 'systemd', 'systemd', '', d)} \
                   "
 #
 # Compositor choices
@@ -57,10 +56,6 @@ PACKAGECONFIG[vaapi] = "--enable-vaapi-recorder,--disable-vaapi-recorder,libva"
 PACKAGECONFIG[egl] = "--enable-egl --enable-simple-egl-clients,--disable-egl --disable-simple-egl-clients,virtual/egl"
 # Weston with cairo glesv2 support
 PACKAGECONFIG[cairo-glesv2] = "--with-cairo-glesv2,--with-cairo=image,cairo"
-# Weston with lcms support
-PACKAGECONFIG[lcms] = "--enable-lcms,--disable-lcms,lcms"
-# Weston with webp support
-PACKAGECONFIG[webp] = "--enable-webp,--disable-webp,libwebp"
 # Weston with unwinding support
 PACKAGECONFIG[libunwind] = "--enable-libunwind,--disable-libunwind,libunwind"
 
