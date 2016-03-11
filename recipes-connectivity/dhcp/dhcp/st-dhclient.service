@@ -6,7 +6,7 @@ After=syslog.target network.target
 Type=simple
 PIDFile=/var/run/st-dhclient.pid
 EnvironmentFile=-/etc/default/dhcp-client
-ExecStart=/sbin/udhcpc -i eth0
+ExecStart=/sbin/udhcpc -i $INTERFACES
 
 [Install]
 WantedBy=multi-user.target
