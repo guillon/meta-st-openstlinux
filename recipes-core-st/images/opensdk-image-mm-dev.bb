@@ -14,7 +14,6 @@ IMAGE_DEVTOOLS_PART += " \
     gstreamer1.0-devtools \
     i2c-tools \
     v4l-utils \
-    szap-s2 \
     smcroute \
     bridge-utils \
     "
