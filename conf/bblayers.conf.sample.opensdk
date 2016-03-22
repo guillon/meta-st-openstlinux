@@ -50,3 +50,6 @@ BBLAYERS += "${@'${OEROOT}/meta-st/meta-demo' if os.path.isfile('${OEROOT}/meta-
 
 # specific to st st mali400
 BBLAYERS += "${@'${OEROOT}/meta-st/meta-mali400' if os.path.isfile('${OEROOT}/meta-st/meta-mali400/conf/layer.conf') else ''}"
+
+# specific to st st gcnano
+BBLAYERS += "${@'${OEROOT}/meta-st/meta-gcnano' if os.path.isfile('${OEROOT}/meta-st/meta-gcnano/conf/layer.conf') else ''}"
