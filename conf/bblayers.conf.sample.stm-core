@@ -6,19 +6,30 @@ BBPATH = "${TOPDIR}"
 BBFILES ?= ""
 OEROOT := "${@os.path.abspath(os.path.dirname(d.getVar('FILE', True)) + '/../..')}"
 
+#--------------------------
+# Layers var definition for buildsystem
+#
+OPENEMBEDDED = "${OPENEMBEDDED_NON_REMOVABLE}"
 
+OPENEMBEDDED_NON_REMOVABLE = "${OEROOT}/openembedded-core/meta"
+
+POKY  = "${POKY_NON_REMOVABLE}"
+POKY += "${OEROOT}/poky/meta-yocto-bsp"
+
+POKY_NON_REMOVABLE  = "${OEROOT}/poky/meta"
+POKY_NON_REMOVABLE += "${OEROOT}/poky/meta-yocto"
+
+#--------------------------
+#
 BBLAYERS ?= " \
-    ${OEROOT}/poky/meta \
-    ${OEROOT}/poky/meta-yocto \
-    ${OEROOT}/poky/meta-yocto-bsp \
+    ${@'${OPENEMBEDDED}' if os.path.isfile('${OEROOT}/openembedded-core/meta/conf/layer.conf') else '${POKY}'} \
     ${OEROOT}/meta-openembedded/meta-oe \
     ${OEROOT}/meta-openembedded/meta-networking \
     ${OEROOT}/meta-openembedded/meta-python \
   "
 
 BBLAYERS_NON_REMOVABLE ?= " \
-  ${OEROOT}/poky/meta \
-  ${OEROOT}/poky/meta-yocto \
+    ${@'${OPENEMBEDDED_NON_REMOVABLE}' if os.path.isfile('${OEROOT}/openembedded-core/meta/conf/layer.conf') else '${POKY_NON_REMOVABLE}'} \
   "
 
 # linaro
@@ -31,4 +42,3 @@ BBLAYERS += "${@'${OEROOT}/meta-qt5' if os.path.isfile('${OEROOT}/meta-qt5/conf/
 
 # specific to distro
 BBLAYERS += '${OEROOT}/meta-st/meta-opensdk'
-

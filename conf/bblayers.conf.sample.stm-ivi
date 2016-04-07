@@ -6,9 +6,23 @@ BBPATH = "${TOPDIR}"
 BBFILES ?= ""
 OEROOT := "${@os.path.abspath(os.path.dirname(d.getVar('FILE', True)) + '/../..')}"
 
+#--------------------------
+# Layers var definition for buildsystem
+#
+OPENEMBEDDED = "${OPENEMBEDDED_NON_REMOVABLE}"
 
+OPENEMBEDDED_NON_REMOVABLE = "${OEROOT}/openembedded-core/meta"
+
+POKY  = "${POKY_NON_REMOVABLE}"
+POKY += "${OEROOT}/poky/meta-yocto-bsp"
+
+POKY_NON_REMOVABLE  = "${OEROOT}/poky/meta"
+POKY_NON_REMOVABLE += "${OEROOT}/poky/meta-yocto"
+
+#--------------------------
+#
 BBLAYERS ?= " \
-    ${OEROOT}/openembedded-core/meta \
+    ${@'${OPENEMBEDDED}' if os.path.isfile('${OEROOT}/openembedded-core/meta/conf/layer.conf') else '${POKY}'} \
     ${OEROOT}/meta-openembedded/meta-oe \
     ${OEROOT}/meta-openembedded/meta-systemd \
     ${OEROOT}/meta-openembedded/meta-webserver \
@@ -18,7 +32,7 @@ BBLAYERS ?= " \
   "
 
 BBLAYERS_NON_REMOVABLE ?= " \
-  ${OEROOT}/openembedded-core/meta \
+    ${@'${OPENEMBEDDED_NON_REMOVABLE}' if os.path.isfile('${OEROOT}/openembedded-core/meta/conf/layer.conf') else '${POKY_NON_REMOVABLE}'} \
   "
 
 # linaro

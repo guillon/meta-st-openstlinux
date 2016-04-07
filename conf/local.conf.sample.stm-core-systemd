@@ -288,4 +288,3 @@ ST_LOCAL_SRC = '${OEROOT}/sources/'
 ST_LOCAL_OE_DOWNLOAD = '${OEROOT}/oe-download'
 
 PRSERV_HOST = "localhost:0"
-
