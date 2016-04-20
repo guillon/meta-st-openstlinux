@@ -29,7 +29,7 @@ IMAGE_CORE_PART = " \
 # Display part addons
 #
 IMAGE_DISPLAY_PART = " \
-    ${@base_contains('DISTRO_FEATURES', 'wayland', 'weston weston-cfg', '', d)} \
+    ${@base_contains('DISTRO_FEATURES', 'wayland', 'weston weston-cfg weston-examples', '', d)} \
     fb-test \
     "
 
