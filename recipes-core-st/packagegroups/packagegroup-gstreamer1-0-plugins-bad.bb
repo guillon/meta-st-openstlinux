@@ -119,7 +119,6 @@ RDEPENDS_packagegroup-gstreamer1-0-plugins-bad = "\
     gstreamer1.0-plugins-bad-curl \
     gstreamer1.0-plugins-bad-faac \
     gstreamer1.0-plugins-bad-neonhttpsrc \
-    gstreamer1.0-plugins-bad-fragmented \
     gstreamer1.0-plugins-bad-dashdemux \
     gstreamer1.0-plugins-bad-bz2 \
     gstreamer1.0-plugins-bad-smoothstreaming \
@@ -132,7 +131,6 @@ RDEPENDS_packagegroup-gstreamer1-0-plugins-bad = "\
     gstreamer1.0-plugins-bad-inter \
     gstreamer1.0-plugins-bad-interlace \
     gstreamer1.0-plugins-bad-jpegformat \
-    gstreamer1.0-plugins-bad-liveadder \
     gstreamer1.0-plugins-bad-mpegpsdemux \
     gstreamer1.0-plugins-bad-mpegpsmux \
     gstreamer1.0-plugins-bad-mpegtsdemux \
