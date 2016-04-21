@@ -22,14 +22,6 @@
 mkdir -p $XDG_RUNTIME_DIR
 chmod 0700 $XDG_RUNTIME_DIR
 
-#load mali 400 driver
-if [ `lsmod | grep mali | wc -l` -eq 1 ];
-then
-    echo "mali400 already loaded"
-else
-    modprobe mali
-fi
-
 #log file managment on weston CMD line
 CMD_LINE_WESTON=""
 if [ -z $LOG_FILE ];
