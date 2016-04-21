@@ -14,21 +14,21 @@
 #
 # Parallelism Options
 #
-# These two options control how much parallelism BitBake should use. The first 
+# These two options control how much parallelism BitBake should use. The first
 # option determines how many tasks bitbake should run in parallel:
 #
-BB_NUMBER_THREADS ?= "##CPU##"
+#BB_NUMBER_THREADS ?= "4"
 #
 # Default to setting automatically based on cpu count
-#BB_NUMBER_THREADS ?= "${@oe.utils.cpu_count()}"
-# 
+BB_NUMBER_THREADS ?= "${@oe.utils.cpu_count()}"
+#
 # The second option controls how many processes make should run in parallel when
 # running compile tasks:
 #
-PARALLEL_MAKE ?= "-j ##CPU##"
+#PARALLEL_MAKE ?= "-j 4"
 #
 # Default to setting automatically based on cpu count
-#PARALLEL_MAKE ?= "-j ${@oe.utils.cpu_count()}"
+PARALLEL_MAKE ?= "-j ${@oe.utils.cpu_count()}"
 #
 # For a quad-core machine, BB_NUMBER_THREADS = "4", PARALLEL_MAKE = "-j 4" would
 # be appropriate for example.
@@ -40,8 +40,7 @@ PARALLEL_MAKE ?= "-j ##CPU##"
 # less than 128MB RAM.
 ENABLE_BINARY_LOCALE_GENERATION = ""
 
-# Set GLIBC_GENERATE_LOCALES to the locales you wish to generate should you
-# not
+# Set GLIBC_GENERATE_LOCALES to the locales you wish to generate should you not
 # wish to perform the time-consuming step of generating all LIBC locales.
 # NOTE: If removing en_US.UTF-8 you will also need to uncomment, and set
 # appropriate value for IMAGE_LINGUAS.
@@ -56,13 +55,14 @@ IMAGE_LINGUAS ?= "en-gb"
 # of emulated machines available which can boot and run in the QEMU emulator:
 #
 #MACHINE ?= "qemuarm"
+#MACHINE ?= "qemuarm64"
 #MACHINE ?= "qemumips"
 #MACHINE ?= "qemuppc"
 #MACHINE ?= "qemux86"
 #MACHINE ?= "qemux86-64"
 #
 # This sets the default machine to be qemux86 if no other machine is selected:
-MACHINE = "##MACHINE##"
+MACHINE ??= "qemux86"
 
 #
 # Default policy config
@@ -72,7 +72,7 @@ MACHINE = "##MACHINE##"
 # Ultimately when creating custom policy, people will likely end up subclassing
 # these defaults.
 #
-DISTRO = "##DISTRO##"
+#DISTRO ?= "defaultsetup"
 
 #
 # Where to place downloads
@@ -85,7 +85,7 @@ DISTRO = "##DISTRO##"
 #
 # The default is a downloads directory under TOPDIR which is the build directory.
 #
-DL_DIR ?= "##DL_CACHEPREFIX##/oe-downloads"
+#DL_DIR ?= "${TOPDIR}/downloads"
 
 #
 # Where to place shared-state files
@@ -101,7 +101,7 @@ DL_DIR ?= "##DL_CACHEPREFIX##/oe-downloads"
 #
 # The default is a sstate-cache directory under TOPDIR.
 #
-#SSTATE_DIR ?= "##SSTATE_CACHEPREFIX##/oe-sstate-cache"
+#SSTATE_DIR ?= "${TOPDIR}/sstate-cache"
 
 #
 # Where to place the build output
@@ -119,8 +119,8 @@ DL_DIR ?= "##DL_CACHEPREFIX##/oe-downloads"
 #
 # Package Management configuration
 #
-# This variable lists which packaging formats to enable. Multiple package backends
-# can be enabled at once and the first item listed in the variable will be used
+# This variable lists which packaging formats to enable. Multiple package backends 
+# can be enabled at once and the first item listed in the variable will be used 
 # to generate the root filesystems.
 # Options are:
 #  - 'package_deb' for debian style deb files
@@ -134,7 +134,7 @@ PACKAGE_CLASSES ?= "package_deb"
 # SDK/ADT target architecture
 #
 # This variable specifies the architecture to build SDK/ADT items for and means
-# you can build the SDK packages for architectures other than the machine you are
+# you can build the SDK packages for architectures other than the machine you are 
 # running the build on (i.e. building i686 packages on an x86_64 host).
 # Supported values are i686 and x86_64
 #SDKMACHINE ?= "i686"
@@ -142,7 +142,7 @@ PACKAGE_CLASSES ?= "package_deb"
 #
 # Extra image configuration defaults
 #
-# The EXTRA_IMAGE_FEATURES variable allows extra packages to be added to the generated
+# The EXTRA_IMAGE_FEATURES variable allows extra packages to be added to the generated 
 # images. Some of these options are added to certain image types automatically. The
 # variable can contain the following options:
 #  "dbg-pkgs"       - add -dbg packages for all installed packages
@@ -175,7 +175,9 @@ EXTRA_IMAGE_FEATURES = "debug-tweaks"
 #   - 'image-swab' to perform host system intrusion detection
 # NOTE: if listing mklibs & prelink both, then make sure mklibs is before prelink
 # NOTE: mklibs also needs to be explicitly enabled for a given image, see local.conf.extended
-USER_CLASSES ?= "buildstats image-mklibs image-prelink"
+# NOTE: image-prelink is currently broken due to problems with the prelinker.  It is advised
+# that you do NOT run the prelinker at this time. 
+USER_CLASSES ?= "buildstats image-mklibs"
 
 
 #
@@ -213,24 +215,28 @@ PATCHRESOLVE = "noop"
 # shutdown the build. If there is less that 100MB or 1K inodes, perform a hard abort
 # of the build. The reason for this is that running completely out of space can corrupt
 # files and damages the build in ways which may not be easily recoverable.
+# It's necesary to monitor /tmp, if there is no space left the build will fail
+# with very exotic errors.
 BB_DISKMON_DIRS = "\
     STOPTASKS,${TMPDIR},1G,100K \
     STOPTASKS,${DL_DIR},1G,100K \
     STOPTASKS,${SSTATE_DIR},1G,100K \
+    STOPTASKS,/tmp,100M,100K \
     ABORT,${TMPDIR},100M,1K \
     ABORT,${DL_DIR},100M,1K \
-    ABORT,${SSTATE_DIR},100M,1K"
+    ABORT,${SSTATE_DIR},100M,1K \
+    ABORT,/tmp,10M,1K"
 
 #
 # Shared-state files from other locations
 #
-# As mentioned above, shared state files are prebuilt cache data objects which can
+# As mentioned above, shared state files are prebuilt cache data objects which can 
 # used to accelerate build time. This variable can be used to configure the system
 # to search other mirror locations for these objects before it builds the data itself.
 #
 # This can be a filesystem directory, or a remote url such as http or ftp. These
-# would contain the sstate-cache results from previous builds (possibly from other
-# machines). This variable works like fetcher MIRRORS/PREMIRRORS and points to the
+# would contain the sstate-cache results from previous builds (possibly from other 
+# machines). This variable works like fetcher MIRRORS/PREMIRRORS and points to the 
 # cache locations to check for the shared objects.
 # NOTE: if the mirror uses the same structure as SSTATE_DIR, you need to add PATH
 # at the end as shown in the examples below. This will be substituted with the
