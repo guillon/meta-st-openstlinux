@@ -42,4 +42,4 @@ BBLAYERS += "${@'${OEROOT}/meta-openembedded/meta-networking' if os.path.isfile(
 BBLAYERS += "${@'${OEROOT}/meta-qt5' if os.path.isfile('${OEROOT}/meta-qt5/conf/layer.conf') else ''}"
 
 # specific to distro
-BBLAYERS += '${OEROOT}/meta-st/meta-opensdk'
+BBLAYERS += '${OEROOT}/meta-st/meta-st-framework'

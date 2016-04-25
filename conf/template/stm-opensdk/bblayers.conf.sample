@@ -45,7 +45,7 @@ BBLAYERS += "${@'${OEROOT}/meta-qt5' if os.path.isfile('${OEROOT}/meta-qt5/conf/
 
 
 # specific to distro
-BBLAYERS += '${OEROOT}/meta-st/meta-opensdk'
+BBLAYERS += '${OEROOT}/meta-st/meta-st-framework'
 
 # specific to st bootloader
 BBLAYERS += "${@'${OEROOT}/meta-st/meta-bootloader' if os.path.isfile('${OEROOT}/meta-st/meta-bootloader/conf/layer.conf') else ''}"
