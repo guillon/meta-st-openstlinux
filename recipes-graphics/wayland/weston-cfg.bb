@@ -5,8 +5,7 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384
 
 SRC_URI = " file://weston.ini \
             file://utilities-terminal.png \
-            file://wallpaper_1920x1080_white.png \
-            file://wallpaper_1280x800_white.png "
+            file://wallpaper_1920x1080_white.png "
 
 SRC_URI += " file://weston.service \
              file://weston.sh \
@@ -16,8 +15,7 @@ FILES_${PN} = "\
     /tmp/xdg_runtime_dir \
     /home/root/.config/weston.ini \
     /usr/share/weston/icon/utilities-terminal.png \
-    /usr/share/weston/backgrounds/wallpaper_1920x1080_white.png \
-    /usr/share/weston/backgrounds/wallpaper_1280x800_white.png "
+    /usr/share/weston/backgrounds/wallpaper_1920x1080_white.png "
 
 FILES_${PN} += "/lib/systemd/system/weston.service \
             /usr/sbin/weston.sh \
@@ -32,7 +30,6 @@ do_install() {
   install -m 0644 ${WORKDIR}/weston.ini ${D}/home/root/.config/weston.ini
   install -m 0644 ${WORKDIR}/utilities-terminal.png ${D}/usr/share/weston/icon/utilities-terminal.png
   install -m 0644 ${WORKDIR}/wallpaper_1920x1080_white.png ${D}/usr/share/weston/backgrounds/wallpaper_1920x1080_white.png
-  install -m 0644 ${WORKDIR}/wallpaper_1280x800_white.png ${D}/usr/share/weston/backgrounds/wallpaper_1280x800_white.png
 
   install -d ${D}/lib/systemd/system/ ${D}/usr/sbin
   install -m 0644 ${WORKDIR}/weston.service ${D}/lib/systemd/system/
