@@ -2,13 +2,16 @@ DEFAULT_PREFERENCE = "-1"
 
 include recipes-multimedia/gstreamer/gstreamer1.0-plugins-base.inc
 
-inherit stm-externalsrc
-
-EXTERNALSRC_pn-gstreamer1.0-plugins-base ?= "${ST_LOCAL_SRC}gst-plugins-base"
-
 LIC_FILES_CHKSUM = "file://${S}/COPYING;md5=c54ce9345727175ff66d17b67ff51f58 \
-                    file://${S}/common/coverage/coverage-report.pl;beginline=2;endline=17;md5=a4e1830fce078028c8f0974161272607 \
                     file://${S}/COPYING.LIB;md5=6762ed442b3822387a51c92d928ead0d"
+
+
+SRCBRANCH = "lms-1.6.0"
+SRC_URI = "${ST_GIT_SERVER_URI}/oeivi/oe/multimedia/gst-plugins-base${ST_GIT_SERVER_PROTOCOL};branch=${SRCBRANCH}"
+SRCREV = "ce02e461d7f2b3f3dbe1e86cbeec56e2811c2920"
+
+S = "${WORKDIR}/git"
+
 
 PACKAGECONFIG ??= " \
     encoding \
