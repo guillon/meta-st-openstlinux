@@ -7,10 +7,14 @@ LICENSE = "LGPLv2.1"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=a6f89e2100d9b6cdffcea4f398e37343"
 
-inherit autotools gettext stm-externalsrc
+inherit autotools gettext
 
-#for local source
-EXTERNALSRC_pn-gstreamer1.0-devtools ?= "${ST_LOCAL_SRC}gst-devtools/validate"
+SRCBRANCH = "lms-1.6.0"
+SRC_URI = "${ST_GIT_SERVER_URI}/oeivi/oe/multimedia/gst-devtools${ST_GIT_SERVER_PROTOCOL};branch=${SRCBRANCH}"
+SRCREV = "9cbed031506423680b8773c6017f394bfd66d47b"
+
+S = "${WORKDIR}/git/validate"
+B = "${S}"
 
 do_configure_prepend() {
     srcdir=${S} NOCONFIGURE=1 ${S}/autogen.sh
