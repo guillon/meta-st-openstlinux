@@ -4,14 +4,17 @@ LICENSE = "GPLv2 & LGPLv2.1"
 LIC_FILES_CHKSUM = "file://${S}/COPYING;md5=48da9957849056017dc568bbc43d8975 \
                     file://${S}/COPYING.libv4l;md5=d749e86a105281d7a44c2328acebc4b0"
 
-PV="1.0+local"
+SRCBRANCH = "oe-v4l-utils-1.6.0"
+SRC_URI = "${ST_GIT_SERVER_URI}/oeivi/oe/st-external/v4l-utils${ST_GIT_SERVER_PROTOCOL};branch=${SRCBRANCH}"
+SRCREV = "eaaa23bdd9045da011edba5a5d00213a03071dd5"
+
+S = "${WORKDIR}/git"
+
 
 DEPENDS = "jpeg gstreamer1.0-plugins-base"
 DEPENDS += " ${@base_contains('DISTRO_FEATURES', 'x11', 'virtual/libx11', '', d)} "
 
-inherit autotools gettext stm-externalsrc pkgconfig
-
-EXTERNALSRC_pn-v4l-utils ?= "${ST_LOCAL_SRC}v4l-utils"
+inherit autotools gettext  pkgconfig
 
 # libv4l was absorbed into this, let OE know that
 PROVIDES = "libv4l"
