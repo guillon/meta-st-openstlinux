@@ -3,11 +3,14 @@ DEFAULT_PREFERENCE = "-1"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d79ee9e66bb0f95d3386a7acae780b70 "
 
-inherit autotools pkgconfig useradd stm-externalsrc
+inherit autotools pkgconfig useradd
 
-EXTERNALSRC_pn-weston ?= "${ST_LOCAL_SRC}weston"
+SRCBRANCH = "oe-weston-1_9"
+SRC_URI = "${ST_GIT_SERVER_URI}/oeivi/oe/st/weston${ST_GIT_SERVER_PROTOCOL};branch=${SRCBRANCH}"
+SRCREV = "e8867a677bf254ce63ef81611f4319a64efeb92c"
 
-S = "${WORKDIR}/build"
+S = "${WORKDIR}/git"
+
 
 DEPENDS = "libxkbcommon gdk-pixbuf pixman libdrm cairo glib-2.0 jpeg"
 DEPENDS += "wayland libinput pango"
