@@ -2,47 +2,53 @@ SUMMARY = "OPTEE SDP trusted application"
 DESCRIPTION = "OPTEE SDP trusted application"
 
 LICENSE = "CLOSED"
-PR="r0"
-PV="1.0+git"
 
 inherit module
 
-DEPENDS = "optee-os optee-client virtual/kernel"
-
-PACKAGE_ARCH = "${MACHINE_ARCH}"
+PR="r0"
+PV="1.0+git"
 
 SRC_URI = "git://git.linaro.org/people/benjamin.gaignard/optee-sdp.git"
-S = "${WORKDIR}/git"
-
 SRCREV = "2a981c229030a9cc46487ba2c75aa48a5d6413de"
 
-#stub
+S = "${WORKDIR}/git"
+
+SRC_URI += "file://sync-ta-makefile-with-optee-1.1.0.patch"
+SRC_URI += "file://fix-smaf-structure.patch"
+
+DEPENDS = "optee-client optee-os"
+
 do_configure[noexec] = "1"
 do_make_scripts[noexec] = "1"
 
-EXTRA_OEMAKE = ""
+# refer to optee-os for TA devkit installation path
+EXTRA_OEMAKE = "TA_DEV_KIT_DIR=${STAGING_INCDIR}/optee/export-ta_arm32"
+
+# TA devkit requires a CROSS_COMPILE
+EXTRA_OEMAKE_TA = "CROSS_COMPILE=${TARGET_PREFIX}"
+
+EXTRA_SMAF_OPTEE_KCMDLINE = "O=${STAGING_KERNEL_BUILDDIR} M=${S}/host"
+
 do_compile() {
-    export TA_DEV_KIT_DIR=${STAGING_INCDIR}/optee/export-user_ta
-    export TEEC_EXPORT=${STAGING_DIR_HOST}/usr
+	#trusted application
+	unset LDFLAGS
+	oe_runmake -C ${S}/ta ${EXTRA_OEMAKE_TA}
 
-    #compile trusted part
-    oe_runmake -C ${S}/ta LDFLAGS=""
-
-	#compile host driver part
-	KDIR=${STAGING_KERNEL_DIR} make -C ${S}/host
+	#linux driver part
+	oe_runmake -C ${STAGING_KERNEL_DIR} modules ${EXTRA_SMAF_OPTEE_KCMDLINE}
 }
 
 do_install() {
-	mkdir -p ${D}/lib/teetz
+	#trusted application
+	install -d ${D}${base_libdir}/optee_armtz
+	install -m 444 ${B}/ta/b9aa5f00-d229-11e4-925c0002a5d5c51b.ta ${D}${base_libdir}/optee_armtz
 
-    #ta part
-    install -m 444 ${B}/ta/b9aa5f00-d229-11e4-925c0002a5d5c51b.ta ${D}/lib/teetz/
-
-	install -d ${D}/lib/modules/${KERNEL_VERSION}
-	install -m 0755 ${S}/host/smaf-optee.ko ${D}/lib/modules/${KERNEL_VERSION}/smaf-optee.ko
+	#linux driver driver
+	install -d ${D}${base_libdir}/modules/${KERNEL_VERSION}
+	install -m 0755 ${S}/host/smaf-optee.ko ${D}${base_libdir}/modules/${KERNEL_VERSION}/smaf-optee.ko
 }
 
-FILES_${PN} = "/lib/teetz/"
+FILES_${PN} = "${base_libdir}/optee_armtz/"
 INSANE_SKIP_${PN}-dev = "staticdev"
 
 INHIBIT_PACKAGE_STRIP = "1"

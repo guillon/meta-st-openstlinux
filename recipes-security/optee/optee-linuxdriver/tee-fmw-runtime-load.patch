@@ -1,0 +1,300 @@
+commit e2535c108e1281c16353fa85823c482006d45fff
+Author: etienne carriere <etienne.carriere@st.com>
+Date:   Wed Mar 23 11:20:10 2016 +0100
+
+    Support runtime loading of the TZ/TEE firmware
+
+diff --git a/armtz/Makefile b/armtz/Makefile
+index af2b10c..bb7c827 100644
+--- a/armtz/Makefile
++++ b/armtz/Makefile
+@@ -21,6 +21,7 @@ obj-m += optee_armtz.o
+ 
+ optee_armtz-objs:=   \
+ 		tee_tz_drv.o \
++		tee_runtime_load.o \
+ 		tee_mem.o \
+ 		handle.o
+ 
+diff --git a/armtz/tee_runtime_load.c b/armtz/tee_runtime_load.c
+new file mode 100644
+index 0000000..95da92b
+--- /dev/null
++++ b/armtz/tee_runtime_load.c
+@@ -0,0 +1,200 @@
++/*
++ * Copyright (c) 2014, STMicroelectronics International N.V.
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License Version 2 as
++ * published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
++ * GNU General Public License for more details.
++ */
++/* #define DEBUG */
++
++#include <linux/module.h>
++#include <linux/firmware.h>
++
++#include <linux/tee_core.h>
++#include <tee_mutex_wait.h>
++#include <tee_wait_queue.h>
++
++#include "tee_tz_priv.h"
++
++#define DEV	(ptee->tee->dev)
++
++/* FIXME: these setting should move to the device tree */
++#define CFG_TEE_LOADER_FILE	"tee-loader-armv7.bin"
++#define CFG_TEE_CORE_FILE	"tee-armv7.bin"
++
++#define CFG_OPTEE_LOADER_MAGIC	0x4c54504f
++struct optee_loader_header {
++	uint32_t	magic;
++	uint32_t	load_addr;
++	uint32_t	size;
++};
++
++#define CFG_OPTEE_IMG_MAGIC	0x4554504f
++struct optee_img_header {
++	uint32_t	magic;
++	uint8_t		version;
++	uint8_t		arch_id;
++	uint16_t	flags;
++	uint32_t	init_size;
++	uint32_t	init_addr_hi;
++	uint32_t	init_addr_lo;
++	uint32_t	full_init_size;
++	uint32_t	paged_size;
++};
++
++/* work for sequential inits of each cpu */
++static void smc_call_wf(struct work_struct *work);
++static DECLARE_WORK(work_inits, smc_call_wf);
++static DECLARE_COMPLETION(smc_completion);
++
++static void smc_call_wf(struct work_struct *work)
++{
++	struct smc_param param;
++
++	memset(&param, 0, sizeof(param));
++	tee_smc_call(&param);
++	complete(&smc_completion);
++}
++
++static int load_optee_image(struct tee_tz *ptee,
++			    const struct firmware *fw)
++{
++	unsigned long pa;
++	unsigned long sz;
++	uint8_t *img;
++	void *va;
++	uint32_t img_magic = CFG_OPTEE_IMG_MAGIC;
++	uint32_t loader_magic = CFG_OPTEE_LOADER_MAGIC;
++
++	if (!memcmp(fw->data, &img_magic, sizeof(uint32_t))) {
++		struct optee_img_header hdr;
++
++		if (fw->size < sizeof(hdr))
++			return -EINVAL;
++
++		memcpy(&hdr, fw->data, sizeof(hdr));
++		if (fw->size < sizeof(hdr) + hdr.init_size) {
++			dev_err(DEV, "invalid fmw image size: %d < %d+%d\n",
++					fw->size, sizeof(hdr), hdr.init_size);
++			return -EINVAL;
++		}
++
++		if (hdr.init_addr_hi) {
++			if (sizeof(pa) == sizeof(uint32_t)) {
++				dev_err(DEV, "invalid 64b load addr 0x%llx\n",
++					((uint64_t)hdr.init_addr_hi << 32) |
++					(uint64_t)hdr.init_addr_lo);
++				return -EINVAL;
++			}
++		}
++
++		pa = hdr.init_addr_lo;
++		sz = hdr.init_size;
++		img = (uint8_t *)fw->data + sizeof(hdr);
++
++	} else if (!memcmp(fw->data, &loader_magic, sizeof(uint32_t))) {
++		struct optee_loader_header hdr;
++
++		if (fw->size < sizeof(hdr))
++			return -EINVAL;
++
++		memcpy(&hdr, fw->data, sizeof(hdr));
++
++		if (fw->size < sizeof(hdr) + hdr.size) {
++			dev_err(DEV, "invalid fmw image size: %d < %d+%d\n",
++					fw->size, sizeof(hdr), hdr.size);
++			return -EINVAL;
++		}
++
++		pa = hdr.load_addr;
++		sz = hdr.size;
++		img = (uint8_t *)fw->data + sizeof(hdr);
++	} else {
++		dev_err(DEV, "Unkwon magic %08xh\n", *(uint32_t *)fw->data);
++		return -EINVAL;
++	}
++
++	va = ioremap_nocache(pa, sz);
++	if (!va) {
++		dev_err(DEV, "map(0x%lx, %lu) failed\n", pa, sz);
++		return -ENOMEM;
++	}
++	memcpy(va, img, sz);
++	iounmap(va);
++	return 0;
++}
++
++/*
++ * Load TEE firmware in RAM and init TEE for each core.
++ *
++ * armv7 legacy: fmw may include a 2nd firmware image required at load time.
++ * this "tztee loader image" must be handle with its specific header/magic.
++ * If related fmw loader image is not found, simply do not load it.
++ */
++int optee_armtz_runtime_load(struct tee_tz *ptee)
++{
++	const struct firmware *fw;
++	unsigned int toms = 100000;
++	int ret = -EINVAL;
++	int n;
++
++	/* load fmw image(s) */
++	if (request_firmware(&fw, CFG_TEE_CORE_FILE, DEV)) {
++		dev_err(DEV, "fmw \"%s\" not available\n", CFG_TEE_CORE_FILE);
++		return -EINVAL;
++	}
++
++	ret = load_optee_image(ptee, fw);
++	if (ret) {
++		release_firmware(fw);
++		return ret;
++	}
++	release_firmware(fw);
++
++	if (!request_firmware(&fw, CFG_TEE_LOADER_FILE, DEV)) {
++		ret = load_optee_image(ptee, fw);
++		if (ret) {
++			release_firmware(fw);
++			return ret;
++		}
++		release_firmware(fw);
++	} else
++		dev_info(DEV, "no loader \"%s\", assume none required\n",
++				CFG_TEE_LOADER_FILE);
++
++	/* launch each core, starting from core #0, into TEE inits */
++	for (n = 0; n < num_present_cpus(); n++) {
++
++		if (!cpu_online(n)) {
++			dev_err(DEV, "cpu%d: all cpus must be online\n", n);
++			return -EINVAL;
++		}
++
++		if (!schedule_work_on(n, &work_inits)) {
++			dev_err(DEV, "cpu%d: failed to launch work\n", n);
++			return -EINVAL;
++		}
++
++		dev_dbg(DEV, "cpu%d: launch inits\n", n);
++		ret = wait_for_completion_interruptible_timeout(&smc_completion,
++							msecs_to_jiffies(toms));
++		if (ret <= 0) {
++			if (ret == 0)
++				ret = -ETIMEDOUT;
++			else
++				ret = -EINVAL;
++		        flush_work(&work_inits);
++		        cancel_work_sync(&work_inits);
++			return ret;
++		}
++		flush_work(&work_inits);
++		cancel_work_sync(&work_inits);
++		dev_dbg(DEV, "cpu%d: inits done\n", n);
++	}
++	return 0;
++}
+diff --git a/armtz/tee_tz_drv.c b/armtz/tee_tz_drv.c
+index 2cc8d17..d980fbb 100644
+--- a/armtz/tee_tz_drv.c
++++ b/armtz/tee_tz_drv.c
+@@ -948,16 +948,6 @@ out:
+ /*
+  * Synchronised outer cache maintenance support
+  */
+-#ifndef CONFIG_ARM_TZ_SUPPORT
+-/* weak outer_tz_mutex in case not supported by kernel */
+-bool __weak outer_tz_mutex(unsigned long *p)
+-{
+-	pr_err("weak outer_tz_mutex");
+-	if (p != NULL)
+-		return false;
+-	return true;
+-}
+-#endif
+ 
+ /* register_outercache_mutex - Negotiate/Disable outer cache shared mutex */
+ static int register_outercache_mutex(struct tee_tz *ptee, bool reg)
+@@ -1097,6 +1087,25 @@ out:
+ 
+ 
+ /******************************************************************************/
++static bool teesmc_api_is_tee(void)
++{
++	struct smc_param param = { .a0 = TEESMC32_CALLS_REVISION };
++
++	tee_smc_call(&param);
++
++	switch (param.a0) {
++	case TEESMC_REVISION_MAJOR:
++		break;
++	default:
++		return false;
++	}
++	switch (param.a1) {
++	case TEESMC_REVISION_MINOR:
++		return true;
++	default:
++		return false;
++	}
++}
+ 
+ static int tz_start(struct tee *tee)
+ {
+@@ -1112,8 +1121,15 @@ static int tz_start(struct tee *tee)
+ 
+ 	ptee = tee->priv;
+ 	BUG_ON(ptee->started);
+-	ptee->started = true;
+ 
++	/* no valid TEE => load firmware */
++	if(!teesmc_api_is_tee()) {
++		ret = optee_armtz_runtime_load(ptee);
++		if (ret)
++			goto exit;
++	}
++
++	ptee->started = true;
+ 	ret = configure_shm(ptee);
+ 	if (ret)
+ 		goto exit;
+diff --git a/armtz/tee_tz_priv.h b/armtz/tee_tz_priv.h
+index 707c72e..e0b30e7 100644
+--- a/armtz/tee_tz_priv.h
++++ b/armtz/tee_tz_priv.h
+@@ -59,6 +59,7 @@ struct tee_tz {
+ 	struct tee_wait_queue_private wait_queue;
+ };
+ 
++int optee_armtz_runtime_load(struct tee_tz *ptee);
+ int tee_smc_call(struct smc_param *param);
+ 
+ #endif /* __TEE_TZ_PRIV__ */
