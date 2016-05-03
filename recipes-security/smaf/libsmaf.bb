@@ -11,4 +11,4 @@ inherit autotools gettext pkgconfig
 SRC_URI = "git://git.linaro.org/people/benjamin.gaignard/libsmaf.git;protocol=http"
 S = "${WORKDIR}/git"
 
-SRCREV = "8eb643b5ae40b64b64f0c82f915ab278bf7fed18"
+SRCREV = "7d55a5f578d480ee97689f961891a7e9091d6937"
