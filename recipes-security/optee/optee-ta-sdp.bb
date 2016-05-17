@@ -1,7 +1,7 @@
 SUMMARY = "OPTEE SDP trusted application"
 DESCRIPTION = "OPTEE SDP trusted application"
 
-LICENSE = "CLOSED"
+LICENSE = "LGPLv2"
 
 inherit module
 
@@ -9,12 +9,11 @@ PR="r0"
 PV="1.0+git"
 
 SRC_URI = "git://git.linaro.org/people/benjamin.gaignard/optee-sdp.git"
-SRCREV = "2a981c229030a9cc46487ba2c75aa48a5d6413de"
+SRCREV = "a12758b7bda2dd28860c6029c0ffa58fcca85975"
 
 S = "${WORKDIR}/git"
 
 SRC_URI += "file://sync-ta-makefile-with-optee-1.1.0.patch"
-SRC_URI += "file://fix-smaf-structure.patch"
 
 DEPENDS = "optee-client optee-os"
 
