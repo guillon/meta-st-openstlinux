@@ -289,6 +289,9 @@ BUILDHISTORY_COMMIT = "1"
 # clean up working directory after build
 #INHERIT += "rm_work"
 
+# to generate debug image with all symbol
+#IMAGE_GEN_DEBUGFS = "1"
+
 #Meta ST source code location:
 ST_LOCAL_SRC = '${OEROOT}/sources/'
 ST_LOCAL_OE_DOWNLOAD = '${OEROOT}/oe-download'
