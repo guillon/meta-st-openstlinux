@@ -19,15 +19,6 @@ FILES_${PN}-client += "/etc/default/dhcp-client"
 
 FILES_st-dhcp-client += "${systemd_unitdir}/system/st-dhclient.service"
 
-# In case meta-openembedded/meta-systemd layer is used, overrides dhclient.service instruction:
-do_install_prepend() {
-    if [ -f ${WORKDIR}/dhclient.service ]; then
-        sed -i 's/\$INTERFACES/eth0/' ${WORKDIR}/dhclient.service
-    else
-        die "Cannot find 'dhclient.service' file in ${WORKDIR} to apply expected config."
-    fi
-}
-
 do_install_append() {
     install -d ${D}/etc/default/
     install -m 0644 ${WORKDIR}/dhcp-client ${D}/etc/default/
