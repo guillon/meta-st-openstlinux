@@ -34,9 +34,18 @@ IMAGE_DISPLAY_PART = " \
     "
 
 #
+# Optee part addons
+#
+IMAGE_OPTEE_PART = " \
+    ${@base_contains('COMBINED_FEATURES', 'optee', 'packagegroup-optee-core', '', d)} \
+    ${@base_contains('COMBINED_FEATURES', 'optee', 'packagegroup-optee-test', '', d)} \
+    "
+
+#
 # INSTALL addons
 #
 CORE_IMAGE_EXTRA_INSTALL += " \
     ${IMAGE_CORE_PART} \
     ${IMAGE_DISPLAY_PART} \
+    ${IMAGE_OPTEE_PART} \
     "
