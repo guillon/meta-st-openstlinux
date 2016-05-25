@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = "file://${S}/COPYING;md5=6762ed442b3822387a51c92d928ead0d \
 
 SRCBRANCH = "lms-1.6.0"
 SRC_URI = "${ST_GIT_SERVER_URI}/oeivi/oe/multimedia/gstreamer${ST_GIT_SERVER_PROTOCOL};branch=${SRCBRANCH}"
-SRCREV = "4dd8e2225c27af7c026e4e02721addb3823a7c27"
+SRCREV = "e1abe5e25e62ba9432de273f24e6d8da782321cb"
 
 S = "${WORKDIR}/git"
 
