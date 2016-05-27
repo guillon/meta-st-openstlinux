@@ -41,4 +41,8 @@ do_install() {
   install -d ${D}/etc/profile.d
   install -m 0755 ${WORKDIR}/weston_profile.sh ${D}/etc/profile.d/
 
+  if ${@bb.utils.contains('DISTRO_FEATURES','xwayland','true','false',d)}; then
+    # uncomment modules line for support of xwayland
+    sed -i -e 's,#modules=xwayland.so,modules=xwayland.so,g' ${D}/home/root/.config/weston.ini
+  fi
 }

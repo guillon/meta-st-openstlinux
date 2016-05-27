@@ -16,7 +16,6 @@ DEPENDS = "libxkbcommon gdk-pixbuf pixman libdrm cairo glib-2.0 jpeg"
 DEPENDS += "wayland libinput pango"
 
 EXTRA_OECONF = "--enable-setuid-install \
-                --disable-xwayland \
                 --enable-simple-clients \
                 --enable-clients \
                 --enable-demo-clients-install \
@@ -32,6 +31,7 @@ EXTRA_OECONF += " ${@base_contains("DISTRO_FEATURES", "wayland", "${WAYLAND_EXTR
 
 PACKAGECONFIG ??= "${@base_contains('DISTRO_FEATURES', 'wayland', 'kms wayland', '', d)} \
                    ${@base_contains('DISTRO_FEATURES', 'x11', 'x11', '', d)} \
+                   ${@base_contains('DISTRO_FEATURES', 'xwayland', 'xwayland', '', d)} \
                    ${@base_contains('DISTRO_FEATURES', 'opengl', 'egl', '', d)} \
                    ${@base_contains('DISTRO_FEATURES', 'pam', 'launch', '', d)} \
                    ${@base_contains('DISTRO_FEATURES', 'systemd', 'systemd', '', d)} \
@@ -49,6 +49,7 @@ PACKAGECONFIG[capture] = "--enable-display-capture,--disable-display-capture"
 PACKAGECONFIG[wayland] = "--enable-wayland-compositor,--disable-wayland-compositor,virtual/mesa"
 # Weston on X11
 PACKAGECONFIG[x11] = "--enable-x11-compositor,--disable-x11-compositor,virtual/libx11 libxcb libxcb libxcursor cairo"
+PACKAGECONFIG[xwayland] = "--enable-xwayland,--disable-xwayland,virtual/libx11 libxcb libxcursor cairo"
 # Headless Weston
 PACKAGECONFIG[headless] = "--enable-headless-compositor,--disable-headless-compositor"
 # Weston on framebuffer
