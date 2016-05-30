@@ -15,7 +15,7 @@ IMAGE_CORE_PART = " \
     util-linux \
     procps \
     kbd \
-    ${@base_contains('DISTRO_FEATURES', 'systemd', 'dhcp-client st-dhcp-client', '', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'dhcp-client st-dhcp-client', '', d)} \
     usbutils \
     pciutils \
     file \
@@ -29,7 +29,7 @@ IMAGE_CORE_PART = " \
 # Display part addons
 #
 IMAGE_DISPLAY_PART = " \
-    ${@base_contains('DISTRO_FEATURES', 'wayland', 'weston weston-cfg weston-examples', '', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'weston weston-cfg weston-examples', '', d)} \
     fb-test \
     "
 
@@ -37,8 +37,8 @@ IMAGE_DISPLAY_PART = " \
 # Optee part addons
 #
 IMAGE_OPTEE_PART = " \
-    ${@base_contains('COMBINED_FEATURES', 'optee', 'packagegroup-optee-core', '', d)} \
-    ${@base_contains('COMBINED_FEATURES', 'optee', 'packagegroup-optee-test', '', d)} \
+    ${@bb.utils.contains('COMBINED_FEATURES', 'optee', 'packagegroup-optee-core', '', d)} \
+    ${@bb.utils.contains('COMBINED_FEATURES', 'optee', 'packagegroup-optee-test', '', d)} \
     "
 
 #

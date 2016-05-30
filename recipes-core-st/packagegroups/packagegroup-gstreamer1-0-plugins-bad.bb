@@ -51,10 +51,10 @@ PACKAGES = "\
 
 # Default configuration used:
 # PACKAGECONFIG_pn-gstreamer1.0-plugins-bad = " \
-#    ${@base_contains('DISTRO_FEATURES', 'wayland', 'wayland', '', d)} \
-#    ${@base_contains('DISTRO_FEATURES', 'opengl', 'gles2', '', d)} \
-#    ${@base_contains('DISTRO_FEATURES', 'bluetooth', 'bluez', '', d)} \
-#    ${@base_contains('DISTRO_FEATURES', 'directfb', 'directfb', '', d)} \
+#    ${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'wayland', '', d)} \
+#    ${@bb.utils.contains('DISTRO_FEATURES', 'opengl', 'gles2', '', d)} \
+#    ${@bb.utils.contains('DISTRO_FEATURES', 'bluetooth', 'bluez', '', d)} \
+#    ${@bb.utils.contains('DISTRO_FEATURES', 'directfb', 'directfb', '', d)} \
 #    orc curl uvch264 neon \
 #    hls sbc dash bz2 smoothstreaming \
 #    faad faac \

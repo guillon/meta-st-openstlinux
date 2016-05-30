@@ -63,7 +63,7 @@ IMAGE_X11_DISPLAY_PART = "${@bb.utils.contains('DISTRO_FEATURES', 'xwayland', '$
 # Multimedia part addons
 #
 IMAGE_MM_PART = " \
-    ${@base_contains('DISTRO_FEATURES', 'gstreamer', 'packagegroup-gstreamer1-0', '', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'gstreamer', 'packagegroup-gstreamer1-0', '', d)} \
     tiff \
     libv4l \
     rc-keymaps \
@@ -73,8 +73,8 @@ IMAGE_MM_PART = " \
 # INSTALL addons
 #
 CORE_IMAGE_EXTRA_INSTALL += " \
-    ${@base_contains('DISTRO_FEATURES', 'alsa', '${IMAGE_AUDIO_ALSA_PART}', '', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'alsa', '${IMAGE_AUDIO_ALSA_PART}', '', d)} \
     ${IMAGE_DISPLAY_DRM_PART} \
-    ${@base_contains('DISTRO_FEATURES', 'x11', '${IMAGE_X11_DISPLAY_PART}', '', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'x11', '${IMAGE_X11_DISPLAY_PART}', '', d)} \
     ${IMAGE_MM_PART} \
     "

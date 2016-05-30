@@ -27,14 +27,14 @@ EXTRA_OECONF = "--enable-setuid-install \
 #EXTRA_OECONF += "--enable-screen-sharing "
 
 WAYLAND_EXTRA_OECONF ="WAYLAND_SCANNER_CFLAGS=' ' WAYLAND_SCANNER_LIBS=' ' "
-EXTRA_OECONF += " ${@base_contains("DISTRO_FEATURES", "wayland", "${WAYLAND_EXTRA_OECONF}", "", d)} "
+EXTRA_OECONF += " ${@bb.utils.contains("DISTRO_FEATURES", "wayland", "${WAYLAND_EXTRA_OECONF}", "", d)} "
 
-PACKAGECONFIG ??= "${@base_contains('DISTRO_FEATURES', 'wayland', 'kms wayland', '', d)} \
-                   ${@base_contains('DISTRO_FEATURES', 'x11', 'x11', '', d)} \
-                   ${@base_contains('DISTRO_FEATURES', 'xwayland', 'xwayland', '', d)} \
-                   ${@base_contains('DISTRO_FEATURES', 'opengl', 'egl', '', d)} \
-                   ${@base_contains('DISTRO_FEATURES', 'pam', 'launch', '', d)} \
-                   ${@base_contains('DISTRO_FEATURES', 'systemd', 'systemd', '', d)} \
+PACKAGECONFIG ??= "${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'kms wayland', '', d)} \
+                   ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'x11', '', d)} \
+                   ${@bb.utils.contains('DISTRO_FEATURES', 'xwayland', 'xwayland', '', d)} \
+                   ${@bb.utils.contains('DISTRO_FEATURES', 'opengl', 'egl', '', d)} \
+                   ${@bb.utils.contains('DISTRO_FEATURES', 'pam', 'launch', '', d)} \
+                   ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'systemd', '', d)} \
                   "
 #
 # Compositor choices

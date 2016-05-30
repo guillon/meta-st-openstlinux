@@ -15,8 +15,8 @@ S = "${WORKDIR}/git"
 
 PACKAGECONFIG ??= " \
     encoding \
-    ${@base_contains('DISTRO_FEATURES', 'x11', 'x11', '', d)} \
-    ${@base_contains('DISTRO_FEATURES', 'alsa', 'alsa', '', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'x11', '', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'alsa', 'alsa', '', d)} \
     orc ivorbis ogg theora vorbis \
     pango \
      "

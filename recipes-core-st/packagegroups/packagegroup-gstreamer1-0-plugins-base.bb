@@ -28,8 +28,8 @@ PACKAGES = "\
 #
 # Default configuration used:
 #  PACKAGECONFIG_pn-gstreamer1.0-plugins-base = " \
-#      ${@base.contains('DISTRO_FEATURES', 'x11', 'x11', '', d)} \
-#      ${@base_contains('DISTRO_FEATURES', 'alsa', 'alsa', '', d)} \
+#      ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'x11', '', d)} \
+#      ${@bb.utils.contains('DISTRO_FEATURES', 'alsa', 'alsa', '', d)} \
 #      orc ivorbis ogg theora vorbis \
 #      pango encoding \
 #  "

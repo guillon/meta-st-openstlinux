@@ -18,10 +18,10 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=73a5855a8119deb017f5f13cf327095d \
                     file://gst/tta/crc32.h;beginline=12;endline=29;md5=27db269c575d1e5317fffca2d33b3b50"
 
 PACKAGECONFIG ??= " \
-   ${@base_contains('DISTRO_FEATURES', 'wayland', 'wayland', '', d)} \
-   ${@base_contains('DISTRO_FEATURES', 'opengl', 'gles2', '', d)} \
-   ${@base_contains('DISTRO_FEATURES', 'bluetooth', 'bluez', '', d)} \
-   ${@base_contains('DISTRO_FEATURES', 'directfb', 'directfb', '', d)} \
+   ${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'wayland', '', d)} \
+   ${@bb.utils.contains('DISTRO_FEATURES', 'opengl', 'gles2', '', d)} \
+   ${@bb.utils.contains('DISTRO_FEATURES', 'bluetooth', 'bluez', '', d)} \
+   ${@bb.utils.contains('DISTRO_FEATURES', 'directfb', 'directfb', '', d)} \
    orc curl uvch264 neon \
    hls sbc dash bz2 smoothstreaming \
    faac \

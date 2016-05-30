@@ -12,7 +12,7 @@ S = "${WORKDIR}/git"
 
 
 DEPENDS = "jpeg gstreamer1.0-plugins-base"
-DEPENDS += " ${@base_contains('DISTRO_FEATURES', 'x11', 'virtual/libx11', '', d)} "
+DEPENDS += " ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'virtual/libx11', '', d)} "
 
 inherit autotools gettext  pkgconfig
 
