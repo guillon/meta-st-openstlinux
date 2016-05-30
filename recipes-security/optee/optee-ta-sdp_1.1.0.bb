@@ -6,12 +6,14 @@ LICENSE = "LGPLv2"
 inherit module
 
 PR="r0"
-PV="1.0+git"
+PV="1.1.0"
 
 SRC_URI = "git://git.linaro.org/people/benjamin.gaignard/optee-sdp.git"
 SRCREV = "a12758b7bda2dd28860c6029c0ffa58fcca85975"
 
 S = "${WORKDIR}/git"
+
+FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}/${PV}:"
 
 SRC_URI += "file://sync-ta-makefile-with-optee-1.1.0.patch"
 

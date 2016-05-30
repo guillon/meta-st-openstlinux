@@ -1,0 +1,77 @@
+commit 10bfccd7f6baec3caa7bf16d028002287aa24b90
+Author: etienne carriere <etienne.carriere@st.com>
+Date:   Fri May 13 15:41:14 2016 +0200
+
+    fix armv7 mmu level2 mappig issues
+
+diff --git a/core/arch/arm/mm/core_mmu_v7.c b/core/arch/arm/mm/core_mmu_v7.c
+index 50236e5..0f9d3dd 100644
+--- a/core/arch/arm/mm/core_mmu_v7.c
++++ b/core/arch/arm/mm/core_mmu_v7.c
+@@ -150,10 +150,18 @@ enum desc_type {
+ static uint32_t main_mmu_l1_ttb[TEE_MMU_L1_NUM_ENTRIES]
+ 	__attribute__((section(".nozi.mmu.l1"),
+ 		       aligned(TEE_MMU_L1_ALIGNMENT)));
+-static uint32_t main_mmu_l2_ttb[TEE_MMU_L2_NUM_ENTRIES]
++
++/* support for basic not-freeable L2 mmu table allocation */
++#ifndef MAX_XLAT_TABLES
++#define MAX_XLAT_TABLES		1
++#endif
++
++static uint32_t main_mmu_l2_ttb[MAX_XLAT_TABLES][TEE_MMU_L2_NUM_ENTRIES]
+ 	__attribute__((section(".nozi.mmu.l2"),
+ 		       aligned(TEE_MMU_L2_ALIGNMENT)));
+ 
++static unsigned next_xlat __data;
++
+ /* MMU L1 table for TAs, one for each Core */
+ static uint32_t main_mmu_ul1_ttb[CFG_NUM_THREADS][TEE_MMU_UL1_NUM_ENTRIES]
+ 	__attribute__((section(".nozi.mmu.ul1"),
+@@ -187,20 +195,15 @@ static paddr_t core_mmu_get_ul1_ttb_pa(void)
+ 	return pa;
+ }
+ 
+-static void *core_mmu_alloc_l2(struct tee_mmap_region *mm)
++static uint32_t *core_mmu_alloc_l2(void)
+ {
+-	/* Can't have this in .bss since it's not initialized yet */
+-	static size_t l2_offs __attribute__((section(".data")));
+-	const size_t l2_va_size = TEE_MMU_L2_NUM_ENTRIES * SMALL_PAGE_SIZE;
+-	size_t l2_va_space = ((sizeof(main_mmu_l2_ttb) - l2_offs) /
+-			     TEE_MMU_L2_SIZE) * l2_va_size;
+-
+-	if (l2_offs)
+-		return NULL;
+-	if (mm->size > l2_va_space)
+-		return NULL;
+-	l2_offs += ROUNDUP(mm->size, l2_va_size) / l2_va_size;
+-	return main_mmu_l2_ttb;
++	uint32_t *tbl;
++
++	assert(next_xlat < MAX_XLAT_TABLES);
++
++	tbl = main_mmu_l2_ttb[next_xlat++];
++	memset(tbl, 0, TEE_MMU_L2_NUM_ENTRIES * sizeof(uint32_t));
++	return tbl;
+ }
+ 
+ static enum desc_type get_desc_type(unsigned level, uint32_t desc)
+@@ -597,7 +600,7 @@ bool core_mmu_user_mapping_is_active(void)
+ 
+ static paddr_t map_page_memarea(struct tee_mmap_region *mm)
+ {
+-	uint32_t *l2 = core_mmu_alloc_l2(mm);
++	uint32_t *l2 = core_mmu_alloc_l2();
+ 	size_t pg_idx;
+ 	uint32_t attr;
+ 
+@@ -615,7 +618,7 @@ static paddr_t map_page_memarea(struct tee_mmap_region *mm)
+ 	/* Fill in the entries */
+ 	while ((pg_idx * SMALL_PAGE_SIZE) <
+ 		(mm->size + (mm->pa & SECTION_MASK))) {
+-		l2[pg_idx] = ((mm->pa & ~SECTION_MASK) +
++		l2[pg_idx] = ((mm->pa & ~SMALL_PAGE_MASK) +
+ 				pg_idx * SMALL_PAGE_SIZE) | attr;
+ 		pg_idx++;
+ 	}
