@@ -14,7 +14,6 @@ PACKAGES = "packagegroup-optee-core"
 PROVIDES = "${PACKAGES}"
 
 RDEPENDS_packagegroup-optee-core = "\
-    optee-os \
     optee-linuxdriver \
     optee-client \
 "
