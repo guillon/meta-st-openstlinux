@@ -2,6 +2,7 @@ SUMMARY = "OPTEE SDP trusted application"
 DESCRIPTION = "OPTEE SDP trusted application"
 
 LICENSE = "LGPLv2"
+LIC_FILES_CHKSUM = "file://host/smaf-optee.c;beginline=1;endline=7;md5=f065d06d933e001ca619e02b182e6d9d "
 
 inherit module
 
