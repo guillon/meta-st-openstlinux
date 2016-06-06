@@ -31,7 +31,7 @@ IMAGE_X11_SERVER_DISPLAY_PART = " \
     xf86-input-evdev \
     xf86-input-mouse \
     xf86-input-keyboard \
-    xf86-video-armsoc \
+    xf86-video-modesetting \
     xauth \
     xterm \
     xorg-minimal-fonts \
