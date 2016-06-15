@@ -8,7 +8,7 @@ LIC_FILES_CHKSUM = "file://${S}/COPYING;md5=c54ce9345727175ff66d17b67ff51f58 \
 
 SRCBRANCH = "lms-1.6.0"
 SRC_URI = "${ST_GIT_SERVER_URI}/oeivi/oe/multimedia/gst-plugins-base${ST_GIT_SERVER_PROTOCOL};branch=${SRCBRANCH}"
-SRCREV = "ce02e461d7f2b3f3dbe1e86cbeec56e2811c2920"
+SRCREV = "893e6351055c1b74f7cd10cdc529d6224fe0cf0d"
 
 S = "${WORKDIR}/git"
 
