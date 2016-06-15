@@ -54,8 +54,20 @@ WHITELIST_LGPLv3.0 = "${OPENSDK_WHITELIST_GPLv3}"
 WHITELIST_GPL-3.0 = "${OPENSDK_WHITELIST_GPLv3}"
 WHITELIST_GPL-3.0+ = "${OPENSDK_WHITELIST_GPLv3}"
 
-
 #--------------------------
 # Defines how BitBake handles situations where an append file (.bbappend) has no corresponding recipe file (.bb).
 #
 BB_DANGLINGAPPENDS_WARNONLY = "1"
+
+#--------------------------
+# Tune build config display
+#
+BUILDCFG_VARS += "GCCVERSION"
+BUILDCFG_VARS += "PREFERRED_PROVIDER_virtual/kernel"
+BUILDCFG_VARS += "PREFERRED_VERSION_${PREFERRED_PROVIDER_virtual/kernel}"
+
+#--------------------------
+# Writes build information to target filesystem on /etc/build
+#
+IMAGE_BUILDINFO_VARS = "${BUILDCFG_VARS}"
+INHERIT += "image-buildinfo"
