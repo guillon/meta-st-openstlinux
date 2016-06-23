@@ -3,6 +3,9 @@ include recipes-multimedia/gstreamer/gstreamer1.0.inc
 LIC_FILES_CHKSUM = "file://${S}/COPYING;md5=6762ed442b3822387a51c92d928ead0d \
                     file://${S}/gst/gst.h;beginline=1;endline=21;md5=e059138481205ee2c6fc1c079c016d0d"
 
+PV = "st-1.6.0"
+PR = "git${SRCPV}.r0"
+
 SRCBRANCH = "lms-1.6.0"
 SRC_URI = "${ST_GIT_SERVER_URI}/oeivi/oe/multimedia/gstreamer${ST_GIT_SERVER_PROTOCOL};branch=${SRCBRANCH}"
 SRCREV = "e1abe5e25e62ba9432de273f24e6d8da782321cb"
