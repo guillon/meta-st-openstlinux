@@ -7,7 +7,7 @@ inherit autotools pkgconfig useradd
 
 SRCBRANCH = "oe-weston-1_9"
 SRC_URI = "${ST_GIT_SERVER_URI}/oeivi/oe/st/weston${ST_GIT_SERVER_PROTOCOL};branch=${SRCBRANCH}"
-SRCREV = "61874566fe7302c641e0336da478a9c0cecdeff8"
+SRCREV = "ad92910364d22fb7184ca37903a835aa8ea45985"
 
 S = "${WORKDIR}/git"
 
