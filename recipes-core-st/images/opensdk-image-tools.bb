@@ -26,10 +26,8 @@ SUMMARY = "OpenSDK multimedia image plus some dev tools."
 # Kernel tools part addons
 #
 IMAGE_TOOLS_KERNEL_PART += " \
-    perf            \
     strace          \
     trace-cmd       \
-    perf            \
     \
     cpuburn-neon    \
     memtester       \
