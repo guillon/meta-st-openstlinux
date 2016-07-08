@@ -3,20 +3,15 @@
 #--------------------------
 # Mirror settings
 #
-PREMIRRORS ??= "\
-bzr://.*/.*   http://downloads.yoctoproject.org/mirror/sources/ \n \
-cvs://.*/.*   http://downloads.yoctoproject.org/mirror/sources/ \n \
-git://.*/.*   http://downloads.yoctoproject.org/mirror/sources/ \n \
-gitsm://.*/.* http://downloads.yoctoproject.org/mirror/sources/ \n \
-hg://.*/.*    http://downloads.yoctoproject.org/mirror/sources/ \n \
-osc://.*/.*   http://downloads.yoctoproject.org/mirror/sources/ \n \
-p4://.*/.*    http://downloads.yoctoproject.org/mirror/sources/ \n \
-svn://.*/.*   http://downloads.yoctoproject.org/mirror/sources/ \n"
+YOCTOPROJECT_MIRROR_URL = "http://downloads.yoctoproject.org/mirror/sources/"
 
 MIRRORS =+ "\
-ftp://.*/.*      http://downloads.yoctoproject.org/mirror/sources/ \n \
-http://.*/.*     http://downloads.yoctoproject.org/mirror/sources/ \n \
-https://.*/.*    http://downloads.yoctoproject.org/mirror/sources/ \n"
+ftp://.*/.*    ${YOCTOPROJECT_MIRROR_URL} \n \
+http://.*/.*   ${YOCTOPROJECT_MIRROR_URL} \n \
+https://.*/.*  ${YOCTOPROJECT_MIRROR_URL} \n"
+
+INHERIT += "own-mirrors"
+SOURCE_MIRROR_URL ??= "${YOCTOPROJECT_MIRROR_URL}"
 
 #--------------------------
 # The CONNECTIVITY_CHECK_URI's are used to test whether we can succesfully
