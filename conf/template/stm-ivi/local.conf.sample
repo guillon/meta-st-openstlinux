@@ -294,5 +294,3 @@ BUILDHISTORY_COMMIT = "1"
 
 #Meta ST source code location:
 ST_LOCAL_SRC = '${OEROOT}/sources/'
-
-PRSERV_HOST = "localhost:0"
