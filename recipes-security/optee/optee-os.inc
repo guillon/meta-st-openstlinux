@@ -7,7 +7,6 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=69663ab153298557a59c67a60a743e5b"
 inherit deploy
 
 SRC_URI = "git://github.com/OP-TEE/optee_os.git"
-SRCREV = "c5bbfb4de5de0f0e82939e7c51b1f99586a9f212"
 
 S = "${WORKDIR}/git"
 
@@ -16,6 +15,10 @@ DEPENDS = "virtual/kernel"
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 OPTEE_PLATFORM ?= "vexpress"
+
+TEE_IMAGE_BASE_NAME = "tee-${MACHINE}-${DATETIME}"
+# Don't include the DATETIME variable in the sstate package signatures
+TEE_IMAGE_BASE_NAME[vardepsexclude] = "DATETIME"
 
 EXTRA_OEMAKE = "CROSS_COMPILE=${TARGET_PREFIX}"
 EXTRA_OEMAKE += "ARCH=${TARGET_ARCH}"
@@ -35,7 +38,7 @@ do_install() {
 
 do_deploy() {
     install -d ${DEPLOYDIR}/boot
-    install -m 644 ${B}/out/${TARGET_ARCH}-plat-${OPTEE_PLATFORM}/core/tee.bin ${DEPLOYDIR}/boot/tee-${MACHINE}-${DATETIME}.bin
+    install -m 644 ${B}/out/${TARGET_ARCH}-plat-${OPTEE_PLATFORM}/core/tee.bin ${DEPLOYDIR}/boot/${TEE_IMAGE_BASE_NAME}.bin
 }
 addtask deploy before do_build after do_install
 
