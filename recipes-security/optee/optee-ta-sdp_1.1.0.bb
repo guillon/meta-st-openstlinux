@@ -6,8 +6,8 @@ LIC_FILES_CHKSUM = "file://host/smaf-optee.c;beginline=1;endline=7;md5=f065d06d9
 
 inherit module
 
-PR="r0"
-PV="1.1.0"
+PR = "git${SRCPV}.r0"
+PV = "1.1.0"
 
 SRC_URI = "git://git.linaro.org/people/benjamin.gaignard/optee-sdp.git"
 SRCREV = "a12758b7bda2dd28860c6029c0ffa58fcca85975"

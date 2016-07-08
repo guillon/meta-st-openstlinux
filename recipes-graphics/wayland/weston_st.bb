@@ -9,8 +9,10 @@ SRCBRANCH = "oe-weston-1_9"
 SRC_URI = "${ST_GIT_SERVER_URI}/oeivi/oe/st/weston${ST_GIT_SERVER_PROTOCOL};branch=${SRCBRANCH}"
 SRCREV = "ad92910364d22fb7184ca37903a835aa8ea45985"
 
-S = "${WORKDIR}/git"
+PV = "st-1.9.0"
+PR = "git${SRCPV}.r0"
 
+S = "${WORKDIR}/git"
 
 DEPENDS = "libxkbcommon gdk-pixbuf pixman libdrm cairo glib-2.0 jpeg"
 DEPENDS += "wayland libinput pango"
