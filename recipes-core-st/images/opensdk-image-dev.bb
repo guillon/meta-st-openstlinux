@@ -1,21 +1,14 @@
-require opensdk-image-mm.bb
+require opensdk-image-tools.bb
 
-SUMMARY = "OpenSDK multimedia image plus some dev tools."
-
-IMAGE_FEATURES += "tools-sdk"
+SUMMARY = "OpenSDK tools image plus dev tools and modules (i.e. opensdk-image-tools + dev)."
 
 #
 # Dev-tools part addons
 #
 IMAGE_DEVTOOLS_PART += " \
-    perf \
-    strace \
-    trace-cmd \
     gstreamer1.0-devtools \
-    i2c-tools \
     v4l-utils \
     smcroute \
-    bridge-utils \
     "
 
 #
@@ -39,8 +32,6 @@ IMAGE_DVB-APPS_PART += " \
 # Networking part addons
 #
 IMAGE_NETWORKING_PART += " \
-    iperf \
-    tcpdump \
     net-snmp-client \
     net-snmp-libs \
     net-snmp-mibs \

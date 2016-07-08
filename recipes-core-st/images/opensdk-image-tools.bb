@@ -1,6 +1,6 @@
 require opensdk-image-mm.bb
 
-SUMMARY = "OpenSDK multimedia image plus some dev tools."
+SUMMARY = "OpenSDK multimedia image with additional tools (i.e. opensdk-image-image + tools)."
 
 # Tools alreay installed by opensdk-image-core
 # generic:
