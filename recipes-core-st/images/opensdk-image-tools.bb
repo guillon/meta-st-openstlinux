@@ -95,7 +95,6 @@ IMAGE_TOOLS_BUS_PART += " \
 IMAGE_TOOLS_FS_PART += " \
     dosfstools      \
     mmc-utils       \
-    nfs-utils       \
     blktool         \
     blktrace        \
     "
