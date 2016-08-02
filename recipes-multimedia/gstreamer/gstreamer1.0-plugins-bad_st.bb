@@ -5,9 +5,9 @@ include recipes-multimedia/gstreamer/gstreamer1.0-plugins-bad.inc
 PV = "st-1.8.0"
 PR = "git${SRCPV}.r0"
 
-SRCBRANCH = "lms-1.8.0"
+SRCBRANCH = "iso/lms-1.8.0_wayland-protocol"
 SRC_URI = "${ST_GIT_SERVER_URI}/oeivi/oe/multimedia/gst-plugins-bad${ST_GIT_SERVER_PROTOCOL};branch=${SRCBRANCH}"
-SRCREV = "0cc48c81d5aac0bd7baee81023ae3af13cb7cc24"
+SRCREV = "24edd73f75a3517c8ef7e33315e26a2c82cf91e5"
 
 S = "${WORKDIR}/git"
 
