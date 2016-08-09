@@ -31,8 +31,6 @@ PACKAGECONFIG[v4l2]       = "--enable-gst_v4l2,--disable-gst_v4l2"
 PACKAGECONFIG[vpx]        = "--enable-vpx,--disable-vpx,libvpx"
 PACKAGECONFIG[wavpack]    = "--enable-wavpack,--disable-wavpack,wavpack"
 PACKAGECONFIG[x11]        = "--enable-x,--disable-x,${X11DEPENDS}"
-PACKAGECONFIG[v4l2-probe] = "--enable-v4l2-probe,--disable-v4l2-probe,"
-
 
 EXTRA_OECONF += " \
     --enable-bz2 \

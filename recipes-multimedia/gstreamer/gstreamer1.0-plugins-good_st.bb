@@ -19,8 +19,12 @@ PACKAGECONFIG ??= " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'pulseaudio', 'pulseaudio', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'x11', '', d)} \
     cairo flac gdk-pixbuf gudev jpeg libpng orc soup speex taglib v4l2 \
-    v4l2-probe \
 "
+
+EXTRA_OECONF += " \
+    --enable-v4l2-probe \
+"
+
 
 
 do_configure_prepend() {
