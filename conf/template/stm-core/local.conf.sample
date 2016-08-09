@@ -72,7 +72,7 @@ MACHINE ??= "qemux86"
 # Ultimately when creating custom policy, people will likely end up subclassing
 # these defaults.
 #
-#DISTRO ?= "defaultsetup"
+DISTRO = "stm-core"
 
 #
 # Where to place downloads
