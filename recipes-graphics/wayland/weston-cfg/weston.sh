@@ -22,6 +22,30 @@
 mkdir -p $XDG_RUNTIME_DIR
 chmod 0700 $XDG_RUNTIME_DIR
 
+# psplash management
+case "$1" in
+  start)
+     PSPLASH_PID=`pgrep psplash`
+     if [ ! -z $PSPLASH_PID ]; then
+        echo -n "Stop psplash: "
+        /usr/bin/psplash-write QUIT
+        #kill -9 $PSPLASH_PID
+        echo "done."
+     fi
+     PSPLASH_PID=`pgrep psplash-drm`
+     if [ ! -z $PSPLASH_PID ]; then
+        echo -n "Stop psplash: "
+        echo QUIT > /tmp/splash_fifo
+        #kill -9 $PSPLASH_PID
+        echo "done."
+     fi
+
+     ;;
+   *)
+    ;;
+esac
+
+
 #log file managment on weston CMD line
 CMD_LINE_WESTON=""
 if [ -z $LOG_FILE ];
@@ -54,6 +78,10 @@ fi
 # See how we were called.
 case "$1" in
   start)
+    if [ ! -z $LOG_FILE ];
+    then
+       echo "[SERVICE] start.........." >> $LOG_FILE
+    fi
     echo "Starting Weston"
     if [ -n "$DEBUG_OPENGL_VIA_OPENVT" ];
     then
@@ -68,11 +96,16 @@ EOF
     else
         echo "/usr/bin/weston $CMD_LINE_WESTON"
         openvt -s -w -- /usr/bin/weston $CMD_LINE_WESTON
+#        weston --tty=1 $CMD_LINE_WESTON
     fi
     ;;
 
   stop)
     echo "Stopping Weston"
+    if [ ! -z $LOG_FILE ];
+    then
+       echo "[SERVICE] stop.........." >> $LOG_FILE
+    fi
     pid_weston=`pidof weston`
     kill -9 $pid_weston
     ;;
