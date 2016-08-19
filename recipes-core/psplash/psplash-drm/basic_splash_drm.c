@@ -517,7 +517,7 @@ splash_processing ()
     struct timeval tv;
     char          *end;
     char           command[2048];
-    int            timeout = 15; //2 sec
+    int            timeout = 2; //2 sec
 
     tv.tv_sec = timeout;
     tv.tv_usec = 0;
