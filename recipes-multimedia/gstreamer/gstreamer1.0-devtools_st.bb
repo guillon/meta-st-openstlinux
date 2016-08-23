@@ -9,12 +9,12 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=a6f89e2100d9b6cdffcea4f398e37343"
 
 inherit autotools gettext
 
-PV = "st-1.6.0"
+PV = "st-1.8.0"
 PR = "git${SRCPV}.r0"
 
-SRCBRANCH = "lms-1.6.0"
+SRCBRANCH = "lms-1.8.0"
 SRC_URI = "${ST_GIT_SERVER_URI}/oeivi/oe/multimedia/gst-devtools${ST_GIT_SERVER_PROTOCOL};branch=${SRCBRANCH}"
-SRCREV = "9cbed031506423680b8773c6017f394bfd66d47b"
+SRCREV = "1f1cf2f1139c175945a33e34ed1b051b21a594ff"
 
 S = "${WORKDIR}/git/validate"
 B = "${S}"
