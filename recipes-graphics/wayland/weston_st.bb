@@ -6,7 +6,11 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=d79ee9e66bb0f95d3386a7acae780b70 \
 
 SRCBRANCH = "oe-weston-1_11"
 SRC_URI = "${ST_GIT_SERVER_URI}/oeivi/oe/st/weston${ST_GIT_SERVER_PROTOCOL};branch=${SRCBRANCH}"
-SRCREV = "044d89b68981b797ee6179a8755b723a8ac09f44"
+SRCREV = "3f95c8efbbdb861cc3bdb56b171e543fdb17489c"
+
+SRC_URI += "file://weston.desktop"
+SRC_URI += "file://weston.png"
+SRC_URI += "file://xwayland.weston-start"
 
 PV = "st-1.11.0"
 PR = "git${SRCPV}.r0"
