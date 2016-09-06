@@ -8,6 +8,11 @@ def _run(cmd, cwd=''):
 python __anonymous () {
     if bb.data.inherits_class('externalsrc', d):
         srcpath = d.getVar('EXTERNALSRC', True)
+        # Update scrpath to .git root folder
+        while not os.path.exists(os.path.join(srcpath, '.git')):
+            srcpath = os.path.realpath(os.path.join(srcpath, os.pardir))
+            if srcpath == "/":
+                bb.fatal("Cannot find .git folder for in %s" % d.getVar('EXTERNALSRC', True))
         if not os.path.isfile(os.path.join(srcpath, '.git/hooks/commit-msg')):
             # Check if module relies on ST gerrit server to host source
             cmd = d.expand('echo ${SRC_URI} | grep "git://gerrit.st.com"')
