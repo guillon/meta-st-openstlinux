@@ -58,7 +58,7 @@ IMAGE_X11_XWAYLAND_DISPLAY_PART = " \
     xeyes \
     xclock \
     "
-IMAGE_X11_DISPLAY_PART = "${@bb.utils.contains('DISTRO_FEATURES', 'xwayland', '${IMAGE_X11_XWAYLAND_DISPLAY_PART}', '${IMAGE_X11_SERVER_DISPLAY_PART}', d)}"
+IMAGE_X11_DISPLAY_PART = "${@bb.utils.contains('DISTRO_FEATURES', 'x11 wayland', '${IMAGE_X11_XWAYLAND_DISPLAY_PART}', '${IMAGE_X11_SERVER_DISPLAY_PART}', d)}"
 #
 # Multimedia part addons
 #
