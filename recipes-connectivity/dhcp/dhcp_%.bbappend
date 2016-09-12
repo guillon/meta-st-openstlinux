@@ -11,7 +11,7 @@ SYSTEMD_AUTO_ENABLE_dhcp-client = "disable"
 
 SYSTEMD_PACKAGES += "st-dhcp-client"
 SYSTEMD_SERVICE_st-dhcp-client = "st-dhclient.service"
-SYSTEMD_AUTO_ENABLE_st-dhcp-client = "disable"
+SYSTEMD_AUTO_ENABLE_st-dhcp-client = "enable"
 
 PACKAGES += "st-dhcp-client"
 
