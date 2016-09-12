@@ -22,6 +22,7 @@ IMAGE_CORE_PART = " \
     bc \
     coreutils\
     e2fsprogs \
+    e2fsprogs-resize2fs \
     sysstat \
     ${@bb.utils.contains('DISTRO_FEATURES', 'bluetooth', 'bluez5', '', d)} \
     "
