@@ -50,11 +50,6 @@ WHITELIST_GPL-3.0 = "${OPENSDK_WHITELIST_GPLv3}"
 WHITELIST_GPL-3.0+ = "${OPENSDK_WHITELIST_GPLv3}"
 
 #--------------------------
-# Defines how BitBake handles situations where an append file (.bbappend) has no corresponding recipe file (.bb).
-#
-BB_DANGLINGAPPENDS_WARNONLY = "1"
-
-#--------------------------
 # Tune build config display
 #
 BUILDCFG_VARS += "GCCVERSION"
