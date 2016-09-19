@@ -1,4 +1,4 @@
-#@DESCRIPTION: STM default distro providers
+#@DESCRIPTION: ST default distro providers
 
 PREFERRED_PROVIDER_libevent = "libevent-fb"
 PREFERRED_PROVIDER_jpeg = "libjpeg-turbo"

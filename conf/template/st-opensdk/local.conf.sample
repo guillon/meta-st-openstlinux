@@ -72,7 +72,7 @@ MACHINE ??= "qemux86"
 # Ultimately when creating custom policy, people will likely end up subclassing
 # these defaults.
 #
-DISTRO = "stm-core"
+DISTRO = "st-opensdk"
 
 #
 # Where to place downloads

@@ -72,7 +72,7 @@ MACHINE ??= "qemux86"
 # Ultimately when creating custom policy, people will likely end up subclassing
 # these defaults.
 #
-DISTRO = "stm-ivi"
+DISTRO = "st-core"
 
 #
 # Where to place downloads
@@ -128,7 +128,7 @@ DISTRO = "stm-ivi"
 #  - 'package_rpm' for rpm style packages
 # E.g.: PACKAGE_CLASSES ?= "package_rpm package_deb package_ipk"
 # We default to ipk:
-PACKAGE_CLASSES ?= "package_ipk"
+PACKAGE_CLASSES ?= "package_deb"
 
 #
 # SDK/ADT target architecture

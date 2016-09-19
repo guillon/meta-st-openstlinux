@@ -48,22 +48,22 @@ BBLAYERS += "${@'${OEROOT}/meta-qt5' if os.path.isfile('${OEROOT}/meta-qt5/conf/
 BBLAYERS += '${OEROOT}/meta-st/meta-st-framework'
 
 # specific to st bootloader
-BBLAYERS += "${@'${OEROOT}/meta-st/meta-bootloader' if os.path.isfile('${OEROOT}/meta-st/meta-bootloader/conf/layer.conf') else ''}"
+BBLAYERS += "${@'${OEROOT}/meta-st/meta-st-bootloader' if os.path.isfile('${OEROOT}/meta-st/meta-st-bootloader/conf/layer.conf') else ''}"
 
 # specific to st st-mm-oxford
-BBLAYERS += "${@'${OEROOT}/meta-st/meta-oxford' if os.path.isfile('${OEROOT}/meta-st/meta-oxford/conf/layer.conf') else ''}"
+BBLAYERS += "${@'${OEROOT}/meta-st/meta-st-oxford' if os.path.isfile('${OEROOT}/meta-st/meta-st-oxford/conf/layer.conf') else ''}"
 
 # specific to st st dev
-BBLAYERS += "${@'${OEROOT}/meta-st/meta-dev' if os.path.isfile('${OEROOT}/meta-st/meta-dev/conf/layer.conf') else ''}"
+BBLAYERS += "${@'${OEROOT}/meta-st/meta-st-dev' if os.path.isfile('${OEROOT}/meta-st/meta-st-dev/conf/layer.conf') else ''}"
 
 # specific to st st adas
-BBLAYERS += "${@'${OEROOT}/meta-st/meta-adas' if os.path.isfile('${OEROOT}/meta-st/meta-adas/conf/layer.conf') else ''}"
+BBLAYERS += "${@'${OEROOT}/meta-st/meta-st-adas' if os.path.isfile('${OEROOT}/meta-st/meta-st-adas/conf/layer.conf') else ''}"
 
 # specific to st st demo
-BBLAYERS += "${@'${OEROOT}/meta-st/meta-demo' if os.path.isfile('${OEROOT}/meta-st/meta-demo/conf/layer.conf') else ''}"
+BBLAYERS += "${@'${OEROOT}/meta-st/meta-st-demo' if os.path.isfile('${OEROOT}/meta-st/meta-st-demo/conf/layer.conf') else ''}"
 
 # specific to st st mali400
-BBLAYERS += "${@'${OEROOT}/meta-st/meta-mali400' if os.path.isfile('${OEROOT}/meta-st/meta-mali400/conf/layer.conf') else ''}"
+BBLAYERS += "${@'${OEROOT}/meta-st/meta-st-mali400' if os.path.isfile('${OEROOT}/meta-st/meta-st-mali400/conf/layer.conf') else ''}"
 
 # specific to st st gcnano
-BBLAYERS += "${@'${OEROOT}/meta-st/meta-gcnano' if os.path.isfile('${OEROOT}/meta-st/meta-gcnano/conf/layer.conf') else ''}"
+BBLAYERS += "${@'${OEROOT}/meta-st/meta-st-gcnano' if os.path.isfile('${OEROOT}/meta-st/meta-st-gcnano/conf/layer.conf') else ''}"

@@ -1,4 +1,4 @@
-#@DESCRIPTION: STM default distro rules
+#@DESCRIPTION: ST default distro rules
 
 #--------------------------
 # Mirror settings
