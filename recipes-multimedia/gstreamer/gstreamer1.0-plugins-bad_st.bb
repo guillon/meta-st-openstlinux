@@ -2,12 +2,12 @@ DEFAULT_PREFERENCE = "-1"
 
 include recipes-multimedia/gstreamer/gstreamer1.0-plugins-bad.inc
 
-PV = "st-1.6.0"
+PV = "st-1.8.0"
 PR = "git${SRCPV}.r0"
 
-SRCBRANCH = "lms-1.6.0"
+SRCBRANCH = "lms-1.8.0"
 SRC_URI = "${ST_GIT_SERVER_URI}/oeivi/oe/multimedia/gst-plugins-bad${ST_GIT_SERVER_PROTOCOL};branch=${SRCBRANCH}"
-SRCREV = "41c9a461c6e787db9f4e7b3f612c6d52a4b1937c"
+SRCREV = "0cc48c81d5aac0bd7baee81023ae3af13cb7cc24"
 
 S = "${WORKDIR}/git"
 
@@ -27,7 +27,7 @@ PACKAGECONFIG ??= " \
    ${@bb.utils.contains('DISTRO_FEATURES', 'directfb', 'directfb', '', d)} \
    orc curl uvch264 neon \
    hls sbc dash bz2 smoothstreaming \
-   faac \
+   faac sndfile \
    libsmaf \
    "
 

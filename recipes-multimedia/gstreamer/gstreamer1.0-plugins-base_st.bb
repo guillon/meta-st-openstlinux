@@ -5,12 +5,12 @@ include recipes-multimedia/gstreamer/gstreamer1.0-plugins-base.inc
 LIC_FILES_CHKSUM = "file://${S}/COPYING;md5=c54ce9345727175ff66d17b67ff51f58 \
                     file://${S}/COPYING.LIB;md5=6762ed442b3822387a51c92d928ead0d"
 
-PV = "st-1.6.0"
+PV = "st-1.8.0"
 PR = "git${SRCPV}.r0"
 
-SRCBRANCH = "lms-1.6.0"
+SRCBRANCH = "lms-1.8.0"
 SRC_URI = "${ST_GIT_SERVER_URI}/oeivi/oe/multimedia/gst-plugins-base${ST_GIT_SERVER_PROTOCOL};branch=${SRCBRANCH}"
-SRCREV = "893e6351055c1b74f7cd10cdc529d6224fe0cf0d"
+SRCREV = "9fe382b41be4f6c0ca2770c57a02e86405a86bee"
 
 S = "${WORKDIR}/git"
 
