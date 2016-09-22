@@ -1,5 +1,8 @@
 DEFAULT_PREFERENCE = "-1"
 
+SUMMARY = "Weston, a Wayland compositor"
+DESCRIPTION = "Weston is the reference implementation of a Wayland compositor"
+
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d79ee9e66bb0f95d3386a7acae780b70 \
                     file://src/compositor.c;endline=23;md5=1d535fed266cf39f6d8c0647f52ac331"

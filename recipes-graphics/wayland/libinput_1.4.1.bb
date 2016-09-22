@@ -10,14 +10,14 @@ DEPENDS = "libevdev udev mtdev"
 SRC_URI = "http://www.freedesktop.org/software/${BPN}/${BP}.tar.xz \
            file://touchpad-serial-synaptics-need-to-fake-new-touches-on-TRIPLETAP.patch \
 "
-
-SRC_URI[md5sum] = "f390e592aa09f77dabceabeb2ddd4419"
-SRC_URI[sha256sum] = "482fb35119b457ba65a8bebaa47e4f6b4dbd77e59c320014a22296847b7ff99e"
+SRC_URI[md5sum] = "2e7ba577ed74d8d1baeb07dbd4fb912a"
+SRC_URI[sha256sum] = "26e7b3ab499358caba499705680ea7e5851af2bd37dc32f2be64181610d6392a"
 
 inherit autotools pkgconfig
 
 PACKAGECONFIG ??= ""
 PACKAGECONFIG[libunwind] = "--with-libunwind,--without-libunwind,libunwind"
+PACKAGECONFIG[libwacom] = "--enable-libwacom,--disable-libwacom,libwacom"
 PACKAGECONFIG[gui] = "--enable-event-gui,--disable-event-gui,cairo gtk+3"
 
 FILES_${PN} += "${libdir}/udev/"
