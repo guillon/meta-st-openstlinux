@@ -13,6 +13,10 @@ S = "${WORKDIR}/${PNREAL}-${PV}"
 
 inherit autotools pkgconfig
 
-FILES_${PN}     += "${libdir}/gstreamer-1.0"
-FILES_${PN}-dev += "${libdir}/gstreamer-1.0/*.la"
-FILES_${PN}-dbg += "${libdir}/gstreamer-1.0/.debug"
+# Starting with 1.8.0 gst-rtsp-server includes dependency-less plugins as well
+LIBV = "1.0"
+require gst-plugins-package.inc
+
+#FILES_${PN}     += "${libdir}/gstreamer-1.0"
+#FILES_${PN}-dev += "${libdir}/gstreamer-1.0/*.la"
+#FILES_${PN}-dbg += "${libdir}/gstreamer-1.0/.debug"

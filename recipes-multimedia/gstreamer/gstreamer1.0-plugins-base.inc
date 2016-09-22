@@ -1,17 +1,18 @@
-require recipes-multimedia/gstreamer/gstreamer1.0-plugins.inc
+require gstreamer1.0-plugins.inc
 
 LICENSE = "GPLv2+ & LGPLv2+"
 
-DEPENDS += "freetype iso-codes util-linux zlib"
+DEPENDS += "iso-codes util-linux zlib"
 
 inherit gettext
 
 PACKAGES_DYNAMIC =+ "^libgst.*"
 
 PACKAGECONFIG ??= " \
+    ${GSTREAMER_ORC} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'alsa', 'alsa', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'x11', '', d)} \
-    ivorbis ogg orc pango theora vorbis \
+    ivorbis ogg pango theora vorbis \
 "
 
 X11DEPENDS = "virtual/libx11 libsm libxrender libxv"
@@ -22,6 +23,7 @@ PACKAGECONFIG[alsa]         = "--enable-alsa,--disable-alsa,alsa-lib"
 PACKAGECONFIG[cdparanoia]   = "--enable-cdparanoia,--disable-cdparanoia,cdparanoia"
 PACKAGECONFIG[ivorbis]      = "--enable-ivorbis,--disable-ivorbis,tremor"
 PACKAGECONFIG[ogg]          = "--enable-ogg,--disable-ogg,libogg"
+PACKAGECONFIG[opus]         = "--enable-opus,--disable-opus,libopus"
 PACKAGECONFIG[pango]        = "--enable-pango,--disable-pango,pango"
 PACKAGECONFIG[theora]       = "--enable-theora,--disable-theora,libtheora"
 PACKAGECONFIG[visual]       = "--enable-libvisual,--disable-libvisual,libvisual"
@@ -36,4 +38,3 @@ CACHED_CONFIGUREVARS_append_x86 = " ac_cv_header_emmintrin_h=no ac_cv_header_xmm
 
 FILES_${MLPREFIX}libgsttag-1.0 += "${datadir}/gst-plugins-base/1.0/license-translations.dict"
 
-FILES_${PN}-dbg = "${libdir}/gstreamer-1.0/.debug ${bindir}/.debug ${libdir}/.debug"

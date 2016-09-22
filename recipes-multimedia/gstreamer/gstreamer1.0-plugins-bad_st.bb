@@ -1,6 +1,6 @@
 DEFAULT_PREFERENCE = "-1"
 
-include recipes-multimedia/gstreamer/gstreamer1.0-plugins-bad.inc
+include gstreamer1.0-plugins-bad.inc
 
 PV = "st-1.8.0"
 PR = "git${SRCPV}.r0"
