@@ -28,7 +28,13 @@ do_install_append () {
     install -m 0555 -C ${S}/data/scenarios/*.scenario ${D}/usr/share/gstreamer-1.0/validate/scenarios
 }
 
-FILES_${PN} += "/usr/share/gstreamer-1.0/* /usr/lib/gstreamer-1.0/validate/* /usr/lib/gst-validate-launcher"
+FILES_${PN} += "${datadir}/gstreamer-1.0/*"
+FILES_${PN} += "${libdir}/gstreamer-1.0/*"
+FILES_${PN} += "${libdir}/gst-validate-launcher"
+
 FILES_${PN}-dbg += "${libdir}/gstreamer-1.0/validate/.debug"
+FILES_${PN}-dbg += "${libdir}/gstreamer-1.0/.debug"
+
+FILES_${PN}-dev += "${libdir}/gstreamer-1.0/*.so"
 
 RDEPENDS_${PN} += "python python-netclient python-io python-stringold python-shell python-subprocess python-fcntl python-misc python-xml"
