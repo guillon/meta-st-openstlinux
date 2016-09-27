@@ -14,7 +14,7 @@ PR = "git${SRCPV}.r0"
 
 SRCBRANCH = "lms-1.8.0"
 SRC_URI = "${ST_GIT_SERVER_URI}/oeivi/oe/multimedia/gst-devtools${ST_GIT_SERVER_PROTOCOL};branch=${SRCBRANCH}"
-SRCREV = "1f1cf2f1139c175945a33e34ed1b051b21a594ff"
+SRCREV = "a08806a6ae8f29e3952182840b3f48597a87e483"
 
 S = "${WORKDIR}/git/validate"
 B = "${S}"
