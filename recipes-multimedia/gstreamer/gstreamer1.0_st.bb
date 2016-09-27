@@ -8,7 +8,7 @@ PR = "git${SRCPV}.r0"
 
 SRCBRANCH = "lms-1.8.0"
 SRC_URI = "${ST_GIT_SERVER_URI}/oeivi/oe/multimedia/gstreamer${ST_GIT_SERVER_PROTOCOL};branch=${SRCBRANCH}"
-SRCREV = "1c5c2df33554f866ae5c779676423918ddac7485"
+SRCREV = "ea7219842ef1b4f51e86547c1cfcac6bb2409342"
 
 S = "${WORKDIR}/git"
 
