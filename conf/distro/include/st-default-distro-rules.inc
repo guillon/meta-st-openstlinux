@@ -50,6 +50,12 @@ WHITELIST_GPL-3.0 = "${OPENSDK_WHITELIST_GPLv3}"
 WHITELIST_GPL-3.0+ = "${OPENSDK_WHITELIST_GPLv3}"
 
 #--------------------------
+# Package configuration
+#
+# Force the gpl functionnality usage for libav
+PACKAGECONFIG_pn-gstreamer1.0-libav = " gpl "
+
+#--------------------------
 # Tune build config display
 #
 BUILDCFG_VARS += "GCCVERSION"
