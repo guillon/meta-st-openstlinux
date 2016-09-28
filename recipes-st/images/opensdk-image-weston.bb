@@ -1,14 +1,14 @@
-SUMMARY = "OpenSDK multimedia image based on X11."
+SUMMARY = "OpenSDK weston image with basic Wayland support (if enable in distro)."
 LICENSE = "MIT"
 
 inherit core-image distro_features_check
 
 # let's make sure we have a good image..
-REQUIRED_DISTRO_FEATURES = "x11"
+REQUIRED_DISTRO_FEATURES = "wayland"
 
 IMAGE_LINGUAS = "en-gb"
 
-IMAGE_FEATURES += "splash package-management x11-base x11-sato ssh-server-dropbear hwcodecs"
+IMAGE_FEATURES += "splash package-management ssh-server-dropbear hwcodecs"
 
 #
 # Multimedia part addons
@@ -24,17 +24,17 @@ IMAGE_MM_PART = " \
 # Display part addons
 #
 IMAGE_DISPLAY_PART = " \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'weston weston-cfg weston-examples', '', d)} \
     fb-test         \
     libdrm          \
     libdrm-tests    \
     "
 
 #
-# Display part addons: X11
+# Display part addons: X11 via Xwayland
 #
-IMAGE_X11_DISPLAY_PART = " \
-    x11-common \
-    xf86-video-modesetting \
+IMAGE_X11_XWAYLAND_DISPLAY_PART = " \
+    xserver-xorg-xwayland \
     xkbcomp \
     libxcb \
     libxcursor \
@@ -49,17 +49,12 @@ IMAGE_X11_DISPLAY_PART = " \
     xorg-minimal-fonts \
     xinit \
     tslib-calibrate \
-    \
-    encodings \
-    font-alias \
-    font-util \
-    mkfontdir \
-    mkfontscale \
-    \
-    libxkbfile \
-    \
-    pcmanfm \
     "
+
+IMAGE_X11_DISPLAY_PART = " \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'x11 wayland', '${IMAGE_X11_XWAYLAND_DISPLAY_PART}', '', d)} \
+    "
+
 
 #
 # Optee part addons
@@ -79,8 +74,6 @@ CORE_IMAGE_EXTRA_INSTALL += " \
     packagegroup-framework-tools-kernel  \
     packagegroup-framework-tools-network \
     packagegroup-framework-tools-audio   \
-    \
-    packagegroup-core-x11-sato-games     \
     \
     ${IMAGE_DISPLAY_PART}               \
     ${IMAGE_MM_PART}                    \
