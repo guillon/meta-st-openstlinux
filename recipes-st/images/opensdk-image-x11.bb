@@ -33,19 +33,16 @@ IMAGE_DISPLAY_PART = " \
 # Display part addons: X11
 #
 IMAGE_X11_DISPLAY_PART = " \
-    x11-common \
     xf86-video-modesetting \
     xkbcomp \
     libxcb \
     libxcursor \
-    xf86-input-evdev \
     xf86-input-mouse \
     xf86-input-keyboard \
     xterm \
     xinput \
     xeyes \
     xclock \
-    xauth \
     xorg-minimal-fonts \
     xinit \
     tslib-calibrate \
@@ -57,8 +54,6 @@ IMAGE_X11_DISPLAY_PART = " \
     mkfontscale \
     \
     libxkbfile \
-    \
-    pcmanfm \
     "
 
 #

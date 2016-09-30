@@ -45,9 +45,7 @@ IMAGE_X11_XWAYLAND_DISPLAY_PART = " \
     xinput \
     xeyes \
     xclock \
-    xauth \
     xorg-minimal-fonts \
-    xinit \
     tslib-calibrate \
     "
 
