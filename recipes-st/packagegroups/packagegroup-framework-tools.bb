@@ -47,7 +47,6 @@ RDEPENDS_packagegroup-framework-tools-kernel = "\
     blktool         \
     blktrace        \
     \
-    cpuburn-neon    \
     memtester       \
     lmbench         \
     nbench-byte     \
