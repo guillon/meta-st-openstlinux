@@ -5,17 +5,17 @@ DESCRIPTION = "Weston is the reference implementation of a Wayland compositor"
 
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d79ee9e66bb0f95d3386a7acae780b70 \
-                    file://src/compositor.c;endline=23;md5=1d535fed266cf39f6d8c0647f52ac331"
+                    file://libweston/compositor.c;endline=23;md5=1d535fed266cf39f6d8c0647f52ac331"
 
-SRCBRANCH = "oe-weston-1_11"
+SRCBRANCH = "oe-weston-1_12"
 SRC_URI = "${ST_GIT_SERVER_URI}/oeivi/oe/st/weston${ST_GIT_SERVER_PROTOCOL};branch=${SRCBRANCH}"
-SRCREV = "3f95c8efbbdb861cc3bdb56b171e543fdb17489c"
+SRCREV = "4177630a2bc90aa4f0c1cfb073d8143d7d9cf31d"
 
 SRC_URI += "file://weston.desktop"
 SRC_URI += "file://weston.png"
 SRC_URI += "file://xwayland.weston-start"
 
-PV = "st-1.11.0"
+PV = "st-1.12.0"
 PR = "git${SRCPV}.r0"
 
 S = "${WORKDIR}/git"
@@ -28,7 +28,6 @@ DEPENDS = "libxkbcommon gdk-pixbuf pixman cairo glib-2.0 jpeg libdrm"
 DEPENDS += "wayland wayland-protocols libinput virtual/egl pango wayland-native"
 
 EXTRA_OECONF = "--enable-setuid-install \
-                --disable-rpi-compositor \
                 --disable-rdp-compositor \
                 WAYLAND_PROTOCOLS_SYSROOT_DIR=${STAGING_DIR}/${MACHINE} \
                 "
@@ -43,10 +42,10 @@ EXTRA_OECONF_append_qemux86-64 = "\
 PACKAGECONFIG ??= "${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'kms fbdev wayland egl', '', d)} \
                    ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'x11', '', d)} \
                    ${@bb.utils.contains('DISTRO_FEATURES', 'x11 wayland', 'xwayland', '', d)} \
-                   ${@bb.utils.contains('DISTRO_FEATURES', 'pam', 'pam', '', d)} \
+                   ${@bb.utils.contains('DISTRO_FEATURES', 'pam', 'launch', '', d)} \
                    ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'systemd', '', d)} \
                    ${@bb.utils.contains('DISTRO_FEATURES', 'opengl', 'egl', '', d)} \
-                   clients launch"
+                   clients"
 #
 # Compositor choices
 #
@@ -65,7 +64,7 @@ PACKAGECONFIG[headless] = "--enable-headless-compositor,--disable-headless-compo
 # Weston on framebuffer
 PACKAGECONFIG[fbdev] = "--enable-fbdev-compositor,--disable-fbdev-compositor,udev mtdev"
 # weston-launch
-PACKAGECONFIG[launch] = "--enable-weston-launch,--disable-weston-launch,drm"
+PACKAGECONFIG[launch] = "--enable-weston-launch,--disable-weston-launch,libpam drm"
 # VA-API desktop recorder
 PACKAGECONFIG[vaapi] = "--enable-vaapi-recorder,--disable-vaapi-recorder,libva"
 # Weston with EGL support
@@ -86,12 +85,12 @@ PACKAGECONFIG[xwayland] = "--enable-xwayland,--disable-xwayland"
 PACKAGECONFIG[colord] = "--enable-colord,--disable-colord,colord"
 # Clients support
 PACKAGECONFIG[clients] = "--enable-clients --enable-simple-clients --enable-demo-clients-install,--disable-clients --disable-simple-clients"
-# Weston with PAM support
-PACKAGECONFIG[pam] = "--with-pam,--without-pam,libpam"
 
 do_install_append() {
 	# Weston doesn't need the .la files to load modules, so wipe them
+	rm -f ${D}/${libdir}/libweston-*/*.la
 	rm -f ${D}/${libdir}/weston/*.la
+	rm -f ${D}/${libdir}/*.la
 
 	# If X11, ship a desktop file to launch it
 	if [ "${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'x11', '', d)}" = "x11" ]; then
@@ -110,7 +109,8 @@ do_install_append() {
 PACKAGE_BEFORE_PN += "${@bb.utils.contains('PACKAGECONFIG', 'xwayland', '${PN}-xwayland', '', d)}"
 PACKAGES += "${PN}-examples"
 
-FILES_${PN} = "${bindir}/weston ${bindir}/weston-terminal ${bindir}/weston-info ${bindir}/weston-launch ${bindir}/wcap-decode ${libexecdir} ${libdir}/${BPN}/*.so ${datadir}"
+FILES_${PN} = "${bindir}/weston ${bindir}/weston-terminal ${bindir}/weston-info ${bindir}/weston-launch ${bindir}/wcap-decode ${libexecdir} ${libdir}/${BPN}/*.so ${libdir}/lib${BPN}-*/*.so ${libdir}/lib${BPN}-*.so* ${datadir}"
+FILES_${PN}-dbg += "${libdir}/lib${BPN}-*/.debug/"
 FILES_${PN}-examples = "${bindir}/*"
 
 FILES_${PN}-xwayland = "${libdir}/${BPN}/xwayland.so"
