@@ -18,7 +18,7 @@ S = "${WORKDIR}/git"
 PACKAGECONFIG ?= " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'pulseaudio', 'pulseaudio', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'x11', '', d)} \
-    cairo flac gdk-pixbuf gudev jpeg libpng orc soup speex taglib v4l2 \
+    cairo flac gdk-pixbuf gudev jpeg libpng orc soup speex taglib v4l2 libv4l2\
 "
 
 EXTRA_OECONF += " \
