@@ -24,6 +24,9 @@ POKY_NON_REMOVABLE += "${OEROOT}/poky/meta-yocto"
 BBLAYERS ?= " \
     ${@'${OPENEMBEDDED}' if os.path.isfile('${OEROOT}/openembedded-core/meta/conf/layer.conf') else '${POKY}'} \
     ${OEROOT}/meta-openembedded/meta-oe \
+    ${OEROOT}/meta-openembedded/meta-systemd \
+    ${OEROOT}/meta-openembedded/meta-webserver \
+    ${OEROOT}/meta-openembedded/meta-multimedia \
     ${OEROOT}/meta-openembedded/meta-networking \
     ${OEROOT}/meta-openembedded/meta-python \
   "
@@ -42,3 +45,10 @@ BBLAYERS += "${@'${OEROOT}/meta-qt5' if os.path.isfile('${OEROOT}/meta-qt5/conf/
 
 # specific to distro
 BBLAYERS += '${OEROOT}/meta-st/meta-st-framework'
+
+# specific to st bootloader
+BBLAYERS += "${@'${OEROOT}/meta-st/meta-st-bootloader' if os.path.isfile('${OEROOT}/meta-st/meta-st-bootloader/conf/layer.conf') else ''}"
+
+# specific to st st dev
+BBLAYERS += "${@'${OEROOT}/meta-st/meta-st-dev' if os.path.isfile('${OEROOT}/meta-st/meta-st-dev/conf/layer.conf') else ''}"
+
