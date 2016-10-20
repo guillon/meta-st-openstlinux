@@ -15,7 +15,7 @@ SRCREV = "b0b9779875ec5cec2482d2b936eb4b8b1161a692"
 S = "${WORKDIR}/git"
 
 
-PACKAGECONFIG ??= " \
+PACKAGECONFIG ?= " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'pulseaudio', 'pulseaudio', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'x11', '', d)} \
     cairo flac gdk-pixbuf gudev jpeg libpng orc soup speex taglib v4l2 \

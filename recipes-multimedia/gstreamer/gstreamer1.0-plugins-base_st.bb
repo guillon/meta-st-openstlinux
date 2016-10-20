@@ -15,7 +15,7 @@ SRCREV = "7e705f608a1a4597bb0bd6055a86e987b1e2cdcd"
 S = "${WORKDIR}/git"
 
 
-PACKAGECONFIG ??= " \
+PACKAGECONFIG ?= " \
     encoding \
     ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'x11', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'alsa', 'alsa', '', d)} \
