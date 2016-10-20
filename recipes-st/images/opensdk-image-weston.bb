@@ -8,7 +8,7 @@ REQUIRED_DISTRO_FEATURES = "wayland"
 
 IMAGE_LINGUAS = "en-gb"
 
-IMAGE_FEATURES += "splash package-management ssh-server-dropbear hwcodecs"
+IMAGE_FEATURES += "splash package-management ssh-server-dropbear hwcodecs tools-profile"
 
 #
 # Multimedia part addons
@@ -46,7 +46,6 @@ IMAGE_X11_XWAYLAND_DISPLAY_PART = " \
     xeyes \
     xclock \
     xorg-minimal-fonts \
-    tslib-calibrate \
     "
 
 IMAGE_X11_DISPLAY_PART = " \
@@ -72,6 +71,7 @@ CORE_IMAGE_EXTRA_INSTALL += " \
     packagegroup-framework-tools-kernel  \
     packagegroup-framework-tools-network \
     packagegroup-framework-tools-audio   \
+    packagegroup-framework-tools-ui      \
     \
     ${IMAGE_DISPLAY_PART}               \
     ${IMAGE_MM_PART}                    \

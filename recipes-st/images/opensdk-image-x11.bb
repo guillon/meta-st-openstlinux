@@ -8,7 +8,7 @@ REQUIRED_DISTRO_FEATURES = "x11"
 
 IMAGE_LINGUAS = "en-gb"
 
-IMAGE_FEATURES += "splash package-management x11-base x11-sato ssh-server-dropbear hwcodecs"
+IMAGE_FEATURES += "splash package-management x11-base x11-sato ssh-server-dropbear hwcodecs tools-profile"
 
 #
 # Multimedia part addons
@@ -45,7 +45,6 @@ IMAGE_X11_DISPLAY_PART = " \
     xclock \
     xorg-minimal-fonts \
     xinit \
-    tslib-calibrate \
     \
     encodings \
     font-alias \
@@ -74,6 +73,7 @@ CORE_IMAGE_EXTRA_INSTALL += " \
     packagegroup-framework-tools-kernel  \
     packagegroup-framework-tools-network \
     packagegroup-framework-tools-audio   \
+    packagegroup-framework-tools-ui      \
     \
     packagegroup-core-x11-sato-games     \
     \
