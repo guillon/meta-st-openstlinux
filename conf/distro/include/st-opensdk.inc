@@ -87,8 +87,8 @@ PREFERRED_VERSION_gst-player ?= "1.8"
 PREFERRED_VERSION_mesa ?= "10.6.3"
 
 # wayland / weston
-PREFERRED_VERSION_wayland ?= "1.11.0"
-PREFERRED_VERSION_wayland-native ?= "1.11.0"
+PREFERRED_VERSION_wayland ?= "1.12.0"
+PREFERRED_VERSION_wayland-native ?= "1.12.0"
 PREFERRED_VERSION_weston ?= "st%"
 
 # v4l-utils
