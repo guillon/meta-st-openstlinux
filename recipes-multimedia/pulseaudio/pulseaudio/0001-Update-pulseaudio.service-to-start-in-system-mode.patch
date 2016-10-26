@@ -22,7 +22,7 @@ index e08ff1e..3e71d60 100644
 -Restart=on-failure
 +Type=simple
 +PrivateTmp=true
-+ExecStart=@PA_BINARY@ --system --disallow-module-loading --disallow-exit
++ExecStart=@PA_BINARY@ --system --realtime --disallow-exit
 +Restart=always
 +RestartSec=5
 +TimeoutSec=5
