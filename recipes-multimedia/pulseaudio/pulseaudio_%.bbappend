@@ -1,4 +1,4 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}:${PN}"
+FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 
 # Pulse audio configuration files
 SRC_URI += " file://pulse_profile.sh \
