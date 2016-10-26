@@ -10,9 +10,6 @@ PACKAGECONFIG[systemd] = "--enable-systemd-daemon --enable-systemd-login --enabl
 # Define systemd package for 'pulseaudio.service'
 SYSTEMD_PACKAGES = "${PN}-server"
 
-# Disable pulseaudio.service by default
-SYSTEMD_AUTO_ENABLE_${PN}-server = "disable"
-
 GROUPADD_PARAM_${PN} = "--system pulse-access;--system pulse"
 
 CACHED_CONFIGUREVARS += " ax_cv_PTHREAD_PRIO_INHERIT=no"
