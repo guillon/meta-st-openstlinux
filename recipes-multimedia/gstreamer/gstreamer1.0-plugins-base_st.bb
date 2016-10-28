@@ -19,8 +19,7 @@ PACKAGECONFIG ?= " \
     encoding \
     ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'x11', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'alsa', 'alsa', '', d)} \
-    orc ivorbis ogg theora vorbis \
-    pango \
+    orc ivorbis ogg pango theora vorbis \
      "
 PACKAGECONFIG[encoding]    = "--enable-encoding,--disable-encoding,"
 EXTRA_OECONF += " \
