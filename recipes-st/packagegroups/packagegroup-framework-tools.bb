@@ -99,6 +99,10 @@ RDEPENDS_packagegroup-framework-tools-audio = "\
     pulseaudio-server \
     pulseaudio-misc \
     pulseaudio-module-combine-sink \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'bluetooth', 'pulseaudio-module-bluetooth-discover', '', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'bluetooth', 'pulseaudio-module-bluetooth-policy', '', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'bluetooth', 'pulseaudio-module-bluez5-device', '', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'bluetooth', 'pulseaudio-module-bluez5-discover', '', d)} \
 "
 
 RDEPENDS_packagegroup-framework-tools-ui = "\
