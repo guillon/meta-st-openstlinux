@@ -24,7 +24,7 @@ IMAGE_MM_PART = " \
 # Display part addons
 #
 IMAGE_DISPLAY_PART = " \
-    ${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'weston weston-cfg weston-examples', '', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'weston weston-init weston-examples', '', d)} \
     fb-test         \
     libdrm          \
     libdrm-tests    \
