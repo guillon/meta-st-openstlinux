@@ -2,11 +2,8 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 
 SRC_URI += "file://dhcp-client"
-SRC_URI += "file://dhclient.service "
 SRC_URI += "file://st-dhclient.service "
 
-SYSTEMD_PACKAGES += "dhcp-client"
-SYSTEMD_SERVICE_dhcp-client = "dhclient.service"
 SYSTEMD_AUTO_ENABLE_dhcp-client = "disable"
 
 SYSTEMD_PACKAGES += "st-dhcp-client"
