@@ -2,7 +2,9 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 
 # Pulse audio configuration files
 SRC_URI += " file://pulse_profile.sh \
-             file://0001-Update-pulseaudio.service-to-start-in-system-mode.patch"
+             file://0009-Update-pulseaudio.service-to-start-in-system-mode.patch \
+             file://0010-dbus-authorize-to-communicate-with-bluez.patch \
+           "
 
 # Rewrite PACKAGECONFIG for systemd to provide 'systemd_system_unitdir' var instead of 'systemd_user_unitdir' one
 PACKAGECONFIG[systemd] = "--enable-systemd-daemon --enable-systemd-login --enable-systemd-journal --with-systemduserunitdir=${systemd_system_unitdir},--disable-systemd-daemon --disable-systemd-login --disable-systemd-journal,systemd"
