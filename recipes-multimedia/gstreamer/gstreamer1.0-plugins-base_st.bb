@@ -28,7 +28,7 @@ EXTRA_OECONF += " \
 
 #enable hardware convert/scale in playbin (gstsubtitleoverlay.c, gstplaysinkvideoconvert.c, gstplaysink.c) & gstencodebin (gstencodebin.c)
 #disable software convert/scale/rate in gstencodebin (gstencodebin.c), hardware convert/scale enabled through COLORSPACE define (gstencodebin.c)
-GSTVIDEOCONVERTOR ?= "videoconvert"
+GSTVIDEOCONVERTOR ?= "autovideoconvert"
 CACHED_CONFIGUREVARS += '   CFLAGS="-DCOLORSPACE=\\\"${GSTVIDEOCONVERTOR}\\\" \
                                     -DCOLORSPACE_SUBT=\\\"videoconvert\\\" \
                                     -DGST_PLAYBIN_DEFAULT_FLAGS=0x00000017 \
