@@ -73,6 +73,11 @@ VIRTUAL-RUNTIME_initscripts = "systemd-compat-units"
 LICENSE_FLAGS_WHITELIST += " commercial"
 
 #--------------------------
+# Preferred provider
+# for openvt tools
+PREFERRED_PROVIDER_console-tools ?= "kbd"
+
+#--------------------------
 # Preferred version
 
 # gstreamer configuration
