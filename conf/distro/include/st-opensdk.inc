@@ -11,9 +11,9 @@
 #      TCLIBC [required if creating from scratch]
 
 DISTRO = "st-opensdk"
-DISTRO_NAME = "ST OpenSDK (A Yocto Project 2.0 based Distro)"
-DISTRO_VERSION = "2.0"
-DISTRO_CODENAME = "jethro"
+DISTRO_NAME = "ST OpenSDK (A Yocto Project 2.1 based Distro)"
+DISTRO_VERSION = "2.1"
+DISTRO_CODENAME = "krogoth"
 
 SDK_VENDOR = "-stopensdk"
 SDK_VERSION := "${@'${DISTRO_VERSION}'.replace('snapshot-${DATE}','snapshot')}"
