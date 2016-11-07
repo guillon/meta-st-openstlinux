@@ -10,7 +10,7 @@ PR = "git${SRCPV}.r0"
 
 SRCBRANCH = "lms-1.8.0"
 SRC_URI = "${ST_GIT_SERVER_URI}/oeivi/oe/multimedia/gst-plugins-good${ST_GIT_SERVER_PROTOCOL};branch=${SRCBRANCH}"
-SRCREV = "b0b9779875ec5cec2482d2b936eb4b8b1161a692"
+SRCREV = "03ed6f7637f6f4ad1487f030747f9f9acf7cc5a2"
 
 S = "${WORKDIR}/git"
 
