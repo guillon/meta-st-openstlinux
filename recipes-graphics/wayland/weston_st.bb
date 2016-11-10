@@ -9,7 +9,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=d79ee9e66bb0f95d3386a7acae780b70 \
 
 SRCBRANCH = "oe-weston-1_12"
 SRC_URI = "${ST_GIT_SERVER_URI}/oeivi/oe/st/weston${ST_GIT_SERVER_PROTOCOL};branch=${SRCBRANCH}"
-SRCREV = "f2b5c007e7960a28d7afdd9e26e32e5bc09ddeb3"
+SRCREV = "25aa3304aaf55a05726b7f6fa7cc9df0dea83fe2"
 
 SRC_URI += "file://weston.desktop"
 SRC_URI += "file://weston.png"
