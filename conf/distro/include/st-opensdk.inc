@@ -15,12 +15,12 @@ DISTRO_NAME = "ST OpenSDK (A Yocto Project 2.1 based Distro)"
 DISTRO_VERSION = "2.1"
 DISTRO_CODENAME = "krogoth"
 
-SDK_VENDOR = "-stopensdk"
+SDK_VENDOR = "-stopensdk_SDK"
 SDK_VERSION := "${@'${DISTRO_VERSION}'.replace('snapshot-${DATE}','snapshot')}"
 
 MAINTAINER = "Christophe Priouzeau <christophe.priouzeau@st.com>"
 
-TARGET_VENDOR = "${SDK_VENDOR}"
+TARGET_VENDOR = "-stopensdk"
 
 # Add image name for generated SDK and set default SDK install folder
 SDK_NAME_PREFIX = "${DISTRO}-${IMAGE_LINK_NAME}"
