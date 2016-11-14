@@ -73,11 +73,6 @@ VIRTUAL-RUNTIME_initscripts = "systemd-compat-units"
 LICENSE_FLAGS_WHITELIST += " commercial"
 
 #--------------------------
-# Preferred provider
-# for openvt tools
-PREFERRED_PROVIDER_console-tools ?= "kbd"
-
-#--------------------------
 # Preferred version
 
 # gstreamer configuration
@@ -107,14 +102,8 @@ PREFERRED_VERSION_optee-linuxdriver ?= "${OPTEE_VERS}"
 PREFERRED_VERSION_optee-client ?= "${OPTEE_VERS}"
 PREFERRED_VERSION_optee-test ?= "${OPTEE_VERS}"
 
-# splash
-SPLASH = "psplash-drm"
-PREFERRED_PROVIDER_virtual/psplash = "psplash-drm"
-
 #X11 addons
 IMAGE_INSTALL_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'xf86-video-modesetting', '', d)} "
 
 VIRTUAL-RUNTIME_graphical_init_manager = "xserver-nodm-init"
 PREFERRED_VERSION_xserver-nodm-init = "1.0"
-
-
