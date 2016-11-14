@@ -83,9 +83,6 @@ PREFERRED_VERSION_gstreamer1.0-plugins-ugly ?= "1.8.0"
 PREFERRED_VERSION_gstreamer1.0-plugins-bad ?= "st%"
 PREFERRED_VERSION_gst-player ?= "1.8"
 
-# mesa
-PREFERRED_VERSION_mesa ?= "10.6.3"
-
 # wayland / weston
 PREFERRED_VERSION_wayland ?= "1.12.0"
 PREFERRED_VERSION_wayland-native ?= "1.12.0"
