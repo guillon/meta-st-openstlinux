@@ -1,6 +1,7 @@
 FILESEXTRAPATHS_append := ":${THISDIR}/${PN}"
 
 SRC_URI += "file://${BUSYBOX_CONFIG_FRAGMENT}"
+SRC_URI += "file://busybox-syslog.default"
 
 BUSYBOX_CONFIG_FRAGMENT = "busybox-opensdk.cfg"
 
