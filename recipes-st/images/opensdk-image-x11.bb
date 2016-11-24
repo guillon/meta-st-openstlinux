@@ -75,6 +75,8 @@ CORE_IMAGE_EXTRA_INSTALL += " \
     packagegroup-framework-tools-audio   \
     packagegroup-framework-tools-ui      \
     \
+    packagegroup-core-eclipse-debug      \
+    \
     packagegroup-core-x11-sato-games     \
     \
     ${IMAGE_DISPLAY_PART}               \

@@ -73,6 +73,8 @@ CORE_IMAGE_EXTRA_INSTALL += " \
     packagegroup-framework-tools-audio   \
     packagegroup-framework-tools-ui      \
     \
+    packagegroup-core-eclipse-debug     \
+    \
     ${IMAGE_DISPLAY_PART}               \
     ${IMAGE_MM_PART}                    \
     \
