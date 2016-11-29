@@ -1,0 +1,56 @@
+commit c822893e0ce0a17e41103ace9d8019ad7566d6f2
+Author: Etienne Carriere <etienne.carriere@linaro.org>
+Date:   Tue Nov 29 09:37:06 2016 +0100
+
+    [PATCH v13 1/5] dt/bindings: add bindings for optee
+    
+    Introduces linaro prefix and adds bindings for ARM TrustZone based OP-TEE
+    implementation.
+    
+    Acked-by: Rob Herring <robh@kernel.org>
+    Signed-off-by: Jens Wiklander <jens.wiklander@linaro.org>
+
+diff --git a/Documentation/devicetree/bindings/arm/firmware/linaro,optee-tz.txt b/Documentation/devicetree/bindings/arm/firmware/linaro,optee-tz.txt
+new file mode 100644
+index 0000000..d38834c
+--- /dev/null
++++ b/Documentation/devicetree/bindings/arm/firmware/linaro,optee-tz.txt
+@@ -0,0 +1,31 @@
++OP-TEE Device Tree Bindings
++
++OP-TEE is a piece of software using hardware features to provide a Trusted
++Execution Environment. The security can be provided with ARM TrustZone, but
++also by virtualization or a separate chip.
++
++We're using "linaro" as the first part of the compatible property for
++the reference implementation maintained by Linaro.
++
++* OP-TEE based on ARM TrustZone required properties:
++
++- compatible     : should contain "linaro,optee-tz"
++
++- method         : The method of calling the OP-TEE Trusted OS. Permitted
++                   values are:
++
++                   "smc" : SMC #0, with the register assignments specified
++		           in drivers/tee/optee/optee_smc.h
++
++                   "hvc" : HVC #0, with the register assignments specified
++		           in drivers/tee/optee/optee_smc.h
++
++
++
++Example:
++	firmware {
++		optee {
++			compatible = "linaro,optee-tz";
++			method = "smc";
++		};
++	};
+diff --git a/Documentation/devicetree/bindings/vendor-prefixes.txt b/Documentation/devicetree/bindings/vendor-prefixes.txt
+new file mode 100644
+index 0000000..6a8c70d
+--- /dev/null
++++ b/Documentation/devicetree/bindings/vendor-prefixes.txt
+@@ -0,0 +1 @@
++linaro	Linaro Limited

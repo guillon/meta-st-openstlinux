@@ -1,0 +1,26 @@
+commit 246497a8511055aa0f3ea579747bea06301de00f
+Author: Etienne Carriere <etienne.carriere@linaro.org>
+Date:   Tue Nov 29 10:01:43 2016 +0100
+
+    [PATCH v13 5/5] arm64: dt: hikey: Add optee node
+    
+    From: Jerome Forissier <jerome.forissier@linaro.org>
+    
+    Note: this patch is dedicated to the HiKey DTS.
+    It is meaningless in the out-of-tree TEE device driver.
+    
+    Signed-off-by: Jerome Forissier <jerome.forissier@linaro.org>
+    Signed-off-by: Jens Wiklander <jens.wiklander@linaro.org>
+
+diff --git a/arch/arm64/boot/dts/hisilicon/hi6220-hikey.dts b/arch/arm64/boot/dts/hisilicon/hi6220-hikey.dts
+new file mode 100644
+index 0000000..78c9604
+--- /dev/null
++++ b/arch/arm64/boot/dts/hisilicon/hi6220-hikey.dts
+@@ -0,0 +1,6 @@
++	firmware {
++		optee {
++			compatible = "linaro,optee-tz";
++			method = "smc";
++		};
++	};

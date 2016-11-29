@@ -93,7 +93,7 @@ PREFERRED_VERSION_v4l-utils ?= "st%"
 
 # optee
 #NOTE: defined default version for optee release
-OPTEE_VERS ?= "2.0.0"
+OPTEE_VERS ?= "2.2.0"
 PREFERRED_VERSION_optee-os ?= "${OPTEE_VERS}"
 PREFERRED_VERSION_optee-linuxdriver ?= "${OPTEE_VERS}"
 PREFERRED_VERSION_optee-client ?= "${OPTEE_VERS}"

@@ -1,8 +1,9 @@
 SUMMARY = "OPTEE Client"
 DESCRIPTION = "OPTEE Client"
 
+# license hash since optee-v2.2.0
+LIC_FILES_CHKSUM ?= "file://LICENSE;md5=a6d62e1b5fef18a1854bd538e3160d7c"
 LICENSE = "BSD"
-LIC_FILES_CHKSUM = "file://LICENSE;md5=69663ab153298557a59c67a60a743e5b"
 
 SRC_URI = "git://github.com/OP-TEE/optee_client.git"
 

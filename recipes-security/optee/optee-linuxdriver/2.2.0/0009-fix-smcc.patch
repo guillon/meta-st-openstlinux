@@ -1,0 +1,31 @@
+commit 68a217007e3b655b9cc9ac302dc965b1f1b43a9a
+Author: Etienne Carriere <etienne.carriere@linaro.org>
+Date:   Tue Nov 29 10:18:22 2016 +0100
+
+    include/linux/arm-smccc.h: avoid sign extension problem
+    
+    Prior to this patch the ARM_SMCCC_FAST_CALL constant was of an unsigned
+    type causing unwanted sign extension. This patch explicitly selects an
+    unsigned type for the constant.
+    
+    Reviewed-by: Pascal Brand <pascal.brand@linaro.org>
+    Tested-by: Jens Wiklander <jens.wiklander@linaro.org> (QEMU Aarch64)
+    Reported-by: Saksham Jain <sakjain92@gmail.com>
+    Signed-off-by: Jens Wiklander <jens.wiklander@linaro.org>
+
+diff --git a/include/linux/arm-smccc.h b/include/linux/arm-smccc.h
+index b5abfda..699c0d8 100644
+--- a/include/linux/arm-smccc.h
++++ b/include/linux/arm-smccc.h
+@@ -23,8 +23,9 @@
+  * http://infocenter.arm.com/help/topic/com.arm.doc.den0028a/index.html
+  */
+ 
+-#define ARM_SMCCC_STD_CALL		0
+-#define ARM_SMCCC_FAST_CALL		1
++/* This constant is shifted by 31, make sure it's of an unsigned type */
++#define ARM_SMCCC_STD_CALL		0UL
++#define ARM_SMCCC_FAST_CALL		1UL
+ #define ARM_SMCCC_TYPE_SHIFT		31
+ 
+ #define ARM_SMCCC_SMC_32		0

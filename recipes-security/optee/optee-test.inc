@@ -9,8 +9,6 @@ SRC_URI = "git://github.com/OP-TEE/optee_test.git"
 S = "${WORKDIR}/git"
 B = "${S}"
 
-SRC_URI += "file://workaround-minor-gcc-warning.patch"
-
 DEPENDS = "optee-os optee-client"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
