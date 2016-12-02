@@ -1,0 +1,194 @@
+commit 53463390a658c13ddcd07bc7117c0ef63e58ac8d
+Author: Etienne Carriere <etienne.carriere@linaro.org>
+Date:   Fri Dec 2 09:54:47 2016 +0100
+
+    stih410: TZ shared mutex for outer cache
+    
+    This relies on linux kernel 'outer_cache_mutex' support.
+    
+    Signed-off-by: Etienne Carriere <etienne.carriere@linaro.org>
+
+diff --git a/drivers/tee/optee/core.c b/drivers/tee/optee/core.c
+index 6986011..122922d 100644
+--- a/drivers/tee/optee/core.c
++++ b/drivers/tee/optee/core.c
+@@ -11,6 +11,7 @@
+  * GNU General Public License for more details.
+  *
+  */
++
+ #include <linux/errno.h>
+ #include <linux/io.h>
+ #include <linux/module.h>
+@@ -22,6 +23,9 @@
+ #include <linux/tee_drv.h>
+ #include <linux/types.h>
+ #include <linux/uaccess.h>
++
++#include <asm/outercache.h>
++
+ #include "optee_private.h"
+ #include "optee_smc.h"
+ 
+@@ -409,6 +413,70 @@ out:
+ 	return pool;
+ }
+ 
++#ifdef outer_tz_mutex
++static int register_outer_cache_mutex(struct device *dev,
++					optee_invoke_fn *invoke_fn,
++					bool reg)
++{
++	union {
++		struct arm_smccc_res smccc;
++		struct optee_smc_outer_cache_result result;
++	} res;
++	phys_addr_t mutex_pa;
++	static void __iomem *mutex_va;
++
++	/* TODO: if several OPTEE devices are registers... we have a problem */
++
++	if (!reg && mutex_va) {
++		(void)outer_tz_mutex(NULL);
++		invoke_fn(OPTEE_SMC_L2CC_MUTEX, OPTEE_SMC_L2CC_MUTEX_DISABLE,
++					0, 0, 0, 0, 0, 0, &res.smccc);
++		iounmap(mutex_va);
++		mutex_va = NULL;
++		return 0;
++	}
++
++	invoke_fn(OPTEE_SMC_L2CC_MUTEX, OPTEE_SMC_L2CC_MUTEX_GET_ADDR,
++					0, 0, 0, 0, 0, 0, &res.smccc);
++	if (res.result.status != OPTEE_SMC_RETURN_OK) {
++		dev_info(dev, "outer cache mutex not available\n");
++		return -ENOENT;
++	}
++	mutex_pa = (phys_addr_t)(((u64)res.result.mutex_upper32 << 32) |
++					res.result.mutex_lower32);
++
++	mutex_va = ioremap_cache(mutex_pa, sizeof(unsigned int));
++	if (!mutex_va) {
++		dev_err(dev, "outer cache mutex ioremap failed\n");
++		return -EINVAL;
++	}
++
++	if (!outer_tz_mutex(mutex_va)) {
++		dev_err(dev, "outer cache mutex registering failed\n");
++		iounmap(mutex_va);
++		return -EINVAL;
++	}
++
++	invoke_fn(OPTEE_SMC_L2CC_MUTEX, OPTEE_SMC_L2CC_MUTEX_ENABLE,
++					0, 0, 0, 0, 0, 0, &res.smccc);
++	if (res.result.status != OPTEE_SMC_RETURN_OK) {
++		dev_err(dev, "outer cache mutex enabling failed\n");
++		(void)outer_tz_mutex(NULL);
++		iounmap(mutex_va);
++		return -EINVAL;
++	}
++
++	return 0;
++}
++#else
++static int register_outer_cache_mutex(struct device *dev,
++					optee_invoke_fn *invoke_fn,
++					bool reg)
++{
++	return 0;
++}
++#endif
++
+ static int get_invoke_func(struct device *dev, optee_invoke_fn **invoke_fn)
+ {
+ 	struct device_node *np = dev->of_node;
+@@ -475,6 +543,11 @@ static int optee_probe(struct platform_device *pdev)
+ 	if (IS_ERR(pool))
+ 		return PTR_ERR(pool);
+ 
++	if (register_outer_cache_mutex(&pdev->dev, invoke_fn, true)) {
++		rc = -EINVAL;
++		goto err;
++	}
++
+ 	optee = devm_kzalloc(&pdev->dev, sizeof(*optee), GFP_KERNEL);
+ 	if (!optee) {
+ 		rc = -ENOMEM;
+@@ -531,6 +604,9 @@ err:
+ 	}
+ 	if (pool)
+ 		tee_shm_pool_free(pool);
++
++	register_outer_cache_mutex(&pdev->dev, invoke_fn, false);
++
+ 	if (ioremaped_shm)
+ 		iounmap(ioremaped_shm);
+ 	return rc;
+@@ -540,6 +616,8 @@ static int optee_remove(struct platform_device *pdev)
+ {
+ 	struct optee *optee = platform_get_drvdata(pdev);
+ 
++	register_outer_cache_mutex(&pdev->dev, optee->invoke_fn, false);
++
+ 	/*
+ 	 * Ask OP-TEE to free all cached shared memory objects to decrease
+ 	 * reference counters and also avoid wild pointers in secure world
+diff --git a/drivers/tee/optee/optee_smc.h b/drivers/tee/optee/optee_smc.h
+index ff98cb7..56e9e83 100644
+--- a/drivers/tee/optee/optee_smc.h
++++ b/drivers/tee/optee/optee_smc.h
+@@ -426,6 +426,55 @@ struct optee_smc_disable_shm_cache_result {
+ #define OPTEE_SMC_RETURN_RPC_CMD \
+ 	OPTEE_SMC_RPC_VAL(OPTEE_SMC_RPC_FUNC_CMD)
+ 
++/*
++ * Configures L2CC mutex
++ *
++ * Disables, enables usage of L2CC mutex. Returns or sets physical address
++ * of L2CC mutex.
++ *
++ * Call register usage:
++ * a0	SMC Function ID, OPTEE_SMC_L2CC_MUTEX
++ * a1	OPTEE_SMC_L2CC_MUTEX_GET_ADDR	Get physical address of mutex
++ *	OPTEE_SMC_L2CC_MUTEX_SET_ADDR	Set physical address of mutex
++ *	OPTEE_SMC_L2CC_MUTEX_ENABLE	Enable usage of mutex
++ *	OPTEE_SMC_L2CC_MUTEX_DISABLE	Disable usage of mutex
++ * a2	if a1 == OPTEE_SMC_L2CC_MUTEX_SET_ADDR, upper 32bit of a 64bit
++ *      physical address of mutex
++ * a3	if a1 == OPTEE_SMC_L2CC_MUTEX_SET_ADDR, lower 32bit of a 64bit
++ *      physical address of mutex
++ * a3-6	Not used
++ * a7	Hypervisor Client ID register
++ *
++ * Have config return register usage:
++ * a0	OPTEE_SMC_RETURN_OK
++ * a1	Preserved
++ * a2	if a1 == OPTEE_SMC_L2CC_MUTEX_GET_ADDR, upper 32bit of a 64bit
++ *      physical address of mutex
++ * a3	if a1 == OPTEE_SMC_L2CC_MUTEX_GET_ADDR, lower 32bit of a 64bit
++ *      physical address of mutex
++ * a3-7	Preserved
++ *
++ * Error return register usage:
++ * a0	OPTEE_SMC_RETURN_ENOTAVAIL	Physical address not available
++ *	OPTEE_SMC_RETURN_EBADADDR	Bad supplied physical address
++ *	OPTEE_SMC_RETURN_EBADCMD	Unsupported value in a1
++ * a1-7	Preserved
++ */
++#define OPTEE_SMC_L2CC_MUTEX_GET_ADDR	0
++#define OPTEE_SMC_L2CC_MUTEX_SET_ADDR	1
++#define OPTEE_SMC_L2CC_MUTEX_ENABLE	2
++#define OPTEE_SMC_L2CC_MUTEX_DISABLE	3
++#define OPTEE_SMC_FUNCID_L2CC_MUTEX	8
++#define OPTEE_SMC_L2CC_MUTEX \
++	OPTEE_SMC_FAST_CALL_VAL(OPTEE_SMC_FUNCID_L2CC_MUTEX)
++
++struct optee_smc_outer_cache_result {
++	unsigned long status;
++	unsigned long mutex_cmd;
++	unsigned long mutex_upper32;
++	unsigned long mutex_lower32;
++};
++
+ /* Returned in a0 */
+ #define OPTEE_SMC_RETURN_UNKNOWN_FUNCTION 0xFFFFFFFF
+ 
