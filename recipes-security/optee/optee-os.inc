@@ -25,11 +25,11 @@ do_compile() {
 }
 
 do_install() {
-	# intallation deferred to board specific
+    install -d ${D}
 }
 
 do_deploy() {
-	# deployment deferred to board specific
+    install -d ${DEPLOYDIR}
 }
 addtask deploy before do_build after do_install
 
