@@ -33,6 +33,7 @@
 // Static variable
 static int drm_fd;
 static int pipe_fd;
+static int wait = 0;
 
 //----------------------
 // Prototype
@@ -527,6 +528,8 @@ splash_processing ()
 
     end = command;
 
+    if (wait > 0)
+        timeout = 0;
     while (1) {
         if (timeout != 0)
             err = select(pipe_fd+1, &descriptors, NULL, NULL, &tv);
@@ -582,8 +585,22 @@ main (int argc, char **argv)
     //    card = argv[1];
     //else
     card = "/dev/dri/card0";
-
     fprintf (stderr, "using card '%s'\n", card);
+
+    wait = 0;
+    if (argc > 1) {
+        if ( !strncasecmp(argv[1], "-w",2) ||
+             !strncasecmp(argv[1], "--wait", 6) ) {
+            fprintf (stderr, "Wait until we are stopped via %s\n"
+                        "echo QUIT > %s",
+                        SPLASH_FIFO, SPLASH_FIFO);
+            wait = 1;
+        }
+        else {
+            fprintf (stderr, "%s [-w|--wait]\n", argv[0]);
+            wait = 1;
+        }
+    }
 
     //set signal
     signal(SIGHUP, splash_exit);

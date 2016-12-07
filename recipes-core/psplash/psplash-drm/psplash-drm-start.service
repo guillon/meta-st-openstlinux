@@ -6,7 +6,7 @@ After=systemd-remount-fs.service
 DefaultDependencies=no
 
 [Service]
-ExecStart=/usr/bin/psplash-drm
+ExecStart=/usr/bin/psplash-drm -w
 
 [Install]
 WantedBy=local-fs.target

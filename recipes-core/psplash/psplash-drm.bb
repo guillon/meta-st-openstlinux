@@ -32,10 +32,13 @@ do_install() {
     install -d ${D}/usr/bin/
     install -m 755 ${WORKDIR}/psplash-drm ${D}/usr/bin
 
+    echo "#!/bin/sh" > ${WORKDIR}//psplash-drm-quit
+    echo "echo QUIT > /tmp/splash_fifo" >> ${WORKDIR}//psplash-drm-quit
+    install -m 755 ${WORKDIR}/psplash-drm-quit ${D}/usr/bin
+
     if ${@base_contains('DISTRO_FEATURES','systemd','true','false',d)}; then
         install -d ${D}${systemd_unitdir}/system
         install -m 644 ${WORKDIR}/*.service ${D}/${systemd_unitdir}/system
     fi
 }
-#plymouth: scritp which send to fofo command like QUIT
 
