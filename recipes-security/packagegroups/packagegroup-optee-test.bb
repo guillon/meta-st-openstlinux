@@ -15,5 +15,4 @@ PROVIDES = "${PACKAGES}"
 
 RDEPENDS_packagegroup-optee-test = "\
     optee-test \
-    ${@bb.utils.contains('OPTEE_VERS', '1.1.0', 'optee-ta-sdp', '', d)} \
 "
