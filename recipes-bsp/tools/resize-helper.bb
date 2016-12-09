@@ -11,19 +11,17 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/GPL-2.0;md5=80
 
 # e2fsprogs for resize2fs
 # gptfdisk for sgdisk
-# parted for parted and partprobe
+# parted for parted and partprobe (Gplv3)
 # util-linux for findmnt
-DEPENDS = " e2fsprogs gptfdisk parted util-linux"
+DEPENDS = " e2fsprogs gptfdisk util-linux"
 
 SRC_URI = " file://resize-helper.service file://resize-helper"
 
 S = "${WORKDIR}"
 
-SYSTEMD_SERVICE_${PN} = "resize-helper.service"
-
 inherit systemd
 
-SYSTEMD_PACKAGES += " SYSTEMD_SERVICE_resize-helper "
+SYSTEMD_PACKAGES += " resize-helper "
 SYSTEMD_SERVICE_${PN} = "resize-helper.service"
 SYSTEMD_AUTO_ENABLE_${PN} = "enable"
 

@@ -105,3 +105,7 @@ IMAGE_INSTALL_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'xf86-vi
 
 VIRTUAL-RUNTIME_graphical_init_manager = "xserver-nodm-init"
 PREFERRED_VERSION_xserver-nodm-init = "1.0"
+
+# resize tools
+IMAGE_INSTALL_append = " resize-helper "
+
