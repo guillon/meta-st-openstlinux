@@ -9,8 +9,11 @@ SRCBRANCH = "lms-1.8.0"
 SRC_URI = "${ST_GIT_SERVER_URI}/oeivi/oe/multimedia/gst-plugins-bad${ST_GIT_SERVER_PROTOCOL};branch=${SRCBRANCH}"
 SRCREV = "a437d47b6ae6b320977f36290d01b1891e965e85"
 
-S = "${WORKDIR}/git"
+SRC_URI_append = " \
+    file://0001-gstreamer-gl.pc.in-don-t-append-GL_CFLAGS-to-CFLAGS.patch \
+"
 
+S = "${WORKDIR}/git"
 
 EXTRA_OECONF_remove = "--disable-osx_video --disable-quicktime --disable-directdraw --disable-mythtv --disable-libssh2"
 
