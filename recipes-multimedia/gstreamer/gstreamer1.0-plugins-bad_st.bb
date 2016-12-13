@@ -7,7 +7,7 @@ PR = "git${SRCPV}.r0"
 
 SRCBRANCH = "lms-1.8.0"
 SRC_URI = "${ST_GIT_SERVER_URI}/oeivi/oe/multimedia/gst-plugins-bad${ST_GIT_SERVER_PROTOCOL};branch=${SRCBRANCH}"
-SRCREV = "a437d47b6ae6b320977f36290d01b1891e965e85"
+SRCREV = "b2f3f239fb14ebcdbaaaddbd24102144f5b38800"
 
 SRC_URI_append = " \
     file://0001-gstreamer-gl.pc.in-don-t-append-GL_CFLAGS-to-CFLAGS.patch \
