@@ -22,8 +22,8 @@ MAINTAINER = "Christophe Priouzeau <christophe.priouzeau@st.com>"
 
 TARGET_VENDOR = "-stopensdk"
 
-#add distro name on each image name
-IMAGE_NAME = "${IMAGE_BASENAME}-${MACHINE}-${DISTRO}-${DATETIME}"
+# Append distro name to each image name
+IMAGE_BASENAME_append = "-${DISTRO}"
 
 # Add image name for generated SDK and set default SDK install folder
 SDK_NAME_PREFIX = "${DISTRO}-${IMAGE_LINK_NAME}"
