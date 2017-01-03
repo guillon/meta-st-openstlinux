@@ -11,6 +11,7 @@ SRC_URI = " \
         file://image_header.h \
         file://basic_splash_drm.c \
         file://Makefile \
+        file://psplash-drm-quit \
     "
 
 SRC_URI += " file://psplash-drm-start.service "
@@ -32,8 +33,6 @@ do_install() {
     install -d ${D}/usr/bin/
     install -m 755 ${WORKDIR}/psplash-drm ${D}/usr/bin
 
-    echo "#!/bin/sh" > ${WORKDIR}//psplash-drm-quit
-    echo "echo QUIT > /tmp/splash_fifo" >> ${WORKDIR}//psplash-drm-quit
     install -m 755 ${WORKDIR}/psplash-drm-quit ${D}/usr/bin
 
     if ${@base_contains('DISTRO_FEATURES','systemd','true','false',d)}; then
