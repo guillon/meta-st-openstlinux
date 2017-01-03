@@ -14,6 +14,12 @@ PACKAGES = "\
     packagegroup-framework-tools-network \
     packagegroup-framework-tools-audio \
     packagegroup-framework-tools-ui \
+    \
+    packagegroup-framework-tools-core-extra \
+    packagegroup-framework-tools-kernel-extra \
+    packagegroup-framework-tools-network-extra \
+    packagegroup-framework-tools-audio-extra \
+    packagegroup-framework-tools-ui-extra \
     "
 
 PROVIDES = "${PACKAGES}"
@@ -32,24 +38,30 @@ RDEPENDS_packagegroup-framework-tools-core = "\
     ntp             \
     systemtap       \
     gptfdisk        \
-    \
+"
+RDEPENDS_packagegroup-framework-tools-core-extra = "\
     tslib-calibrate \
     pointercal      \
 "
+
 
 RDEPENDS_packagegroup-framework-tools-kernel = "\
     usbutils        \
     pciutils        \
     cpufrequtils    \
     sysfsutils      \
-    latencytop      \
-    powertop        \
     can-utils       \
     i2c-tools       \
     dosfstools      \
     mmc-utils       \
-    mtd-utils       \
     blktool         \
+    \
+    strace          \
+"
+RDEPENDS_packagegroup-framework-tools-kernel-extra = "\
+    latencytop      \
+    powertop        \
+    mtd-utils       \
     fio             \
     \
     memtester       \
@@ -61,34 +73,36 @@ RDEPENDS_packagegroup-framework-tools-kernel = "\
     elfutils        \
     formfactor      \
     \
-    strace          \
-    \
     evtest          \
 "
 
 RDEPENDS_packagegroup-framework-tools-network = "\
-    iperf           \
-    iperf3          \
     tcpdump         \
-    ethtool         \
-    bridge-utils    \
     iproute2        \
     iptables        \
-    vlan            \
-    libnl           \
-    connman         \
-    connman-client  \
     ${@bb.utils.contains('DISTRO_FEATURES', 'wifi', 'hostap-utils', '', d)}    \
     ${@bb.utils.contains('DISTRO_FEATURES', 'wifi', 'iw', '', d)}              \
     ${@bb.utils.contains('DISTRO_FEATURES', 'wifi', 'wireless-tools', '', d)}  \
     ${@bb.utils.contains('DISTRO_FEATURES', 'wifi', 'wpa-supplicant', '', d)}  \
     ${@bb.utils.contains('DISTRO_FEATURES', 'wifi', 'hostapd', '', d)}         \
     openssh-sftp    \
-    net-snmp        \
     ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'dhcp-client st-dhcp-client', '', d)} \
+"
+
+RDEPENDS_packagegroup-framework-tools-network-extra = "\
+    iperf           \
+    iperf3          \
+    ethtool         \
+    bridge-utils    \
+    vlan            \
+    libnl           \
+    connman         \
+    connman-client  \
+    net-snmp        \
     \
     neard           \
 "
+
 
 RDEPENDS_packagegroup-framework-tools-audio = "\
     ${@bb.utils.contains('DISTRO_FEATURES', 'alsa', 'alsa-lib', '', d)} \
@@ -107,6 +121,8 @@ RDEPENDS_packagegroup-framework-tools-audio = "\
 
 RDEPENDS_packagegroup-framework-tools-ui = "\
     ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'xvinfo', '', d)}    \
+"
+RDEPENDS_packagegroup-framework-tools-ui-extra = "\
     ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'xvideo-tests', '', d)}  \
     ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'x11perf', '', d)}   \
     ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'fstests', '', d)}   \
