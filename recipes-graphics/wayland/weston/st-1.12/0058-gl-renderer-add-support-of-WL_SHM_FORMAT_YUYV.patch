@@ -1,0 +1,141 @@
+From f2b5c007e7960a28d7afdd9e26e32e5bc09ddeb3 Mon Sep 17 00:00:00 2001
+From: Vincent Abriou <vincent.abriou@st.com>
+Date: Thu, 20 Oct 2016 16:13:35 +0200
+Subject: [PATCH 58/61] gl-renderer: add support of WL_SHM_FORMAT_YUYV
+
+This patch allow gl-renderer to accept WL_SHM_FORMAT_YUYV buffers.
+This is the pixel format supported by most of the USB webcams.
+
+Change-Id: I3868ee48f56fccaca5db0c81a836c210739ddf16
+Signed-off-by: Vincent Abriou <vincent.abriou@st.com>
+Reviewed-on: https://gerrit.st.com/59388
+---
+ libweston/gl-renderer.c | 56 +++++++++++++++++++++++++++++++++----------------
+ 1 file changed, 38 insertions(+), 18 deletions(-)
+
+diff --git a/libweston/gl-renderer.c b/libweston/gl-renderer.c
+index b284178..9025c0a 100644
+--- a/libweston/gl-renderer.c
++++ b/libweston/gl-renderer.c
+@@ -162,7 +162,8 @@ struct gl_surface_state {
+ 
+ 	/* Extension needed for SHM YUV texture */
+ 	int offset[3]; /* offset per plane */
+-	int hvsub[3];  /* horizontal vertical subsampling per plane */
++	int hsub[3];  /* horizontal subsampling per plane */
++	int vsub[3];  /* vertical subsampling per plane */
+ 
+ 	struct weston_surface *surface;
+ 
+@@ -1406,8 +1407,8 @@ gl_renderer_flush_damage(struct weston_surface *surface)
+ 			glBindTexture(GL_TEXTURE_2D, gs->textures[j]);
+ 			glTexImage2D(GL_TEXTURE_2D, 0,
+ 				     gs->gl_format[j],
+-				     gs->pitch / gs->hvsub[j],
+-				     buffer->height / gs->hvsub[j],
++				     gs->pitch / gs->hsub[j],
++				     buffer->height / gs->vsub[j],
+ 				     0,
+ 				     gs->gl_format[j],
+ 				     gs->gl_pixel_type,
+@@ -1428,8 +1429,8 @@ gl_renderer_flush_damage(struct weston_surface *surface)
+ 			glBindTexture(GL_TEXTURE_2D, gs->textures[j]);
+ 			glTexImage2D(GL_TEXTURE_2D, 0,
+ 				     gs->gl_format[j],
+-				     gs->pitch / gs->hvsub[j],
+-				     buffer->height / gs->hvsub[j],
++				     gs->pitch / gs->hsub[j],
++				     buffer->height / gs->vsub[j],
+ 				     0,
+ 				     gs->gl_format[j],
+ 				     gs->gl_pixel_type,
+@@ -1451,10 +1452,10 @@ gl_renderer_flush_damage(struct weston_surface *surface)
+ 		for (j = 0; j < gs->num_textures; j++) {
+ 			glBindTexture(GL_TEXTURE_2D, gs->textures[j]);
+ 			glTexSubImage2D(GL_TEXTURE_2D, 0,
+-					r.x1 / gs->hvsub[j],
+-					r.y1 / gs->hvsub[j],
+-					(r.x2 - r.x1) / gs->hvsub[j],
+-					(r.y2 - r.y1) / gs->hvsub[j],
++					r.x1 / gs->hsub[j],
++					r.y1 / gs->vsub[j],
++					(r.x2 - r.x1) / gs->hsub[j],
++					(r.y2 - r.y1) / gs->vsub[j],
+ 					gs->gl_format[j],
+ 					gs->gl_pixel_type,
+ 					data + gs->offset[j]);
+@@ -1508,7 +1509,8 @@ gl_renderer_attach_shm(struct weston_surface *es, struct weston_buffer *buffer,
+ 
+ 	num_planes = 1;
+ 	gs->offset[0] = 0;
+-	gs->hvsub[0] = 1;
++	gs->hsub[0] = 1;
++	gs->vsub[0] = 1;
+ 
+ 	switch (wl_shm_buffer_get_format(shm_buffer)) {
+ 	case WL_SHM_FORMAT_XRGB8888:
+@@ -1534,12 +1536,14 @@ gl_renderer_attach_shm(struct weston_surface *es, struct weston_buffer *buffer,
+ 		pitch = wl_shm_buffer_get_stride(shm_buffer);
+ 		gl_pixel_type = GL_UNSIGNED_BYTE;
+ 		num_planes = 3;
+-		gs->offset[1] = gs->offset[0] + (pitch / gs->hvsub[0]) *
+-					    (buffer->height / gs->hvsub[0]);
+-		gs->hvsub[1] = 2;
+-		gs->offset[2] = gs->offset[1] + (pitch / gs->hvsub[1]) *
+-					    (buffer->height / gs->hvsub[1]);
+-		gs->hvsub[2] = 2;
++		gs->offset[1] = gs->offset[0] + (pitch / gs->hsub[0]) *
++				(buffer->height / gs->vsub[0]);
++		gs->hsub[1] = 2;
++		gs->vsub[1] = 2;
++		gs->offset[2] = gs->offset[1] + (pitch / gs->hsub[1]) *
++				(buffer->height / gs->vsub[1]);
++		gs->hsub[2] = 2;
++		gs->vsub[2] = 2;
+ 		if (gr->has_gl_texture_rg) {
+ 			gl_format[0] = GL_R8_EXT;
+ 			gl_format[1] = GL_R8_EXT;
+@@ -1555,8 +1559,10 @@ gl_renderer_attach_shm(struct weston_surface *es, struct weston_buffer *buffer,
+ 		pitch = wl_shm_buffer_get_stride(shm_buffer);
+ 		gl_pixel_type = GL_UNSIGNED_BYTE;
+ 		num_planes = 2;
+-		gs->offset[1] = gs->offset[0] + (pitch / gs->hvsub[0]) * (buffer->height / gs->hvsub[0]);
+-		gs->hvsub[1] = 2;
++		gs->offset[1] = gs->offset[0] + (pitch / gs->hsub[0]) *
++				(buffer->height / gs->vsub[0]);
++		gs->hsub[1] = 2;
++		gs->vsub[1] = 2;
+ 		if (gr->has_gl_texture_rg) {
+ 			gl_format[0] = GL_R8_EXT;
+ 			gl_format[1] = GL_RG8_EXT;
+@@ -1565,6 +1571,19 @@ gl_renderer_attach_shm(struct weston_surface *es, struct weston_buffer *buffer,
+ 			gl_format[1] = GL_LUMINANCE_ALPHA;
+ 		}
+ 		break;
++	case WL_SHM_FORMAT_YUYV:
++		gs->shader = &gr->texture_shader_y_xuxv;
++		pitch = wl_shm_buffer_get_stride(shm_buffer) / 2;
++		gl_pixel_type = GL_UNSIGNED_BYTE;
++		num_planes = 2;
++		gs->hsub[1] = 2;
++		gs->vsub[1] = 1;
++		if (gr->has_gl_texture_rg)
++			gl_format[0] = GL_RG8_EXT;
++		else
++			gl_format[0] = GL_LUMINANCE_ALPHA;
++		gl_format[1] = GL_BGRA_EXT;
++		break;
+ 	default:
+ 		weston_log("warning: unknown shm buffer format: %08x\n",
+ 			   wl_shm_buffer_get_format(shm_buffer));
+@@ -3234,6 +3253,7 @@ gl_renderer_create(struct weston_compositor *ec, EGLenum platform,
+ 	wl_display_add_shm_format(ec->wl_display, WL_SHM_FORMAT_RGB565);
+ 	wl_display_add_shm_format(ec->wl_display, WL_SHM_FORMAT_YUV420);
+ 	wl_display_add_shm_format(ec->wl_display, WL_SHM_FORMAT_NV12);
++	wl_display_add_shm_format(ec->wl_display, WL_SHM_FORMAT_YUYV);
+ 
+ 	wl_signal_init(&gr->destroy_signal);
+ 
+-- 
+2.7.4
+

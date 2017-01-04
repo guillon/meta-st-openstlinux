@@ -1,0 +1,30 @@
+From c339b60016def90e565929345fa4bc4ce5c6800e Mon Sep 17 00:00:00 2001
+From: Vincent Abriou <vincent.abriou@st.com>
+Date: Wed, 10 Aug 2016 13:41:15 +0200
+Subject: [PATCH 51/61] compositor-st: use DRM planes with pixman
+
+When pixman is used (instead of GL-renderer), do not prevent buffers to
+be sent to DRM planes.
+
+Change-Id: I84eca8e81c9e44dbcc14619cd3b6965c13c057fd
+Signed-off-by: Vincent Abriou <vincent.abriou@st.com>
+---
+ libweston/compositor-st.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libweston/compositor-st.c b/libweston/compositor-st.c
+index b64cdd1..707f787 100644
+--- a/libweston/compositor-st.c
++++ b/libweston/compositor-st.c
+@@ -1082,7 +1082,7 @@ drm_output_prepare_overlay_view(struct drm_output *output,
+ 
+ 	weston_xlog("   %s: output_base->id = %d\n", __func__, output->base.id);
+ 
+-	if (b->gbm == NULL)
++	if ((b->gbm == NULL) && !b->use_pixman)
+ 		return NULL;
+ 
+ 	if (ev->surface->buffer_ref.buffer == NULL)
+-- 
+2.7.4
+

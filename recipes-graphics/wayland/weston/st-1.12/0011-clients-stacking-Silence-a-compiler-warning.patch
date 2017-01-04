@@ -1,0 +1,50 @@
+From eaf5841f0cc6e8b7156e495511cdd6e69d9cbfdf Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Armin=20Krezovi=C4=87?= <krezovic.armin@gmail.com>
+Date: Thu, 29 Sep 2016 00:18:10 +0200
+Subject: [PATCH 11/61] clients/stacking: Silence a compiler warning
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+This patch fixes a compiler warning when building with
+clang, since it doesn't support gnu_printf attribute.
+
+v2:
+
+ - Switch to WL_PRINTF per suggestion from Eric Engestrom.
+
+v3:
+
+ - Explicitly include wayland-util.h
+
+Signed-off-by: Armin Krezović <krezovic.armin@gmail.com>
+Reviewed-by: Eric Engestrom <eric.engestrom@imgtec.com>
+Reviewed-by: Quentin Glidic <sardemff7+git@sardemff7.net>
+---
+ clients/stacking.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/clients/stacking.c b/clients/stacking.c
+index 4285a17..0682e60 100644
+--- a/clients/stacking.c
++++ b/clients/stacking.c
+@@ -32,6 +32,7 @@
+ 
+ #include <linux/input.h>
+ #include <cairo.h>
++#include <wayland-util.h>
+ 
+ #include "shared/helpers.h"
+ #include "window.h"
+@@ -184,7 +185,7 @@ fullscreen_handler(struct window *window, void *data)
+ 
+ static void
+ draw_string(cairo_t *cr,
+-            const char *fmt, ...) __attribute__((format (gnu_printf, 2, 3)));
++            const char *fmt, ...) WL_PRINTF(2, 3);
+ 
+ static void
+ draw_string(cairo_t *cr,
+-- 
+2.7.4
+

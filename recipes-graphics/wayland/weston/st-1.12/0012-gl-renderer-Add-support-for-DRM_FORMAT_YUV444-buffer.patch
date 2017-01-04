@@ -1,0 +1,47 @@
+From aca3ffb3a9b1402290b99ee3226fcfd7a59464e8 Mon Sep 17 00:00:00 2001
+From: Matthias Treydte <mt@waldheinz.de>
+Date: Mon, 25 Jul 2016 12:15:41 +0200
+Subject: [PATCH 12/61] gl-renderer: Add support for DRM_FORMAT_YUV444 buffers
+
+This uses the existing infrastructure for dealing with planar YUV buffers and only adds the
+relevant yuv_format_descriptor to the table.
+Reviewed-by: Emmanuel Gil Peyrot <emmanuel.peyrot@collabora.com>
+---
+ libweston/gl-renderer.c | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
+
+diff --git a/libweston/gl-renderer.c b/libweston/gl-renderer.c
+index 031576b..b18649d 100644
+--- a/libweston/gl-renderer.c
++++ b/libweston/gl-renderer.c
+@@ -1599,6 +1599,27 @@ struct yuv_format_descriptor yuv_formats[] = {
+ 			.format = DRM_FORMAT_R8,
+ 			.plane_index = 2
+ 		}}
++	}, {
++		.format = DRM_FORMAT_YUV444,
++		.input_planes = 3,
++		.output_planes = 3,
++		.texture_type = EGL_TEXTURE_Y_U_V_WL,
++		{{
++			.width_divisor = 1,
++			.height_divisor = 1,
++			.format = DRM_FORMAT_R8,
++			.plane_index = 0
++		}, {
++			.width_divisor = 1,
++			.height_divisor = 1,
++			.format = DRM_FORMAT_R8,
++			.plane_index = 1
++		}, {
++			.width_divisor = 1,
++			.height_divisor = 1,
++			.format = DRM_FORMAT_R8,
++			.plane_index = 2
++		}}
+ 	}
+ };
+ 
+-- 
+2.7.4
+

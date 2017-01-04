@@ -1,0 +1,54 @@
+From 2457fc7ae44e5c7029d6f7041ecf8348c525ca47 Mon Sep 17 00:00:00 2001
+From: Vincent Abriou <vincent.abriou@st.com>
+Date: Wed, 10 Aug 2016 10:48:23 +0200
+Subject: [PATCH 49/61] compositor-st: allow HQVDP scaling
+
+Clients can set source rectangle and destination size using the
+wl_viewport interface : use this information to manage DRM scaling.
+
+Change-Id: I989c6a45782a16bcb7b8cbf06772ac65f5aba96d
+Signed-off-by: Vincent Abriou <vincent.abriou@st.com>
+---
+ libweston/compositor-st.c | 19 +++++++++++++++----
+ 1 file changed, 15 insertions(+), 4 deletions(-)
+
+diff --git a/libweston/compositor-st.c b/libweston/compositor-st.c
+index cfd884c..06b1804 100644
+--- a/libweston/compositor-st.c
++++ b/libweston/compositor-st.c
+@@ -1078,6 +1078,7 @@ drm_output_prepare_overlay_view(struct drm_output *output,
+ 	pixman_box32_t *box, tbox;
+ 	uint32_t format = 0;
+ 	wl_fixed_t sx1, sy1, sx2, sy2;
++	uint64_t src_x, src_y, src_w, src_h;
+ 
+ 	weston_xlog("   %s: output_base->id = %d\n", __func__, output->base.id);
+ 
+@@ -1263,10 +1264,20 @@ drm_output_prepare_overlay_view(struct drm_output *output,
+ 				       viewport->buffer.scale,
+ 				       tbox);
+ 
+-	s->src_x = tbox.x1 << 8;
+-	s->src_y = tbox.y1 << 8;
+-	s->src_w = (tbox.x2 - tbox.x1) << 8;
+-	s->src_h = (tbox.y2 - tbox.y1) << 8;
++	src_x = tbox.x1;
++	src_y = tbox.y1;
++	src_w = (tbox.x2 - tbox.x1);
++	src_h = (tbox.y2 - tbox.y1);
++
++	src_x = (src_x * ev->surface->width_from_buffer) / ev->surface->width;
++	src_w = (src_w * ev->surface->width_from_buffer) / ev->surface->width;
++	src_y = (src_y * ev->surface->height_from_buffer) / ev->surface->height;
++	src_h = (src_h * ev->surface->height_from_buffer) / ev->surface->height;
++
++	s->src_x = src_x << 8;
++	s->src_y = src_y << 8;
++	s->src_w = src_w << 8;
++	s->src_h = src_h << 8;
+ 	pixman_region32_fini(&src_rect);
+ 
+ 	return &s->plane;
+-- 
+2.7.4
+

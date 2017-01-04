@@ -1,30 +1,27 @@
-DEFAULT_PREFERENCE = "-1"
-
 SUMMARY = "Weston, a Wayland compositor"
 DESCRIPTION = "Weston is the reference implementation of a Wayland compositor"
-
+HOMEPAGE = "http://wayland.freedesktop.org"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d79ee9e66bb0f95d3386a7acae780b70 \
                     file://libweston/compositor.c;endline=23;md5=1d535fed266cf39f6d8c0647f52ac331"
 
-SRCBRANCH = "oe-weston-1_12"
-SRC_URI = "${ST_GIT_SERVER_URI}/oeivi/oe/st/weston${ST_GIT_SERVER_PROTOCOL};branch=${SRCBRANCH}"
-SRCREV = "9654e774cd8cf64cf45e709ad802537a38f09d77"
-
-SRC_URI += "file://weston.desktop"
-SRC_URI += "file://weston.png"
-SRC_URI += "file://xwayland.weston-start"
-
-PV = "st-1.12.0"
-PR = "git${SRCPV}.r0"
-
-S = "${WORKDIR}/git"
+SRC_URI = "https://wayland.freedesktop.org/releases/${BPN}-${PV}.tar.xz \
+           file://weston.png \
+           file://weston.desktop \
+           file://0001-make-error-portable.patch \
+           file://0001-configure.ac-Fix-wayland-protocols-path.patch \
+           file://xwayland.weston-start \
+           file://0001-weston-launch-Provide-a-default-version-that-doesn-t.patch \
+           file://0001-Add-configuration-option-for-no-input-device.patch \
+"
+SRC_URI[md5sum] = "310af6d7f8ba03c3418cec8ad72ea748"
+SRC_URI[sha256sum] = "ac7ac2a32e3b9f50131fccded5d2326bd36b2226712d90b61999118a09af5033"
 
 inherit autotools pkgconfig useradd distro_features_check
 # depends on virtual/egl
 REQUIRED_DISTRO_FEATURES = "opengl"
 
-DEPENDS = "libxkbcommon gdk-pixbuf pixman cairo glib-2.0 jpeg libdrm"
+DEPENDS = "libxkbcommon gdk-pixbuf pixman cairo glib-2.0 jpeg"
 DEPENDS += "wayland wayland-protocols libinput virtual/egl pango wayland-native"
 
 EXTRA_OECONF = "--enable-setuid-install \
@@ -34,27 +31,22 @@ EXTRA_OECONF = "--enable-setuid-install \
 EXTRA_OECONF[vardepsexclude] = "MACHINE"
 
 EXTRA_OECONF_append_qemux86 = "\
-		WESTON_NATIVE_BACKEND=fbdev-backend.so \
-		"
+        WESTON_NATIVE_BACKEND=fbdev-backend.so \
+        "
 EXTRA_OECONF_append_qemux86-64 = "\
-		WESTON_NATIVE_BACKEND=fbdev-backend.so \
-		"
+        WESTON_NATIVE_BACKEND=fbdev-backend.so \
+        "
 PACKAGECONFIG ??= "${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'kms fbdev wayland egl', '', d)} \
                    ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'x11', '', d)} \
                    ${@bb.utils.contains('DISTRO_FEATURES', 'x11 wayland', 'xwayland', '', d)} \
-                   ${@bb.utils.contains('DISTRO_FEATURES', 'pam', 'launch', '', d)} \
+                   ${@bb.utils.contains('DISTRO_FEATURES', 'pam', 'pam', '', d)} \
                    ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'systemd', '', d)} \
-                   ${@bb.utils.contains('DISTRO_FEATURES', 'opengl', 'egl', '', d)} \
-                   clients"
+                   clients launch"
 #
 # Compositor choices
 #
 # Weston on KMS
 PACKAGECONFIG[kms] = "--enable-drm-compositor,--disable-drm-compositor,drm udev virtual/mesa mtdev"
-# Weston on KMS
-PACKAGECONFIG[stkms] = "--enable-st-compositor,--disable-st-compositor,drm udev virtual/mesa mtdev"
-# Composition capture
-PACKAGECONFIG[capture] = "--enable-display-capture,--disable-display-capture"
 # Weston on Wayland (nested Weston)
 PACKAGECONFIG[wayland] = "--enable-wayland-compositor,--disable-wayland-compositor,virtual/mesa"
 # Weston on X11
@@ -64,7 +56,7 @@ PACKAGECONFIG[headless] = "--enable-headless-compositor,--disable-headless-compo
 # Weston on framebuffer
 PACKAGECONFIG[fbdev] = "--enable-fbdev-compositor,--disable-fbdev-compositor,udev mtdev"
 # weston-launch
-PACKAGECONFIG[launch] = "--enable-weston-launch,--disable-weston-launch,libpam drm"
+PACKAGECONFIG[launch] = "--enable-weston-launch,--disable-weston-launch,drm"
 # VA-API desktop recorder
 PACKAGECONFIG[vaapi] = "--enable-vaapi-recorder,--disable-vaapi-recorder,libva"
 # Weston with EGL support
@@ -85,6 +77,8 @@ PACKAGECONFIG[xwayland] = "--enable-xwayland,--disable-xwayland"
 PACKAGECONFIG[colord] = "--enable-colord,--disable-colord,colord"
 # Clients support
 PACKAGECONFIG[clients] = "--enable-clients --enable-simple-clients --enable-demo-clients-install,--disable-clients --disable-simple-clients"
+# Weston with PAM support
+PACKAGECONFIG[pam] = "--with-pam,--without-pam,libpam"
 
 do_install_append() {
 	# Weston doesn't need the .la files to load modules, so wipe them
