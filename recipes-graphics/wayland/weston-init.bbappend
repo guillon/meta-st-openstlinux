@@ -6,13 +6,11 @@ SRC_URI += " \
             file://wallpaper_1920x1080_white.png \
             file://weston.sh \
             file://weston_profile.sh \
-            file://start_delta.sh \
             "
 
 FILES_${PN} += " ${datadir}/weston \
          ${systemd_system_unitdir}/weston.service \
          ${sbindir}/weston.sh \
-         ${sbindir}/start_delta.sh \
          ${sysconfdir}/etc/profile.d \
          ${sysconfdir}/xdg/weston/weston.ini \
          "
@@ -30,7 +28,6 @@ do_install_append() {
   install -d ${D}${systemd_system_unitdir} ${D}${sbindir}
 #  install -m 0644 ${WORKDIR}/weston.service ${D}/lib/systemd/system/
   install -m 0755  ${WORKDIR}/weston.sh ${D}${sbindir}/
-  install -m 0755  ${WORKDIR}/start_delta.sh ${D}${sbindir}/
 
 #  install -d ${D}/etc/systemd/system/ ${D}/etc/systemd/system/multi-user.target.wants/
 #  ln -s /lib/systemd/system/weston.service ${D}/etc/systemd/system/multi-user.target.wants/display-manager.service
