@@ -1,0 +1,36 @@
+From 984ce1416fe050160e4cd3c1654bfe9a8997d939 Mon Sep 17 00:00:00 2001
+From: Fabien Dessenne <fabien.dessenne@st.com>
+Date: Thu, 4 Dec 2014 16:19:35 +0100
+Subject: [PATCH 01/15] Addition of the autogen.sh file to ensure that our
+ programs will be created in our build repository, not with the sources
+
+Change-Id: I03e4c6c2626b0e336d3869346a7b76e04852bdf5
+Signed-off-by: ingueret <tifaine.inguere@st.com>
+Signed-off-by: Fabien Dessenne <fabien.dessenne@st.com>
+Reviewed-on: https://gerrit.st.com/18756
+---
+ autogen.sh | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+ create mode 100755 autogen.sh
+
+diff --git a/autogen.sh b/autogen.sh
+new file mode 100755
+index 0000000..71eed0e
+--- /dev/null
++++ b/autogen.sh
+@@ -0,0 +1,12 @@
++#!/bin/bash - 
++
++test -n "$srcdir" || srcdir=`dirname "$0"`
++test -n "$srcdir" || srcdir=.
++
++olddir=`pwd`
++(
++  cd "$srcdir" &&
++  autoreconf --force -v --install
++) || exit
++test -n "$NOCONFIGURE" || "$srcdir/configure" "$@"
++cd $olddir
+-- 
+2.7.4
+

@@ -1,0 +1,35 @@
+From 74c21e1682fe622cfbd782e199034c46aac3c445 Mon Sep 17 00:00:00 2001
+From: Christophe Priouzeau <christophe.priouzeau@linaro.org>
+Date: Wed, 8 Oct 2014 14:47:06 +0200
+Subject: [PATCH 04/15] remove X11 dependency for test program
+
+Change-Id: I8eba40c56e9fe145f0a5a59fc09e29bb0c1e1da3
+Reviewed-on: https://gerrit.st.com/14213
+Tested-by: Christophe PRIOUZEAU <christophe.priouzeau@st.com>
+Reviewed-by: Christophe PRIOUZEAU <christophe.priouzeau@st.com>
+Reviewed-on: https://gerrit.st.com/18763
+Reviewed-by: Fabien DESSENNE <fabien.dessenne@st.com>
+Tested-by: Fabien DESSENNE <fabien.dessenne@st.com>
+---
+ contrib/test/Makefile.am | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/contrib/test/Makefile.am b/contrib/test/Makefile.am
+index 0bfa33e..7f1c783 100644
+--- a/contrib/test/Makefile.am
++++ b/contrib/test/Makefile.am
+@@ -11,9 +11,11 @@ if HAVE_X11
+ noinst_PROGRAMS += pixfmt-test
+ endif
+ 
++if HAVE_X11
+ if HAVE_GLU
+ noinst_PROGRAMS += v4l2gl
+ endif
++endif
+ 
+ driver_test_SOURCES = driver-test.c
+ driver_test_LDADD = ../../utils/libv4l2util/libv4l2util.la
+-- 
+2.7.4
+

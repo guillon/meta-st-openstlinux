@@ -1,0 +1,47 @@
+From dad48b932c6bd431f7fcb869ab1527a1887e3c8b Mon Sep 17 00:00:00 2001
+From: Jean-Christophe TROTIN <jean-christophe.trotin@st.com>
+Date: Thu, 12 Jun 2014 09:10:43 +0200
+Subject: [PATCH 03/15] libv4l2: set log file before plugin initialization
+
+If any log file is specified, it's opened before calling the plugins
+initialization function. Indeed, this function uses the trace macros
+to store logs into the file.
+
+Change-Id: I4d04c241d9e04b7fac4b5b7276a503ce9ab7fe6b
+Reviewed-on: https://gerrit.st.com/7587
+Tested-by: Jean Christophe TROTIN <jean-christophe.trotin@st.com>
+Reviewed-by: Hugues FRUCHET <hugues.fruchet@st.com>
+Reviewed-by: Tifaine INGUERE <tifaine.inguere@st.com>
+Reviewed-by: Jean Christophe TROTIN <jean-christophe.trotin@st.com>
+Reviewed-on: https://gerrit.st.com/18758
+Reviewed-by: Fabien DESSENNE <fabien.dessenne@st.com>
+Tested-by: Fabien DESSENNE <fabien.dessenne@st.com>
+---
+ lib/libv4l2/libv4l2.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/lib/libv4l2/libv4l2.c b/lib/libv4l2/libv4l2.c
+index 0e2dea1..0f943cd 100644
+--- a/lib/libv4l2/libv4l2.c
++++ b/lib/libv4l2/libv4l2.c
+@@ -661,8 +661,6 @@ int v4l2_fd_open(int fd, int v4l2_flags)
+ 	const struct libv4l_dev_ops *dev_ops;
+ 	long page_size;
+ 
+-	v4l2_plugin_init(fd, &plugin_library, &dev_ops_priv, &dev_ops);
+-
+ 	/* If no log file was set by the app, see if one was specified through the
+ 	   environment */
+ 	if (!v4l2_log_file) {
+@@ -671,6 +669,8 @@ int v4l2_fd_open(int fd, int v4l2_flags)
+ 			v4l2_log_file = fopen(lfname, "w");
+ 	}
+ 
++	v4l2_plugin_init(fd, &plugin_library, &dev_ops_priv, &dev_ops);
++
+ 	/* Get page_size (for mmap emulation) */
+ 	page_size = sysconf(_SC_PAGESIZE);
+ 	if (page_size < 0) {
+-- 
+2.7.4
+

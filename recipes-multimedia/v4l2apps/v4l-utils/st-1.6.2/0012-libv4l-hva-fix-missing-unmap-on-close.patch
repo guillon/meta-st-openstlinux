@@ -1,0 +1,52 @@
+From c81577a86cca4649a983a5bf18e0596553f946b2 Mon Sep 17 00:00:00 2001
+From: Hugues Fruchet <hugues.fruchet@st.com>
+Date: Wed, 20 May 2015 15:27:13 +0200
+Subject: [PATCH 12/15] libv4l-hva: fix missing unmap on close
+
+Change-Id: I227fa74f958b95d635a2dc3510ba439a7ecfe240
+Reviewed-on: https://gerrit.st.com/30046
+Reviewed-by: Benjamin GAIGNARD <benjamin.gaignard@st.com>
+Reviewed-by: Chetan NANDA <chetan.nanda@st.com>
+Reviewed-by: Sudip JAIN <sudip.jain@st.com>
+Reviewed-by: Hugues FRUCHET <hugues.fruchet@st.com>
+Tested-by: Hugues FRUCHET <hugues.fruchet@st.com>
+---
+ lib/libv4l-hva/libv4l-hva.c | 15 +++++++++++++--
+ 1 file changed, 13 insertions(+), 2 deletions(-)
+
+diff --git a/lib/libv4l-hva/libv4l-hva.c b/lib/libv4l-hva/libv4l-hva.c
+index 3ecb823..908dbcc 100644
+--- a/lib/libv4l-hva/libv4l-hva.c
++++ b/lib/libv4l-hva/libv4l-hva.c
+@@ -265,15 +265,26 @@ static void *hva_plugin_init(int fd)
+ static void hva_plugin_close(void *dev_ops_priv)
+ {
+ 	struct hva_plugin *hva = dev_ops_priv;
++	unsigned int i;
+ 
+ 	V4L2_LOG("> %s: close the HVA libv4l plugin\n", __func__);
+ 
++	if (!hva)
++		goto close_ret;
++
++	/* unmap AUs */
++	for (i = 0; i < NB_MAX_BUF; i++) {
++		struct hva_buffer *au = &hva->aus[i];
++		if (au->vaddr)
++			SYS_MUNMAP(au->vaddr, au->size);
++	}
++
+ 	if (hva->ctrls.controls)
+ 		free(hva->ctrls.controls);
+ 
+-	if (hva)
+-		free(hva);
++	free(hva);
+ 
++close_ret:
+ 	V4L2_LOG("< %s\n", __func__);
+ 	return;
+ }
+-- 
+2.7.4
+

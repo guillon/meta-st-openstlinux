@@ -87,7 +87,7 @@ PREFERRED_VERSION_gstreamer1.0-plugins-bad ?= "st%"
 PREFERRED_VERSION_gst-player ?= "1.8"
 
 # v4l-utils
-PREFERRED_VERSION_v4l-utils ?= "st%"
+#PREFERRED_VERSION_v4l-utils ?= "st%"
 
 # optee
 #NOTE: defined default version for optee release
