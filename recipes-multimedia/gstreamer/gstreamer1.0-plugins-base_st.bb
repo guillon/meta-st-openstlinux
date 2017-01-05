@@ -2,26 +2,35 @@ DEFAULT_PREFERENCE = "-1"
 
 include gstreamer1.0-plugins-base.inc
 
-LIC_FILES_CHKSUM = "file://${S}/COPYING;md5=c54ce9345727175ff66d17b67ff51f58 \
-                    file://${S}/COPYING.LIB;md5=6762ed442b3822387a51c92d928ead0d"
+LIC_FILES_CHKSUM = "file://COPYING;md5=c54ce9345727175ff66d17b67ff51f58 \
+                    file://COPYING.LIB;md5=6762ed442b3822387a51c92d928ead0d \
+                    file://common/coverage/coverage-report.pl;beginline=2;endline=17;md5=a4e1830fce078028c8f0974161272607"
 
-PV = "st-1.8.0"
+SRCBRANCH = "lms-1.8.3"
+SRC_URI = "${ST_GIT_SERVER_URI}/oeivi/oe/multimedia/gst-plugins-base${ST_GIT_SERVER_PROTOCOL};branch=${SRCBRANCH};name=base"
+SRC_URI_append = " git://anongit.freedesktop.org/gstreamer/common;destsuffix=git/common;name=common"
+
+PV = "st-1.8.3"
 PR = "git${SRCPV}.r0"
 
-SRCBRANCH = "lms-1.8.0"
-SRC_URI = "${ST_GIT_SERVER_URI}/oeivi/oe/multimedia/gst-plugins-base${ST_GIT_SERVER_PROTOCOL};branch=${SRCBRANCH}"
-SRCREV = "c5d3ba71785846dbe9f2e96698db9e0584b40847"
+UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>(\d+(\.\d+)+))"
+
+SRCREV_base = "f65b6400cb289567aa91ca7535172eba35e9b826"
+SRCREV_common = "f363b3205658a38e84fa77f19dee218cd4445275"
+SRCREV_FORMAT = "base"
 
 S = "${WORKDIR}/git"
 
-
 PACKAGECONFIG ?= " \
-    encoding \
-    ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'x11', '', d)} \
+    ${GSTREAMER_ORC} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'alsa', 'alsa', '', d)} \
-    orc ivorbis ogg pango theora vorbis \
-     "
+    ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'x11', '', d)} \
+    ivorbis ogg pango theora vorbis \
+    encoding \
+"
+
 PACKAGECONFIG[encoding]    = "--enable-encoding,--disable-encoding,"
+
 EXTRA_OECONF += " \
     --enable-examples \
 "
@@ -29,6 +38,7 @@ EXTRA_OECONF += " \
 #enable hardware convert/scale in playbin (gstsubtitleoverlay.c, gstplaysinkvideoconvert.c, gstplaysink.c) & gstencodebin (gstencodebin.c)
 #disable software convert/scale/rate in gstencodebin (gstencodebin.c), hardware convert/scale enabled through COLORSPACE define (gstencodebin.c)
 GSTVIDEOCONVERTOR ?= "autovideoconvert"
+
 CACHED_CONFIGUREVARS += '   CFLAGS="-DCOLORSPACE=\\\"${GSTVIDEOCONVERTOR}\\\" \
                                     -DCOLORSPACE_SUBT=\\\"videoconvert\\\" \
                                     -DGST_PLAYBIN_DEFAULT_FLAGS=0x00000017 \
@@ -37,7 +47,7 @@ CACHED_CONFIGUREVARS += '   CFLAGS="-DCOLORSPACE=\\\"${GSTVIDEOCONVERTOR}\\\" \
                                     -DVIDEORATE=\\\"identity\\\" "'
 
 do_configure_prepend() {
-    srcdir=${S} NOCONFIGURE=1 ${S}/autogen.sh
+    ${S}/autogen.sh --noconfigure
 }
 
 do_install_append() {

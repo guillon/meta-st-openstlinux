@@ -14,13 +14,7 @@ SRC_URI = " \
     file://workaround-to-build-gst-libav-for-i586-with-gcc.patch \
 "
 
-SRC_URI[md5sum] = "361638fa45466c5050bcde6bfe10fa46"
-SRC_URI[sha256sum] = "5a1ce28876aee93cb4f3d090f0e807915a5d9bc1325e3480dd302b85aeb4291c"
+SRC_URI[md5sum] = "b51a736147bacb40f85827a4e0ae0d2c"
+SRC_URI[sha256sum] = "9006a05990089f7155ee0e848042f6bb24e52ab1d0a59ff8d1b5d7e33001a495"
 
 S = "${WORKDIR}/gst-libav-${PV}"
-
-LIBAV_EXTRA_CONFIGURE_COMMON_ARG = "--target-os=linux \
-  --cc='${CC}' --as='${CC}' --ld='${CC}' --nm='${NM}' --ar='${AR}' \
-  --ranlib='${RANLIB}' \
-  ${GSTREAMER_1_0_DEBUG} \
-  --cross-prefix='${HOST_PREFIX}'"

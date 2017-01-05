@@ -53,6 +53,4 @@ FILES_${PN} = ""
 FILES_${PN}-apps = "${bindir}"
 FILES_${PN}-glib = "${datadir}/glib-2.0"
 
-FILES_${PN}-dbg += "${libdir}/gstreamer-1.0/.debug ${libdir}/.debug /usr/src/debug/"
-
 RRECOMMENDS_${PN} += "${PN}-meta"

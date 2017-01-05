@@ -9,12 +9,18 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=a6f89e2100d9b6cdffcea4f398e37343"
 
 inherit autotools pkgconfig upstream-version-is-even gobject-introspection gtk-doc gettext
 
-PV = "st-1.8.0"
+SRCBRANCH = "lms-1.8.3"
+SRC_URI = "${ST_GIT_SERVER_URI}oeivi/oe/multimedia/gst-devtools${ST_GIT_SERVER_PROTOCOL};branch=${SRCBRANCH};name=base"
+SRC_URI_append = " git://anongit.freedesktop.org/gstreamer/common;destsuffix=git/validate/common;name=common"
+
+PV = "st-1.8.3"
 PR = "git${SRCPV}.r0"
 
-SRCBRANCH = "lms-1.8.0"
-SRC_URI = "${ST_GIT_SERVER_URI}oeivi/oe/multimedia/gst-devtools${ST_GIT_SERVER_PROTOCOL};branch=${SRCBRANCH}"
-SRCREV = "a08806a6ae8f29e3952182840b3f48597a87e483"
+UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>(\d+(\.\d+)+))"
+
+SRCREV_base = "7208f33578c42458676d619640d8e8616d4fa785"
+SRCREV_common = "f363b3205658a38e84fa77f19dee218cd4445275"
+SRCREV_FORMAT = "base"
 
 #for krogoth
 SRC_URI_append = " file://0001-GSTVALIDATE-introspection.m4-prefix-pkgconfig-paths.patch "

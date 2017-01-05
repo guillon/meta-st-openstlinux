@@ -3,6 +3,7 @@ require gstreamer1.0-plugins.inc
 SRC_URI_append = "\
     file://0001-Makefile.am-don-t-hardcode-libtool-name-when-running.patch \
     file://0002-Makefile.am-prefix-calls-to-pkg-config-with-PKG_CONF.patch \
+    file://0003-riff-add-missing-include-directories-when-calling-in.patch \
     file://0004-rtsp-drop-incorrect-reference-to-gstreamer-sdp-in-Ma.patch \
 "
 
@@ -18,7 +19,7 @@ PACKAGECONFIG ??= " \
     ${GSTREAMER_ORC} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'alsa', 'alsa', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'x11', '', d)} \
-    ivorbis ogg pango theora vorbis \
+    gio-unix-2.0 ivorbis ogg pango theora vorbis \
 "
 
 X11DEPENDS = "virtual/libx11 libsm libxrender libxv"
@@ -27,7 +28,7 @@ X11DISABLEOPTS = "--disable-x --disable-xvideo --disable-xshm"
 
 PACKAGECONFIG[alsa]         = "--enable-alsa,--disable-alsa,alsa-lib"
 PACKAGECONFIG[cdparanoia]   = "--enable-cdparanoia,--disable-cdparanoia,cdparanoia"
-#PACKAGECONFIG[gio-unix-2.0] = "--enable-gio_unix_2_0,--disable-gio_unix_2_0,glib-2.0"
+PACKAGECONFIG[gio-unix-2.0] = "--enable-gio_unix_2_0,--disable-gio_unix_2_0,glib-2.0"
 PACKAGECONFIG[ivorbis]      = "--enable-ivorbis,--disable-ivorbis,tremor"
 PACKAGECONFIG[ogg]          = "--enable-ogg,--disable-ogg,libogg"
 PACKAGECONFIG[opus]         = "--enable-opus,--disable-opus,libopus"

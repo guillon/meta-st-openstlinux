@@ -14,7 +14,8 @@ SRC_URI = "git://github.com/sdroege/gst-player.git \
 
 SRCREV = "ea90e63c1064503f9ba5d59aa4ca604f13ca5def"
 
-PR = "git${SRCPV}"
+PR = "1.8+git${SRCPV}"
+
 S = "${WORKDIR}/git"
 
 inherit autotools pkgconfig distro_features_check

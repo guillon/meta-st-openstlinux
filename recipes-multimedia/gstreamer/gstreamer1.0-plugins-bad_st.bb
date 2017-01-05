@@ -2,48 +2,54 @@ DEFAULT_PREFERENCE = "-1"
 
 include gstreamer1.0-plugins-bad.inc
 
-PV = "st-1.8.0"
+LIC_FILES_CHKSUM = "file://COPYING;md5=73a5855a8119deb017f5f13cf327095d \
+                    file://COPYING.LIB;md5=21682e4e8fea52413fd26c60acb907e5 \
+                    file://gst/tta/crc32.h;beginline=12;endline=29;md5=27db269c575d1e5317fffca2d33b3b50 \
+                    file://gst/tta/filters.h;beginline=12;endline=29;md5=8a08270656f2f8ad7bb3655b83138e5a"
+
+SRCBRANCH = "lms-1.8.3"
+SRC_URI = "${ST_GIT_SERVER_URI}/oeivi/oe/multimedia/gst-plugins-bad${ST_GIT_SERVER_PROTOCOL};branch=${SRCBRANCH};name=base"
+SRC_URI_append = " git://anongit.freedesktop.org/gstreamer/common;destsuffix=git/common;name=common"
+
+PV = "st-1.8.3"
 PR = "git${SRCPV}.r0"
 
-SRCBRANCH = "lms-1.8.0"
-SRC_URI = "${ST_GIT_SERVER_URI}/oeivi/oe/multimedia/gst-plugins-bad${ST_GIT_SERVER_PROTOCOL};branch=${SRCBRANCH}"
-SRCREV = "b2f3f239fb14ebcdbaaaddbd24102144f5b38800"
+UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>(\d+(\.\d+)+))"
 
-SRC_URI_append = " \
-    file://0001-gstreamer-gl.pc.in-don-t-append-GL_CFLAGS-to-CFLAGS.patch \
-"
+SRCREV_base = "a25389aee1b9c32a7c7969d3c2d2325d4d55108b"
+SRCREV_common = "f363b3205658a38e84fa77f19dee218cd4445275"
+SRCREV_FORMAT = "base"
 
 S = "${WORKDIR}/git"
 
-EXTRA_OECONF_remove = "--disable-osx_video --disable-quicktime --disable-directdraw --disable-mythtv --disable-libssh2"
-
-#LICENSE = "GPLv2+ & LGPLv2+ & LGPLv2.1+ "
-LIC_FILES_CHKSUM = "file://COPYING;md5=73a5855a8119deb017f5f13cf327095d \
-                    file://gst/tta/filters.h;beginline=12;endline=29;md5=8a08270656f2f8ad7bb3655b83138e5a \
-                    file://COPYING.LIB;md5=21682e4e8fea52413fd26c60acb907e5 \
-                    file://gst/tta/crc32.h;beginline=12;endline=29;md5=27db269c575d1e5317fffca2d33b3b50"
-
 PACKAGECONFIG ?= " \
-   ${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'wayland egl', '', d)} \
-   ${@bb.utils.contains('DISTRO_FEATURES', 'opengl', 'gles2', '', d)} \
-   ${@bb.utils.contains('DISTRO_FEATURES', 'bluetooth', 'bluez', '', d)} \
-   ${@bb.utils.contains('DISTRO_FEATURES', 'directfb', 'directfb', '', d)} \
-   orc curl uvch264 neon \
-   hls sbc dash bz2 smoothstreaming \
-   faac sndfile \
-   libsmaf \
-   "
+    ${GSTREAMER_ORC} \
+    ${PACKAGECONFIG_GL} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'bluetooth', 'bluez', '', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'directfb', 'directfb', '', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'wayland egl', '', d)} \
+    bz2 curl dash hls neon sbc smoothstreaming sndfile uvch264  \
+    faac \
+    libsmaf \
+"
 
 PACKAGECONFIG[libsmaf] = ",,libsmaf,libsmaf"
 
 ARM_INSTRUCTION_SET = "arm"
 
 do_configure_prepend() {
-    srcdir=${S} NOCONFIGURE=1 ${S}/autogen.sh
+	${S}/autogen.sh --noconfigure
 }
 
-DEPENDS += "openssl"
-RDEPENDS_${PN}-dtls += "openssl"
+# In 1.6.2, the "--enable-hls" configure option generated an installable package
+# called "gstreamer1.0-plugins-bad-fragmented". In 1.7.1 that HLS plugin package
+# has become "gstreamer1.0-plugins-bad-hls". See:
+# http://cgit.freedesktop.org/gstreamer/gst-plugins-bad/commit/?id=efe62292a3d045126654d93239fdf4cc8e48ae08
 
-FILES_${PN}-dev += "${libdir}/gstreamer-1.0/include/gst/gl/gstglconfig.h"
-FILES_${PN}-freeverb += "${datadir}/gstreamer-1.0/presets/GstFreeverb.prs"
+PACKAGESPLITFUNCS_append = " handle_hls_rename "
+
+python handle_hls_rename () {
+    d.setVar('RPROVIDES_gstreamer1.0-plugins-bad-hls', 'gstreamer1.0-plugins-bad-fragmented')
+    d.setVar('RREPLACES_gstreamer1.0-plugins-bad-hls', 'gstreamer1.0-plugins-bad-fragmented')
+    d.setVar('RCONFLICTS_gstreamer1.0-plugins-bad-hls', 'gstreamer1.0-plugins-bad-fragmented')
+}
