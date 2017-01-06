@@ -36,15 +36,15 @@ EXTRA_OECONF += " \
 "
 
 #enable hardware convert/scale in playbin (gstsubtitleoverlay.c, gstplaysinkvideoconvert.c, gstplaysink.c) & gstencodebin (gstencodebin.c)
-#disable software convert/scale/rate in gstencodebin (gstencodebin.c), hardware convert/scale enabled through COLORSPACE define (gstencodebin.c)
-GSTVIDEOCONVERTOR ?= "autovideoconvert"
+#disable software convert/scale/rate in gstencodebin (gstencodebin.c)
+HW_TRANSFORM_CONFIG = 'CFLAGS="-DCOLORSPACE=\\\\\\"autovideoconvert\\\\\\" \
+                               -DCOLORSPACE_SUBT=\\\\\\"videoconvert\\\\\\" \
+                               -DGST_PLAYBIN_DEFAULT_FLAGS=0x00000017 \
+                               -DCOLORSPACE2=\\\\\\"identity\\\\\\" \
+                               -DVIDEOSCALE=\\\\\\"identity\\\\\\" \
+                               -DVIDEORATE=\\\\\\"identity\\\\\\" "'
 
-CACHED_CONFIGUREVARS += '   CFLAGS="-DCOLORSPACE=\\\"${GSTVIDEOCONVERTOR}\\\" \
-                                    -DCOLORSPACE_SUBT=\\\"videoconvert\\\" \
-                                    -DGST_PLAYBIN_DEFAULT_FLAGS=0x00000017 \
-                                    -DCOLORSPACE2=\\\"identity\\\" \
-                                    -DVIDEOSCALE=\\\"identity\\\" \
-                                    -DVIDEORATE=\\\"identity\\\" "'
+CACHED_CONFIGUREVARS += "${@bb.utils.contains('DISTRO_FEATURES', 'swdecode', '', '${HW_TRANSFORM_CONFIG}', d)}"
 
 do_configure_prepend() {
     ${S}/autogen.sh --noconfigure
