@@ -72,7 +72,8 @@ MACHINE ??= "qemux86"
 # Ultimately when creating custom policy, people will likely end up subclassing
 # these defaults.
 #
-DISTRO = "st-opensdk"
+# This sets the default distribution to be nodistro if no other distribution is selected:
+DISTRO ??= "nodistro"
 
 #
 # Where to place downloads
