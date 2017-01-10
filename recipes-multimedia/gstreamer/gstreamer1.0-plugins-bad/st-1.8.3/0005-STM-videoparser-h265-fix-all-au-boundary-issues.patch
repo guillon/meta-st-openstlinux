@@ -1,0 +1,219 @@
+From f44aea402d7046b9c7ef6e96399afdcbe6947f23 Mon Sep 17 00:00:00 2001
+From: Christophe Priouzeau <christophe.priouzeau@linaro.org>
+Date: Thu, 7 Apr 2016 12:09:20 +0200
+Subject: [PATCH 05/24] STM: videoparser: h265: fix all au boundary issues
+
+Following issues are fixed:
+ - Multiple RADL/RASL/TSA/STSA AUs in single buffer
+ - AU boundary criteria when next NALU is VCL
+ - AU boundary criteria when next non-VCL NALU does not follow the last VCL NALU in an AU
+   i.e, when non-VCL NALUs like PREFIX_SEI, SPS, etc are 'in the middle' of an AU
+
+Change-Id: I80f047792f45d96993600c5780600b35102c2fee
+Signed-off-by: Hugues FRUCHET <hugues.fruchet@st.com>
+---
+ gst/videoparsers/gsth265parse.c | 150 ++++++++++++++++++++++++++++++++--------
+ gst/videoparsers/gsth265parse.h |   3 +
+ 2 files changed, 123 insertions(+), 30 deletions(-)
+
+diff --git a/gst/videoparsers/gsth265parse.c b/gst/videoparsers/gsth265parse.c
+index 26e7c48..01c6a14 100644
+--- a/gst/videoparsers/gsth265parse.c
++++ b/gst/videoparsers/gsth265parse.c
+@@ -169,6 +169,10 @@ gst_h265_parse_reset_frame (GstH265Parse * h265parse)
+   h265parse->sei_pos = -1;
+   h265parse->keyframe = FALSE;
+   h265parse->header = FALSE;
++
++  h265parse->curr_au_last_vcl_detected = FALSE;
++  h265parse->curr_au_last_vcl_offset = 0;
++
+   gst_adapter_clear (h265parse->frame_out);
+ }
+ 
+@@ -673,52 +677,138 @@ gst_h265_parse_process_nal (GstH265Parse * h265parse, GstH265NalUnit * nalu)
+ }
+ 
+ /* caller guarantees at least 3 bytes of nal payload for each nal
+- * returns TRUE if next_nal indicates that nal terminates an AU */
++ * returns TRUE if next_nal indicates that nal terminates an AU;
++ * hence purpose of this function is to determine whether
++ * current AU is complete or not. */
+ static inline gboolean
+ gst_h265_parse_collect_nal (GstH265Parse * h265parse, const guint8 * data,
+     guint size, GstH265NalUnit * nalu)
+ {
+-  gboolean complete;
++  gboolean complete = FALSE;
+   GstH265ParserResult parse_res;
+   GstH265NalUnitType nal_type = nalu->type;
+-  GstH265NalUnit nnalu;
++  GstH265NalUnit nalu_next, nalu_i;
++
++  /* nalu          - current NALU, which is input parameter to the function
++   * nalu_next     - NALU next to current NALU
++   * nalu_i        - i'th NALU, can refer to any NALU
++   * nal_type      - can refer to any NALU type, initialized to current NALU type */
++
++  GST_LOG_OBJECT (h265parse, "current NAL type: %d %s, parsing next NALU",
++      nal_type, _nal_name (nal_type));
+ 
+-  GST_DEBUG_OBJECT (h265parse, "parsing collected nal");
+   parse_res = gst_h265_parser_identify_nalu (h265parse->nalparser, data,
+-      nalu->offset + nalu->size, size, &nnalu);
++      nalu->offset + nalu->size, size, &nalu_next);
+ 
+-  if (parse_res == GST_H265_PARSER_ERROR)
++  if (parse_res == GST_H265_PARSER_ERROR) {
++    GST_ERROR_OBJECT(h265parse, "error %d in parsing next NALU", parse_res);
+     return FALSE;
++  }
+ 
+-  /* determine if AU complete */
+-  GST_LOG_OBJECT (h265parse, "nal type: %d %s", nal_type, _nal_name (nal_type));
+   /* coded slice NAL starts a picture,
+    * i.e. other types become aggregated in front of it */
+-  h265parse->picture_start |= ((nal_type >= GST_H265_NAL_SLICE_TRAIL_N
++  if (!h265parse->picture_start) {
++      if ((nal_type >= GST_H265_NAL_SLICE_TRAIL_N
+           && nal_type <= GST_H265_NAL_SLICE_RASL_R)
+-      || (nal_type >= GST_H265_NAL_SLICE_BLA_W_LP
+-          && nal_type <= RESERVED_IRAP_NAL_TYPE_MAX));
+-
+-  /* consider a coded slices (IRAP or not) to start a picture,
+-   * (so ending the previous one) if first_slice_segment_in_pic_flag == 1*/
+-  nal_type = nnalu.type;
+-  complete = h265parse->picture_start && ((nal_type >= GST_H265_NAL_VPS
+-          && nal_type <= GST_H265_NAL_AUD)
+-      || nal_type == GST_H265_NAL_PREFIX_SEI || (nal_type >= 41
+-          && nal_type <= 44) || (nal_type >= 48 && nal_type <= 55));
+-
+-  GST_LOG_OBJECT (h265parse, "next nal type: %d %s", nal_type,
+-      _nal_name (nal_type));
+-
+-  /* Any VCL Nal unit with first_slice_segment_in_pic_flag == 1 considered start of frame */
+-  complete |= h265parse->picture_start
+-      && (((nal_type >= GST_H265_NAL_SLICE_TRAIL_N
+-              && nal_type <= GST_H265_NAL_SLICE_RASL_R)
+           || (nal_type >= GST_H265_NAL_SLICE_BLA_W_LP
+-              && nal_type <= RESERVED_IRAP_NAL_TYPE_MAX))
+-      && (nnalu.data[nnalu.offset + 2] & 0x80));
++          && nal_type <= RESERVED_IRAP_NAL_TYPE_MAX)) {
++
++      h265parse->picture_start = TRUE;
++      /* initialize curr_au_last_vcl_offset for current AU */
++      h265parse->curr_au_last_vcl_offset = nalu->offset;
++    } else {
++      GST_DEBUG_OBJECT(h265parse, "could not find coded NAL slice as picture start");
++      return FALSE;
++    }
++  }
++
++  /* if current NALU is end of sequence or bitstream,
++   * end current AU. Or if next NALU is of type
++   * AU delimiter, it will be the first NALU
++   * of next AU, so current AU ends here. */
++  if (((nalu_next.type != GST_H265_NAL_EOB)
++    && (nal_type == GST_H265_NAL_EOS))
++    || (nal_type == GST_H265_NAL_EOB)
++    || (nalu_next.type == GST_H265_NAL_AUD)) {
++    complete = TRUE;
++    goto out;
++  }
++
++  /* if next nalu is a VCL:
++   * if first_slice_segment_in_pic_flag == 1,
++   * it is start of new frame. So complete current au,
++   * else store its offset */
++  if ((nalu_next.type >= GST_H265_NAL_SLICE_TRAIL_N
++      && nalu_next.type <= GST_H265_NAL_SLICE_RASL_R)
++  || (nalu_next.type >= GST_H265_NAL_SLICE_BLA_W_LP
++      && nalu_next.type <= RESERVED_IRAP_NAL_TYPE_MAX)) {
++
++    if (nalu_next.data[nalu_next.offset + 2] & 0x80) {
++      complete = TRUE;
++      goto out;
++    }
++
++    if (!h265parse->curr_au_last_vcl_detected)
++      h265parse->curr_au_last_vcl_offset = nalu_next.offset;
++  }
+ 
+-  GST_LOG_OBJECT (h265parse, "au complete: %d", complete);
++  /* find last VCL offset in current AU, if not known */
++  if (!h265parse->curr_au_last_vcl_detected) {
++    /* initializing nalu_i */
++    nalu_i = nalu_next;
++
++    /* search for last VCL NALU in the current AU */
++    while (size > (nalu_i.offset + nalu_i.size)) {
++      /* get (i+1)th NALU information into nalu_i */
++      parse_res = gst_h265_parser_identify_nalu (h265parse->nalparser, data,
++          nalu_i.offset + nalu_i.size, size, &nalu_i);
++
++      /* NALU may not be identified if size boundary is reached. */
++      if (parse_res != GST_H265_PARSER_OK) {
++        GST_DEBUG_OBJECT(h265parse, "error in identifying further NALU,"
++                "parse_error=%d size=%d offset=%d",
++                parse_res, size, nalu_i.offset + nalu_i.size);
++        break;
++      }
++
++      /* assign nal_type to i'th NALU type */
++      nal_type = nalu_i.type;
++
++      GST_LOG_OBJECT (h265parse, "next NAL type: %d %s", nal_type,
++            _nal_name (nal_type));
++
++      /* check if VCL NAL unit found */
++      if ((nal_type >= GST_H265_NAL_SLICE_TRAIL_N
++            && nal_type <= GST_H265_NAL_SLICE_RASL_R)
++        || (nal_type >= GST_H265_NAL_SLICE_BLA_W_LP
++            && nal_type <= RESERVED_IRAP_NAL_TYPE_MAX)) {
++
++        /* any VCL NAL unit with first_slice_segment_in_pic_flag == 1
++         * considered start of frame, so break here. */
++        if (nalu_i.data[nalu_i.offset + 2] & 0x80) {
++          h265parse->curr_au_last_vcl_detected = TRUE;
++          break;
++        }
++        /* till last VCL offset found, keep overwriting with latest VCL offset */
++        h265parse->curr_au_last_vcl_offset = nalu_i.offset;
++      }
++    }
++  }
++
++  /* in case next NAL unit is any of the following types,
++   * ensure that it does not follow the last VCL NAL unit in current AU,
++   * and end at current NAL unit */
++  if ((nalu_next.type >= GST_H265_NAL_VPS && nalu_next.type < GST_H265_NAL_AUD)
++      || (nalu_next.type == GST_H265_NAL_PREFIX_SEI)
++      || (nalu_next.type >= 41 && nalu_next.type <= 44)
++      || (nalu_next.type >= 48 && nalu_next.type <= 55)) {
++
++      if (nalu_next.offset > h265parse->curr_au_last_vcl_offset)
++        complete = TRUE;
++  }
++
++out:
++  GST_LOG_OBJECT (h265parse, "AU complete: %d", complete);
+   return complete;
+ }
+ 
+diff --git a/gst/videoparsers/gsth265parse.h b/gst/videoparsers/gsth265parse.h
+index 91e84ab..c58c39f 100644
+--- a/gst/videoparsers/gsth265parse.h
++++ b/gst/videoparsers/gsth265parse.h
+@@ -94,6 +94,9 @@ struct _GstH265Parse
+ 
+   GstClockTime pending_key_unit_ts;
+   GstEvent *force_key_unit_event;
++
++  gboolean curr_au_last_vcl_detected;
++  gint curr_au_last_vcl_offset;
+ };
+ 
+ struct _GstH265ParseClass
+-- 
+2.7.4
+

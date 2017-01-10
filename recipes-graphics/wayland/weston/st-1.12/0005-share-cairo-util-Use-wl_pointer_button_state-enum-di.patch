@@ -1,0 +1,183 @@
+From d8b17bc45277941c4a4a30fc5da3bc9a6145c3bb Mon Sep 17 00:00:00 2001
+From: Quentin Glidic <sardemff7+git@sardemff7.net>
+Date: Sun, 10 Jul 2016 11:00:55 +0200
+Subject: [PATCH 05/61] share/cairo-util: Use wl_pointer_button_state enum
+ directly
+
+This silences two warnings:
+
+clients/window.c:2450:20: warning: implicit conversion from enumeration
+type 'enum wl_pointer_button_state' to different enumeration type 'enum
+frame_button_state' [-Wenum-conversion]
+                                              button, state);
+                                                      ^~~~~
+
+clients/window.c:2453:15: warning: implicit conversion from enumeration
+type 'enum wl_pointer_button_state' to different enumeration type 'enum
+frame_button_state' [-Wenum-conversion]
+                                                button, state);
+                                                        ^~~~~
+
+Warning produced by Clang 3.8.
+
+Signed-off-by: Quentin Glidic <sardemff7+git@sardemff7.net>
+Reviewed-by: Giulio Camuffo <giuliocamuffo@gmail.com>
+---
+ libweston/compositor-wayland.c |  9 ++-------
+ shared/cairo-util.h            | 10 +++-------
+ shared/frame.c                 | 12 ++++++------
+ xwayland/window-manager.c      |  5 +++--
+ 4 files changed, 14 insertions(+), 22 deletions(-)
+
+diff --git a/libweston/compositor-wayland.c b/libweston/compositor-wayland.c
+index c223baa..0375a11 100644
+--- a/libweston/compositor-wayland.c
++++ b/libweston/compositor-wayland.c
+@@ -1363,22 +1363,17 @@ input_handle_motion(void *data, struct wl_pointer *pointer,
+ static void
+ input_handle_button(void *data, struct wl_pointer *pointer,
+ 		    uint32_t serial, uint32_t time, uint32_t button,
+-		    uint32_t state_w)
++		    enum wl_pointer_button_state state)
+ {
+ 	struct wayland_input *input = data;
+-	enum wl_pointer_button_state state = state_w;
+-	enum frame_button_state fstate;
+ 	enum theme_location location;
+ 
+ 	if (!input->output)
+ 		return;
+ 
+ 	if (input->output->frame) {
+-		fstate = state == WL_POINTER_BUTTON_STATE_PRESSED ?
+-			FRAME_BUTTON_PRESSED : FRAME_BUTTON_RELEASED;
+-
+ 		location = frame_pointer_button(input->output->frame, input,
+-						button, fstate);
++						button, state);
+ 
+ 		if (frame_status(input->output->frame) & FRAME_STATUS_MOVE) {
+ 
+diff --git a/shared/cairo-util.h b/shared/cairo-util.h
+index 4fee087..84cf005 100644
+--- a/shared/cairo-util.h
++++ b/shared/cairo-util.h
+@@ -29,6 +29,7 @@
+ #include <stdint.h>
+ #include <cairo.h>
+ 
++#include <wayland-client.h>
+ #include <wayland-util.h>
+ 
+ void
+@@ -123,11 +124,6 @@ enum {
+ 	FRAME_BUTTON_ALL = 0x7
+ };
+ 
+-enum frame_button_state {
+-	FRAME_BUTTON_RELEASED = 0,
+-	FRAME_BUTTON_PRESSED = 1
+-};
+-
+ struct frame *
+ frame_create(struct theme *t, int32_t width, int32_t height, uint32_t buttons,
+ 	     const char *title);
+@@ -208,7 +204,7 @@ frame_pointer_leave(struct frame *frame, void *pointer);
+  */
+ enum theme_location
+ frame_pointer_button(struct frame *frame, void *pointer,
+-		     uint32_t button, enum frame_button_state state);
++		     uint32_t button, enum wl_pointer_button_state state);
+ 
+ enum theme_location
+ frame_touch_down(struct frame *frame, void *data, int32_t id, int x, int y);
+@@ -218,7 +214,7 @@ frame_touch_up(struct frame *frame, void *data, int32_t id);
+ 
+ enum theme_location
+ frame_double_click(struct frame *frame, void *pointer,
+-		   uint32_t button, enum frame_button_state state);
++		   uint32_t button, enum wl_pointer_button_state state);
+ 
+ void
+ frame_double_touch_down(struct frame *frame, void *data, int32_t id,
+diff --git a/shared/frame.c b/shared/frame.c
+index 9cd44c6..eb0cd77 100644
+--- a/shared/frame.c
++++ b/shared/frame.c
+@@ -745,7 +745,7 @@ frame_pointer_leave(struct frame *frame, void *data)
+ 
+ enum theme_location
+ frame_pointer_button(struct frame *frame, void *data,
+-		     uint32_t btn, enum frame_button_state state)
++		     uint32_t btn, enum wl_pointer_button_state state)
+ {
+ 	struct frame_pointer *pointer = frame_pointer_get(frame, data);
+ 	struct frame_pointer_button *button;
+@@ -759,7 +759,7 @@ frame_pointer_button(struct frame *frame, void *data,
+ 				      frame->flags & FRAME_FLAG_MAXIMIZED ?
+ 				      THEME_FRAME_MAXIMIZED : 0);
+ 
+-	if (state == FRAME_BUTTON_PRESSED) {
++	if (state == WL_POINTER_BUTTON_STATE_PRESSED) {
+ 		button = malloc(sizeof *button);
+ 		if (!button)
+ 			return location;
+@@ -770,7 +770,7 @@ frame_pointer_button(struct frame *frame, void *data,
+ 		wl_list_insert(&pointer->down_buttons, &button->link);
+ 
+ 		frame_pointer_button_press(frame, pointer, button);
+-	} else if (state == FRAME_BUTTON_RELEASED) {
++	} else if (state == WL_POINTER_BUTTON_STATE_RELEASED) {
+ 		button = NULL;
+ 		wl_list_for_each(button, &pointer->down_buttons, link)
+ 			if (button->button == btn)
+@@ -844,7 +844,7 @@ frame_touch_up(struct frame *frame, void *data, int32_t id)
+ 
+ enum theme_location
+ frame_double_click(struct frame *frame, void *data,
+-		   uint32_t btn, enum frame_button_state state)
++		   uint32_t btn, enum wl_pointer_button_state state)
+ {
+ 	struct frame_pointer *pointer = frame_pointer_get(frame, data);
+ 	struct frame_button *button;
+@@ -860,12 +860,12 @@ frame_double_click(struct frame *frame, void *data,
+ 	if (location != THEME_LOCATION_TITLEBAR || btn != BTN_LEFT)
+ 		return location;
+ 
+-	if (state == FRAME_BUTTON_PRESSED) {
++	if (state == WL_POINTER_BUTTON_STATE_PRESSED) {
+ 		if (button)
+ 			frame_button_press(button);
+ 		else
+ 			frame->status |= FRAME_STATUS_MAXIMIZE;
+-	} else if (state == FRAME_BUTTON_RELEASED) {
++	} else if (state == WL_POINTER_BUTTON_STATE_RELEASED) {
+ 		if (button)
+ 			frame_button_release(button);
+ 	}
+diff --git a/xwayland/window-manager.c b/xwayland/window-manager.c
+index 4fab602..0e26d7c 100644
+--- a/xwayland/window-manager.c
++++ b/xwayland/window-manager.c
+@@ -1759,7 +1759,7 @@ weston_wm_handle_button(struct weston_wm *wm, xcb_generic_event_t *event)
+ 	struct weston_pointer *pointer;
+ 	struct weston_wm_window *window;
+ 	enum theme_location location;
+-	enum frame_button_state button_state;
++	enum wl_pointer_button_state button_state;
+ 	uint32_t button_id;
+ 
+ 	wm_log("XCB_BUTTON_%s (detail %d)\n",
+@@ -1777,7 +1777,8 @@ weston_wm_handle_button(struct weston_wm *wm, xcb_generic_event_t *event)
+ 	pointer = weston_seat_get_pointer(seat);
+ 
+ 	button_state = button->response_type == XCB_BUTTON_PRESS ?
+-		FRAME_BUTTON_PRESSED : FRAME_BUTTON_RELEASED;
++		WL_POINTER_BUTTON_STATE_PRESSED :
++		WL_POINTER_BUTTON_STATE_RELEASED;
+ 	button_id = button->detail == 1 ? BTN_LEFT : BTN_RIGHT;
+ 
+ 	/* Make sure we're looking at the right location.  The frame
+-- 
+2.7.4
+

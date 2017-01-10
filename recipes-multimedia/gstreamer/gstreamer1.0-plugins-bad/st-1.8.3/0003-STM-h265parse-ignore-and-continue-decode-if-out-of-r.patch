@@ -1,0 +1,81 @@
+From 7de7a4a7e7f652a23c6f4f92b48ebb718480a018 Mon Sep 17 00:00:00 2001
+From: Christophe Priouzeau <christophe.priouzeau@linaro.org>
+Date: Thu, 7 Apr 2016 10:11:47 +0200
+Subject: [PATCH 03/24] STM: h265parse: ignore and continue decode if out of
+ range vui params found
+
+Annex E of specification
+
+VUI parameters are not required for constructing the luma or chroma samples by
+the decoding process. Conforming decoders are not required to process this
+information for output order conformance to this Specification.
+Some VUI parameters are required to check bitstream conformance
+and for output timing decoder conformance.
+
+Change-Id: I677c5f389e25b0e9362149af037e445d3bce403d
+Signed-off-by: Rajnikant Rao <rajnikant.rao@st.com>
+---
+ gst-libs/gst/codecparsers/gsth265parser.c | 47 +++++++++++++++++++++++++++----
+ 1 file changed, 42 insertions(+), 5 deletions(-)
+
+diff --git a/gst-libs/gst/codecparsers/gsth265parser.c b/gst-libs/gst/codecparsers/gsth265parser.c
+index 52a1fc2..f5ceb61 100644
+--- a/gst-libs/gst/codecparsers/gsth265parser.c
++++ b/gst-libs/gst/codecparsers/gsth265parser.c
+@@ -528,11 +528,48 @@ gst_h265_parse_vui_parameters (GstH265SPS * sps, NalReader * nr)
+     READ_UINT8 (nr, vui->tiles_fixed_structure_flag, 1);
+     READ_UINT8 (nr, vui->motion_vectors_over_pic_boundaries_flag, 1);
+     READ_UINT8 (nr, vui->restricted_ref_pic_lists_flag, 1);
+-    READ_UE_MAX (nr, vui->min_spatial_segmentation_idc, 4096);
+-    READ_UE_MAX (nr, vui->max_bytes_per_pic_denom, 16);
+-    READ_UE_MAX (nr, vui->max_bits_per_min_cu_denom, 16);
+-    READ_UE_MAX (nr, vui->log2_max_mv_length_horizontal, 16);
+-    READ_UE_MAX (nr, vui->log2_max_mv_length_vertical, 15);
++
++    /* Annex E: VUI parameters are not required for constructing the luma or chroma
++     * samples by the decoding process. Conforming decoders are not required to
++     * process this information for output order conformance to specification.
++     * Some VUI parameters are required to check bitstream conformance and for
++     * output timing decoder conformance.
++     */
++
++    READ_UE (nr, vui->min_spatial_segmentation_idc);
++    if (vui->min_spatial_segmentation_idc > 4096) {
++      GST_WARNING ("vui min_spatial_segmentation_idc = %d detected in stream "
++              "(incompliant to H.265 E.3.1). ignore and continue",
++                      vui->min_spatial_segmentation_idc);
++    }
++
++   READ_UE (nr, vui->max_bytes_per_pic_denom);
++   if (vui->max_bytes_per_pic_denom > 16) {
++      GST_WARNING ("vui max_bytes_per_pic_denom = %d detected in stream "
++              "(incompliant to H.265 E.3.1). ignore and continue",
++                      vui->max_bytes_per_pic_denom);
++    }
++
++    READ_UE (nr, vui->max_bits_per_min_cu_denom);
++    if (vui->max_bits_per_min_cu_denom > 16) {
++      GST_WARNING ("vui max_bits_per_min_cu_denom = %d detected in stream "
++              "(incompliant to H.265 E.3.1). ignore and continue",
++                      vui->max_bits_per_min_cu_denom);
++    }
++
++    READ_UE (nr, vui->log2_max_mv_length_horizontal);
++    if (vui->log2_max_mv_length_horizontal > 16) {
++      GST_WARNING ("vui log2_max_mv_length_horizontal = %d detected in stream "
++              "(incompliant to H.265 E.3.1). ignore and continue",
++                      vui->log2_max_mv_length_horizontal);
++    }
++
++    READ_UE (nr, vui->log2_max_mv_length_vertical);
++    if (vui->log2_max_mv_length_vertical > 15) {
++      GST_WARNING ("vui log2_max_mv_length_vertical = %d detected in stream "
++              "(incompliant to H.265 E.3.1). ignore and continue",
++                      vui->log2_max_mv_length_vertical);
++    }
+   }
+ 
+   return TRUE;
+-- 
+2.7.4
+

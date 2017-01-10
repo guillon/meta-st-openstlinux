@@ -1,0 +1,62 @@
+From a2150f28da5c1f04cfebf4f77a6076b47a3a861c Mon Sep 17 00:00:00 2001
+From: Fabien Dessenne <fabien.dessenne@st.com>
+Date: Thu, 4 Dec 2014 16:19:54 +0100
+Subject: [PATCH 02/15] libv4l2: remove actions if conversion disabled
+
+If the V4L2_DISABLE_CONVERSION flag is set when calling v4l2_fd_open,
+it's useless to get the current camera format and the capture
+parameters.
+
+Change-Id: I2c42121c8a22782531760999c712837df2175c11
+Signed-off-by: Fabien Dessenne <fabien.dessenne@st.com>
+Reviewed-on: https://gerrit.st.com/18757
+---
+ lib/libv4l2/libv4l2.c | 30 +++++++++++++++---------------
+ 1 file changed, 15 insertions(+), 15 deletions(-)
+
+diff --git a/lib/libv4l2/libv4l2.c b/lib/libv4l2/libv4l2.c
+index 966a000..0e2dea1 100644
+--- a/lib/libv4l2/libv4l2.c
++++ b/lib/libv4l2/libv4l2.c
+@@ -697,23 +697,23 @@ int v4l2_fd_open(int fd, int v4l2_flags)
+ 	    !(cap.capabilities & (V4L2_CAP_STREAMING | V4L2_CAP_READWRITE)))
+ 		goto no_capture;
+ 
+-	/* Get current cam format */
+-	fmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+-	if (dev_ops->ioctl(dev_ops_priv, fd, VIDIOC_G_FMT, &fmt)) {
+-		int saved_err = errno;
+-		V4L2_LOG_ERR("getting pixformat: %s\n", strerror(errno));
+-		v4l2_plugin_cleanup(plugin_library, dev_ops_priv, dev_ops);
+-		errno = saved_err;
+-		return -1;
+-	}
++	if (!(v4l2_flags & V4L2_DISABLE_CONVERSION)) {
++		/* Get current cam format */
++		fmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
++		if (dev_ops->ioctl(dev_ops_priv, fd, VIDIOC_G_FMT, &fmt)) {
++			int saved_err = errno;
++			V4L2_LOG_ERR("getting pixformat: %s\n", strerror(errno));
++			v4l2_plugin_cleanup(plugin_library, dev_ops_priv, dev_ops);
++			errno = saved_err;
++			return -1;
++		}
+ 
+-	/* Check for frame rate setting support */
+-	parm.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+-	if (dev_ops->ioctl(dev_ops_priv, fd, VIDIOC_G_PARM, &parm))
+-		parm.type = 0;
++		/* Check for frame rate setting support */
++		parm.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
++		if (dev_ops->ioctl(dev_ops_priv, fd, VIDIOC_G_PARM, &parm))
++			parm.type = 0;
+ 
+-	/* init libv4lconvert */
+-	if (!(v4l2_flags & V4L2_DISABLE_CONVERSION)) {
++		/* init libv4lconvert */
+ 		convert = v4lconvert_create_with_dev_ops(fd, dev_ops_priv, dev_ops);
+ 		if (!convert) {
+ 			int saved_err = errno;
+-- 
+2.7.4
+

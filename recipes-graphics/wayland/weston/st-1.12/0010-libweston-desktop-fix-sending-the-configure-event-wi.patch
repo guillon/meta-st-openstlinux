@@ -1,0 +1,26 @@
+From 72f68c53eaad0829f9d14f62bb72a0db237983f4 Mon Sep 17 00:00:00 2001
+From: Giulio Camuffo <giuliocamuffo@gmail.com>
+Date: Wed, 28 Sep 2016 21:29:14 +0200
+Subject: [PATCH 10/61] libweston-desktop: fix sending the configure event with
+ wl_shell
+
+Reviewed-by: Quentin Glidic <sardemff7+git@sardemff7.net>
+---
+ libweston-desktop/wl-shell.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/libweston-desktop/wl-shell.c b/libweston-desktop/wl-shell.c
+index b5ad334..695b4a3 100644
+--- a/libweston-desktop/wl-shell.c
++++ b/libweston-desktop/wl-shell.c
+@@ -69,6 +69,7 @@ weston_desktop_wl_shell_surface_set_size(struct weston_desktop_surface *dsurface
+ 
+ 	if ((wsurface->width == width && wsurface->height == height) ||
+ 	    (width == 0 && height == 0))
++		return;
+ 
+ 	wl_shell_surface_send_configure(surface->resource,
+ 					WL_SHELL_SURFACE_RESIZE_NONE,
+-- 
+2.7.4
+

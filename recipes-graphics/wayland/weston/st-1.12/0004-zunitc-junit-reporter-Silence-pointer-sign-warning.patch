@@ -1,0 +1,60 @@
+From 9c36eb912e8c05c849f57f425458d7ab049bb0d9 Mon Sep 17 00:00:00 2001
+From: Quentin Glidic <sardemff7+git@sardemff7.net>
+Date: Sun, 10 Jul 2016 11:00:56 +0200
+Subject: [PATCH 04/61] zunitc/junit-reporter: Silence pointer-sign warning
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+/usr/x86_64-pc-linux-gnu/include/libxml2/libxml/xmlstring.h:35:18:
+warning: pointer targets in passing argument 3 of 'xmlStrPrintf' differ
+in signedness [-Wpointer-sign]
+ #define BAD_CAST (xmlChar *)
+                  ^
+tools/zunitc/src/zuc_junit_reporter.c:77:41: note: in expansion of macro
+'BAD_CAST'
+  xmlStrPrintf(scratch, sizeof(scratch), BAD_CAST %d, value);
+                                         ^~~~~~~~
+/usr/x86_64-pc-linux-gnu/include/libxml2/libxml/xmlstring.h:98:17: note:
+expected 'const char *' but argument is of type 'xmlChar * {aka unsigned
+char *}'
+                 xmlStrPrintf             (xmlChar *buf,
+
+Warning produced by GCC 5.3, 6.1 and Clang 3.8.
+
+Signed-off-by: Quentin Glidic <sardemff7+git@sardemff7.net>
+Reviewed-by: Armin Krezović <krezovic.armin@gmail.com>
+Tested-by: Armin Krezović <krezovic.armin@gmail.com>
+---
+ tools/zunitc/src/zuc_junit_reporter.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/tools/zunitc/src/zuc_junit_reporter.c b/tools/zunitc/src/zuc_junit_reporter.c
+index 369f035..5c6b762 100644
+--- a/tools/zunitc/src/zuc_junit_reporter.c
++++ b/tools/zunitc/src/zuc_junit_reporter.c
+@@ -53,6 +53,12 @@
+ 
+ #define ISO_8601_FORMAT "%Y-%m-%dT%H:%M:%SZ"
+ 
++#if LIBXML_VERSION >= 20904
++#define STRPRINTF_CAST
++#else
++#define STRPRINTF_CAST BAD_CAST
++#endif
++
+ /**
+  * Internal data.
+  */
+@@ -68,7 +74,7 @@ static void
+ set_attribute(xmlNodePtr node, const char *name, int value)
+ {
+ 	xmlChar scratch[MAX_64BIT_STRLEN + 1] = {};
+-	xmlStrPrintf(scratch, sizeof(scratch), BAD_CAST "%d", value);
++	xmlStrPrintf(scratch, sizeof(scratch), STRPRINTF_CAST "%d", value);
+ 	xmlSetProp(node, BAD_CAST name, scratch);
+ }
+ 
+-- 
+2.7.4
+

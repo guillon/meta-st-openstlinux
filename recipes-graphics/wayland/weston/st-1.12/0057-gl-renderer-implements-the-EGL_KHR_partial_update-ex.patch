@@ -1,0 +1,255 @@
+From 4177630a2bc90aa4f0c1cfb073d8143d7d9cf31d Mon Sep 17 00:00:00 2001
+From: Vincent Abriou <vincent.abriou@st.com>
+Date: Mon, 10 Oct 2016 16:14:10 +0200
+Subject: [PATCH 57/61] gl-renderer: implements the EGL_KHR_partial_update
+ extension
+
+This extension allows the EGL to only redraw the damaged area.
+There is a gain of performances because the background is refreshed
+only partially when it is needed.
+In case of video playback (in a compositor stripe), the background
+is then never refreshed.
+This fix the performances issue with 4K display
+
+Change-Id: Iad46510865fcaa4ab68e87e66e237a2239300a05
+Signed-off-by: Vincent Abriou <vincent.abriou@st.com>
+---
+ libweston/gl-renderer.c    | 154 +++++++++++++++++++++++++++++++++++++++++++--
+ libweston/weston-egl-ext.h |  10 +++
+ 2 files changed, 159 insertions(+), 5 deletions(-)
+
+diff --git a/libweston/gl-renderer.c b/libweston/gl-renderer.c
+index 1525df8..b284178 100644
+--- a/libweston/gl-renderer.c
++++ b/libweston/gl-renderer.c
+@@ -58,7 +58,7 @@ struct gl_shader {
+ 	const char *vertex_source, *fragment_source;
+ };
+ 
+-#define BUFFER_DAMAGE_COUNT 2
++#define BUFFER_DAMAGE_COUNT 3
+ 
+ enum gl_border_status {
+ 	BORDER_STATUS_CLEAN = 0,
+@@ -191,6 +191,7 @@ struct gl_renderer {
+ 	PFNEGLDESTROYIMAGEKHRPROC destroy_image;
+ 	PFNEGLSWAPBUFFERSWITHDAMAGEEXTPROC swap_buffers_with_damage;
+ 	PFNEGLCREATEPLATFORMWINDOWSURFACEEXTPROC create_platform_window;
++	PFNEGLSETDAMAGEREGIONKHRPROC set_damage_region;
+ 
+ 	int has_unpack_subimage;
+ 
+@@ -1026,7 +1027,7 @@ output_get_damage(struct weston_output *output,
+ 
+ 	if (gr->has_egl_buffer_age) {
+ 		ret = eglQuerySurface(gr->egl_display, go->egl_surface,
+-				      EGL_BUFFER_AGE_EXT, &buffer_age);
++				      gr->has_egl_buffer_age, &buffer_age);
+ 		if (ret == EGL_FALSE) {
+ 			weston_log("buffer age query failed.\n");
+ 			gl_renderer_print_egl_error_state();
+@@ -1048,8 +1049,8 @@ output_get_damage(struct weston_output *output,
+ 		} else {
+ 			for (i = 0; i < buffer_age - 1; i++)
+ 				pixman_region32_union(buffer_damage,
+-						      buffer_damage,
+-						      &go->buffer_damage[(go->buffer_damage_index + i) % BUFFER_DAMAGE_COUNT]);
++									  buffer_damage,
++									  &go->buffer_damage[(go->buffer_damage_index + i) % BUFFER_DAMAGE_COUNT]);
+ 		}
+ 	}
+ }
+@@ -1072,6 +1073,138 @@ output_rotate_damage(struct weston_output *output,
+ 	go->border_damage[go->buffer_damage_index] = border_status;
+ }
+ 
++#define EXPAND_32_PIX 32
++static void
++output_set_damage(struct weston_output *output, pixman_region32_t *total_damage)
++ {
++	struct gl_renderer *gr = get_renderer(output->compositor);
++
++	if (gr->set_damage_region) {
++		struct gl_output_state *go = get_output_state(output);
++		pixman_region32_t buffer_damage;
++		int i, nrects, buffer_height;
++		EGLint *egl_damage, *d;
++		pixman_box32_t *rects;
++		int offsetx, offsety;
++
++		pixman_region32_init(&buffer_damage);
++		weston_transformed_region(output->width, output->height,
++				output->transform,
++				output->current_scale,
++				total_damage, &buffer_damage);
++
++		if (output_has_borders(output)) {
++			pixman_region32_translate(&buffer_damage,
++					go->borders[GL_RENDERER_BORDER_LEFT].width,
++					go->borders[GL_RENDERER_BORDER_TOP].height);
++			output_get_border_damage(output, go->border_status,
++					&buffer_damage);
++		}
++
++		rects = pixman_region32_rectangles(&buffer_damage, &nrects);
++		/* If buffer_damage is null, we should specify 1 rects with empty
++		 * parameters */
++		if (nrects == 0)
++			nrects = 1;
++
++		egl_damage = malloc(nrects * 4 * sizeof(EGLint));
++
++		buffer_height = go->borders[GL_RENDERER_BORDER_TOP].height +
++			output->current_mode->height +
++			go->borders[GL_RENDERER_BORDER_BOTTOM].height;
++
++		switch (output->transform) {
++		default:
++		case WL_OUTPUT_TRANSFORM_NORMAL:
++			offsetx = output->x;
++			offsety = 0;
++			break;
++		case WL_OUTPUT_TRANSFORM_90:
++			offsetx = 0;
++			offsety = -output->x;
++			break;
++		case WL_OUTPUT_TRANSFORM_180:
++			offsetx = -output->x;
++			offsety = 0;
++			break;
++		case WL_OUTPUT_TRANSFORM_270:
++			offsetx = 0;
++			offsety = output->x;
++			break;
++		case WL_OUTPUT_TRANSFORM_FLIPPED:
++			offsetx = -output->x;
++			offsety = 0;
++			break;
++		case WL_OUTPUT_TRANSFORM_FLIPPED_90:
++			offsetx = 0;
++			offsety = output->x;
++			break;
++		case WL_OUTPUT_TRANSFORM_FLIPPED_180:
++			offsetx = output->x;
++			offsety = 0;
++			break;
++		case WL_OUTPUT_TRANSFORM_FLIPPED_270:
++			offsetx = 0;
++			offsety = -output->x;
++			break;
++		}
++
++		d = egl_damage;
++		if (pixman_region32_not_empty(&buffer_damage)) {
++			for (i = 0; i < nrects; ++i) {
++				*d++ = rects[i].x1 - offsetx;
++				*d++ = buffer_height - rects[i].y2 - offsety;
++				*d++ = rects[i].x2 - rects[i].x1;
++				*d++ = rects[i].y2 - rects[i].y1;
++			}
++		} else {
++			*d++ = 0;
++			*d++ = 0;
++			*d++ = 0;
++			*d++ = 0;
++		}
++
++		/* Inform GPU of the damage region */
++		if (!gr->set_damage_region(gr->egl_display, go->egl_surface, egl_damage, nrects))
++				weston_log("Failed in eglSetDamageRegionKHR.\n");
++
++		free(egl_damage);
++
++		/* Expand the total_dammage region to allow GPU to readback coherent
++		 * data at border of the region defined by eglSetDamageRegionKHR.
++		 * Else border region have undefined value. */
++		pixman_region32_init(&buffer_damage);
++		pixman_region32_copy(&buffer_damage, total_damage);
++
++		if (pixman_region32_not_empty(&buffer_damage)) {
++			rects = pixman_region32_rectangles(&buffer_damage, &nrects);
++
++			for (i = 0; i < nrects; ++i) {
++				rects[i].x1 = rects[i].x1 - EXPAND_32_PIX;
++				rects[i].x2 = rects[i].x2 + EXPAND_32_PIX;
++				rects[i].y1 = rects[i].y1 - EXPAND_32_PIX;
++				rects[i].y2 = rects[i].y2 + EXPAND_32_PIX;
++
++				/* clip to output window size */
++				rects[i].x1 = min(rects[i].x1, output->x + output->width);
++				rects[i].x2 = min(rects[i].x2, output->x + output->width);
++				rects[i].y1 = min(rects[i].y1, output->y + output->height);
++				rects[i].y2 = min(rects[i].y2, output->y + output->height);
++
++				rects[i].x1 = max(rects[i].x1, output->x);
++				rects[i].x2 = max(rects[i].x2, output->x);
++				rects[i].y1 = max(rects[i].y1, output->y);
++				rects[i].y2 = max(rects[i].y2, output->y);
++			}
++
++			pixman_region32_clear(total_damage);
++			pixman_region32_init_rects(total_damage, rects, nrects);
++		}
++
++		pixman_region32_fini(&buffer_damage);
++	}
++}
++
+ /* NOTE: We now allow falling back to ARGB gl visuals when XRGB is
+  * unavailable, so we're assuming the background has no transparency
+  * and that everything with a blend, like drop shadows, will have something
+@@ -1136,6 +1269,8 @@ gl_renderer_repaint_output(struct weston_output *output,
+ 	pixman_region32_union(&total_damage, &buffer_damage, output_damage);
+ 	border_damage |= go->border_status;
+ 
++	output_set_damage(output, &total_damage);
++
+ 	repaint_views(output, &total_damage);
+ 
+ 	pixman_region32_fini(&total_damage);
+@@ -2814,11 +2949,20 @@ gl_renderer_setup_egl_extensions(struct weston_compositor *ec)
+ 	}
+ 
+ 	if (weston_check_egl_extension(extensions, "EGL_EXT_buffer_age"))
+-		gr->has_egl_buffer_age = 1;
++		gr->has_egl_buffer_age = EGL_BUFFER_AGE_EXT;
+ 	else
+ 		weston_log("warning: EGL_EXT_buffer_age not supported. "
+ 			   "Performance could be affected.\n");
+ 
++	if (weston_check_egl_extension(extensions, "EGL_KHR_partial_update")) {
++		gr->set_damage_region =
++			(void *) eglGetProcAddress("eglSetDamageRegionKHR");
++		gr->has_egl_buffer_age = EGL_BUFFER_AGE_KHR;
++	} else {
++		weston_log("warning: EGL_KHR_partial_update not supported."
++				   "Performance could be affected.\n");
++	}
++
+ 	if (weston_check_egl_extension(extensions, "EGL_EXT_swap_buffers_with_damage"))
+ 		gr->swap_buffers_with_damage =
+ 			(void *) eglGetProcAddress("eglSwapBuffersWithDamageEXT");
+diff --git a/libweston/weston-egl-ext.h b/libweston/weston-egl-ext.h
+index 70556fd..95738e7 100644
+--- a/libweston/weston-egl-ext.h
++++ b/libweston/weston-egl-ext.h
+@@ -154,6 +154,16 @@ typedef EGLSurface (EGLAPIENTRYP PFNEGLCREATEPLATFORMPIXMAPSURFACEEXTPROC) (EGLD
+ #define EGL_PLATFORM_X11_KHR 0x31D5
+ #endif
+ 
++#ifndef EGL_KHR_partial_update
++#define EGL_KHR_partial_update 1
++#define EGL_BUFFER_AGE_KHR              0x313D
++
++#ifdef EGL_EGLEXT_PROTOTYPES
++EGLAPI EGLBoolean EGLAPIENTRY eglSetDamageRegionKHR (EGLDisplay dpy, EGLSurface surface, EGLint *rects, EGLint n_rects);
++#endif
++typedef EGLBoolean (EGLAPIENTRYP PFNEGLSETDAMAGEREGIONKHRPROC) (EGLDisplay dpy, EGLSurface surface, EGLint *rects, EGLint n_rects);
++#endif
++
+ #else /* ENABLE_EGL */
+ 
+ /* EGL platform definition are keept to allow compositor-xx.c to build */
+-- 
+2.7.4
+

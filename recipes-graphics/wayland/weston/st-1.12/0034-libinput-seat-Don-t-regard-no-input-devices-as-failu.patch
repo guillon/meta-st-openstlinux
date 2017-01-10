@@ -1,0 +1,47 @@
+From 35e676f683db243b4122a928088086e6944b1236 Mon Sep 17 00:00:00 2001
+From: Vincent Abriou <vincent.abriou@st.com>
+Date: Fri, 13 Mar 2015 15:18:52 +0100
+Subject: [PATCH 34/61] libinput-seat: Don't regard no input devices as failure
+
+The reason for not having any input devices could actually be that there
+are no input devices attached, imagine that. Mention that cause in the
+warning and no longer return an error.
+
+This fixes starting weston on boards with no input devices attached.
+
+Change-Id: Ib573ad0917d545a5a9b730d5b77e6989c09af492
+Signed-off-by: Sjoerd Simons <sjoerd.simons@collabora.co.uk>
+Reviewed-by: Peter Hutterer <peter.hutterer@who-t.net>
+Reviewed-on: https://gerrit.st.com/25457
+Reviewed-by: Vincent ABRIOU <vincent.abriou@st.com>
+Tested-by: Vincent ABRIOU <vincent.abriou@st.com>
+Reviewed-by: Fabien DESSENNE <fabien.dessenne@st.com>
+Tested-by: Fabien DESSENNE <fabien.dessenne@st.com>
+Reviewed-on: https://gerrit.st.com/47169
+Reviewed-by: Denis HUMEAU <denis.humeau@st.com>
+Tested-by: Denis HUMEAU <denis.humeau@st.com>
+Reviewed-by: Romuald JEANNE <romuald.jeanne@st.com>
+---
+ libweston/libinput-seat.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libweston/libinput-seat.c b/libweston/libinput-seat.c
+index 78a5fc4..43af913 100644
+--- a/libweston/libinput-seat.c
++++ b/libweston/libinput-seat.c
+@@ -263,11 +263,11 @@ udev_input_enable(struct udev_input *input)
+ 		weston_log(
+ 			"warning: no input devices on entering Weston. "
+ 			"Possible causes:\n"
++			"\t- no input devices are attached\n"
+ 			"\t- no permissions to read /dev/input/event*\n"
+ 			"\t- seats misconfigured "
+ 			"(Weston backend option 'seat', "
+ 			"udev device property ID_SEAT)\n");
+-		return -1;
+ 	}
+ 
+ 	return 0;
+-- 
+2.7.4
+

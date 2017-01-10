@@ -1,0 +1,136 @@
+From fddea320047d8671758f3ded52a492840d5fcf8f Mon Sep 17 00:00:00 2001
+From: Christophe Priouzeau <christophe.priouzeau@linaro.org>
+Date: Wed, 6 Apr 2016 16:06:10 +0200
+Subject: [PATCH 01/23] STM: videomixer: downstream pool support
+
+Use downstream pool if exist instead allocating default virtual
+buffer.
+
+Change-Id: I32f9ebec73a676932a672d6897f3b990d0762eca
+Signed-off-by: Hugues FRUCHET <hugues.fruchet@st.com>
+---
+ gst/videomixer/videomixer2.c | 69 +++++++++++++++++++++++++++++++++++++++++++-
+ gst/videomixer/videomixer2.h |  3 ++
+ 2 files changed, 71 insertions(+), 1 deletion(-)
+
+diff --git a/gst/videomixer/videomixer2.c b/gst/videomixer/videomixer2.c
+index 25fc35a..526fe98 100644
+--- a/gst/videomixer/videomixer2.c
++++ b/gst/videomixer/videomixer2.c
+@@ -471,6 +471,39 @@ gst_videomixer2_update_converters (GstVideoMixer2 * mix)
+ }
+ 
+ static gboolean
++gst_videomixer2_do_bufferpool (GstVideoMixer2 * mix, GstCaps * outcaps)
++{
++  GstQuery *query;
++  GstBufferPool *pool = NULL;
++  GstAllocator *allocator;
++  guint allocator_nb;
++
++  GST_DEBUG_OBJECT (mix, "doing allocation query");
++  query = gst_query_new_allocation (outcaps, TRUE);
++  if (!gst_pad_peer_query (mix->srcpad, query)) {
++    /* not a problem, just debug a little */
++    GST_DEBUG_OBJECT (mix, "peer ALLOCATION query failed");
++    goto beach;
++  }
++
++  /* get the allocator array size */
++  if (gst_query_get_n_allocation_params (query) > 0) {
++    GST_DEBUG_OBJECT (mix, "got %d allocator(s)", allocator_nb);
++
++    /* take the first pool... */
++    gst_query_parse_nth_allocation_pool (query, 0, &pool, NULL, NULL, NULL);
++
++    GST_DEBUG_OBJECT (mix, "found downstream pool 0x%p", pool);
++    /* now store */
++    mix->pool = pool;
++    mix->pool_active = FALSE;
++  }
++
++beach:
++  return TRUE;
++}
++
++static gboolean
+ gst_videomixer2_pad_sink_setcaps (GstPad * pad, GstObject * parent,
+     GstCaps * caps)
+ {
+@@ -1052,10 +1085,26 @@ gst_videomixer2_blend_buffers (GstVideoMixer2 * mix,
+   BlendFunction composite;
+   GstVideoFrame outframe;
+   static GstAllocationParams params = { 0, 15, 0, 0, };
++  GstFlowReturn ret;
++
+ 
+   outsize = GST_VIDEO_INFO_SIZE (&mix->info);
+ 
+-  *outbuf = gst_buffer_new_allocate (NULL, outsize, &params);
++  if (mix->pool) {
++    if (!mix->pool_active) {
++      GST_DEBUG_OBJECT (mix, "setting pool %p active", mix->pool);
++      if (!gst_buffer_pool_set_active (mix->pool, TRUE))
++        goto activate_failed;
++      mix->pool_active = TRUE;
++    }
++    GST_DEBUG_OBJECT (mix, "using pool alloc");
++    ret = gst_buffer_pool_acquire_buffer (mix->pool, outbuf, NULL);
++    if (ret != GST_FLOW_OK)
++      goto alloc_failed;
++  } else {
++    *outbuf = gst_buffer_new_allocate (NULL, outsize, &params);
++  }
++
+   GST_BUFFER_TIMESTAMP (*outbuf) = output_start_time;
+   GST_BUFFER_DURATION (*outbuf) = output_end_time - output_start_time;
+ 
+@@ -1160,6 +1209,19 @@ gst_videomixer2_blend_buffers (GstVideoMixer2 * mix,
+   gst_video_frame_unmap (&outframe);
+ 
+   return GST_FLOW_OK;
++
++  /* ERRORS */
++activate_failed:
++  {
++    GST_ELEMENT_ERROR (mix, RESOURCE, SETTINGS,
++        ("failed to activate bufferpool"), ("failed to activate bufferpool"));
++    return GST_FLOW_ERROR;
++  }
++alloc_failed:
++  {
++    GST_DEBUG_OBJECT (mix, "could not allocate buffer from pool");
++    return ret;
++  }
+ }
+ 
+ /* Perform qos calculations before processing the next frame. Returns TRUE if
+@@ -1757,6 +1819,11 @@ gst_videomixer2_src_setcaps (GstPad * pad, GstVideoMixer2 * mix, GstCaps * caps)
+     mix->send_caps = TRUE;
+   }
+ 
++  if (ret) {
++    /* try to get a pool when needed */
++    ret = gst_videomixer2_do_bufferpool (mix, caps);
++  }
++
+ done:
+   return ret;
+ }
+diff --git a/gst/videomixer/videomixer2.h b/gst/videomixer/videomixer2.h
+index 8c6a65f..4938b3f 100644
+--- a/gst/videomixer/videomixer2.h
++++ b/gst/videomixer/videomixer2.h
+@@ -120,6 +120,9 @@ struct _GstVideoMixer2
+   gboolean live;
+ 
+   GstTagList *pending_tags;
++
++  GstBufferPool *pool;
++  gboolean pool_active;
+ };
+ 
+ struct _GstVideoMixer2Class
+-- 
+2.7.4
+

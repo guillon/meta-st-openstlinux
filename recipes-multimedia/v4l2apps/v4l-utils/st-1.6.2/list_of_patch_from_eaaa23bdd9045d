@@ -1,0 +1,15 @@
+f0928bc v4l-utils: libv4l-hva: new ops 'set_ctrl' added
+833d3d3 v4l-utils: libv4l-hva: fix for T8x8 for stereo profile
+6e549cc libv4l-hva: fix sps/pps memory leak
+c81577a libv4l-hva: fix missing unmap on close
+764bbe5 libv4l-hva: add second chroma qp index offset in pps
+0f5930b libv4l-hva: manage frame packing arrangement
+aadebf7 libv4l-hva: missing h264 parser
+7a07ac4 lib4l-hva: Implementation of h264 header encoder
+38de18c libv4l-hva: H264 vaapi encoder supported
+e1cdc4f libv4l-hva: H264 vaapi encoder added
+c492117 lib4l-hva: add new plugin for hva
+74c21e1 remove X11 dependency for test program
+dad48b9 libv4l2: set log file before plugin initialization
+a2150f2 libv4l2: remove actions if conversion disabled
+984ce14 Addition of the autogen.sh file to ensure that our programs will be created in our build repository, not with the sources

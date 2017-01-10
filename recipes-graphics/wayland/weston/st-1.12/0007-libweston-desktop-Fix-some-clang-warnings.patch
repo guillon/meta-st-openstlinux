@@ -1,0 +1,79 @@
+From 4e2fa0abc3bd359a309a4f215d528156751ff819 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Armin=20Krezovi=C4=87?= <krezovic.armin@gmail.com>
+Date: Sat, 10 Sep 2016 19:11:21 +0200
+Subject: [PATCH 07/61] libweston-desktop: Fix some clang warnings
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Fixes:
+
+implicit conversion from enumeration type '...' to different
+enumeration type '...' [-Wenum-conversion]
+
+Signed-off-by: Armin Krezović <krezovic.armin@gmail.com>
+Reviewed-by: Quentin Glidic <sardemff7+git@sardemff7.net>
+---
+ libweston-desktop/wl-shell.c     | 4 +++-
+ libweston-desktop/xdg-shell-v5.c | 4 +++-
+ libweston-desktop/xdg-shell-v6.c | 4 +++-
+ 3 files changed, 9 insertions(+), 3 deletions(-)
+
+diff --git a/libweston-desktop/wl-shell.c b/libweston-desktop/wl-shell.c
+index ded69f7..b5ad334 100644
+--- a/libweston-desktop/wl-shell.c
++++ b/libweston-desktop/wl-shell.c
+@@ -231,8 +231,10 @@ weston_desktop_wl_shell_surface_protocol_resize(struct wl_client *wl_client,
+ 	struct weston_seat *seat = wl_resource_get_user_data(seat_resource);
+ 	struct weston_desktop_wl_shell_surface *surface =
+ 		weston_desktop_surface_get_implementation_data(dsurface);
++	enum weston_desktop_surface_edge surf_edges =
++		(enum weston_desktop_surface_edge) edges;
+ 
+-	weston_desktop_api_resize(surface->desktop, dsurface, seat, serial, edges);
++	weston_desktop_api_resize(surface->desktop, dsurface, seat, serial, surf_edges);
+ }
+ 
+ static void
+diff --git a/libweston-desktop/xdg-shell-v5.c b/libweston-desktop/xdg-shell-v5.c
+index 14216b0..9fd3a87 100644
+--- a/libweston-desktop/xdg-shell-v5.c
++++ b/libweston-desktop/xdg-shell-v5.c
+@@ -395,9 +395,11 @@ weston_desktop_xdg_surface_protocol_resize(struct wl_client *wl_client,
+ 		wl_resource_get_user_data(seat_resource);
+ 	struct weston_desktop_xdg_surface *surface =
+ 		weston_desktop_surface_get_implementation_data(dsurface);
++	enum weston_desktop_surface_edge surf_edges =
++		(enum weston_desktop_surface_edge) edges;
+ 
+ 	weston_desktop_xdg_surface_ensure_added(surface);
+-	weston_desktop_api_resize(surface->desktop, dsurface, seat, serial, edges);
++	weston_desktop_api_resize(surface->desktop, dsurface, seat, serial, surf_edges);
+ }
+ 
+ static void
+diff --git a/libweston-desktop/xdg-shell-v6.c b/libweston-desktop/xdg-shell-v6.c
+index 2afce81..552b330 100644
+--- a/libweston-desktop/xdg-shell-v6.c
++++ b/libweston-desktop/xdg-shell-v6.c
+@@ -396,6 +396,8 @@ weston_desktop_xdg_toplevel_protocol_resize(struct wl_client *wl_client,
+ 		wl_resource_get_user_data(seat_resource);
+ 	struct weston_desktop_xdg_toplevel *toplevel =
+ 		weston_desktop_surface_get_implementation_data(dsurface);
++	enum weston_desktop_surface_edge surf_edges =
++		(enum weston_desktop_surface_edge) edges;
+ 
+ 	if (!toplevel->base.configured) {
+ 		wl_resource_post_error(toplevel->resource,
+@@ -405,7 +407,7 @@ weston_desktop_xdg_toplevel_protocol_resize(struct wl_client *wl_client,
+ 	}
+ 
+ 	weston_desktop_api_resize(toplevel->base.desktop,
+-				  dsurface, seat, serial, edges);
++				  dsurface, seat, serial, surf_edges);
+ }
+ 
+ static void
+-- 
+2.7.4
+

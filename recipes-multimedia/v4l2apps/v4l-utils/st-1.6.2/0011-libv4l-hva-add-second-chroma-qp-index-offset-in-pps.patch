@@ -1,0 +1,29 @@
+From 764bbe5736f23224002d7cd053003bcb3d4b5644 Mon Sep 17 00:00:00 2001
+From: Karine Boclaud <karine.boclaud-ext@st.com>
+Date: Thu, 5 Mar 2015 14:39:12 +0100
+Subject: [PATCH 11/15] libv4l-hva: add second chroma qp index offset in pps
+
+Change-Id: I132f822375a0b4d3f2af469236f7ca43c6966578
+Signed-off-by: Karine Boclaud <karine.boclaud-ext@st.com>
+Reviewed-on: https://gerrit.st.com/24926
+Reviewed-by: Yannick FERTRE <yannick.fertre@st.com>
+Tested-by: Yannick FERTRE <yannick.fertre@st.com>
+---
+ lib/libv4l-hva/libv4l-hva-h264.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/lib/libv4l-hva/libv4l-hva-h264.c b/lib/libv4l-hva/libv4l-hva-h264.c
+index b6ff65c..0f00207 100644
+--- a/lib/libv4l-hva/libv4l-hva-h264.c
++++ b/lib/libv4l-hva/libv4l-hva-h264.c
+@@ -304,6 +304,7 @@ hva_h264_get_sps_pps(void *priv, uint8_t **data, size_t *size,
+ 
+ 	pic_param.pic_fields.bits.transform_8x8_mode_flag = meta->dct8x8;
+ 	pic_param.pic_fields.bits.deblocking_filter_control_present_flag = 1;
++	pic_param.second_chroma_qp_index_offset = 2;
+ 
+ 	picture.param = &pic_param;
+ 
+-- 
+2.7.4
+

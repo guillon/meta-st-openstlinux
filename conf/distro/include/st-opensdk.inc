@@ -79,20 +79,15 @@ LICENSE_FLAGS_WHITELIST += " commercial"
 # Preferred version
 
 # gstreamer configuration
-PREFERRED_VERSION_gstreamer1.0 ?= "st%"
-PREFERRED_VERSION_gstreamer1.0-plugins-base ?= "st%"
-PREFERRED_VERSION_gstreamer1.0-plugins-good ?= "st%"
+PREFERRED_VERSION_gstreamer1.0 ?= "1.8.3%"
+PREFERRED_VERSION_gstreamer1.0-plugins-base ?= "1.8.3%"
+PREFERRED_VERSION_gstreamer1.0-plugins-good ?= "1.8.3%"
 PREFERRED_VERSION_gstreamer1.0-plugins-ugly ?= "1.8.3"
-PREFERRED_VERSION_gstreamer1.0-plugins-bad ?= "st%"
+PREFERRED_VERSION_gstreamer1.0-plugins-bad ?= "1.8.3%"
 PREFERRED_VERSION_gst-player ?= "1.8"
 
-# wayland / weston
-PREFERRED_VERSION_wayland ?= "1.12.0"
-PREFERRED_VERSION_wayland-native ?= "1.12.0"
-PREFERRED_VERSION_weston ?= "st%"
-
 # v4l-utils
-PREFERRED_VERSION_v4l-utils ?= "st%"
+#PREFERRED_VERSION_v4l-utils ?= "st%"
 
 # optee
 #NOTE: defined default version for optee release

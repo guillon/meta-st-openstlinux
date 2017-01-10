@@ -1,0 +1,39 @@
+From 2bb421be0d8c73d54be274c6f645ab0fade3321f Mon Sep 17 00:00:00 2001
+From: Hugues Fruchet <hugues.fruchet@st.com>
+Date: Fri, 29 Jul 2016 17:02:23 +0200
+Subject: [PATCH 03/23] v4l2object: TMP workaround for unaligned video
+
+The video meta is not detected in query while waylandsink is well
+requiring it, forcing it as a workaround...
+
+Change-Id: I43cf8c5ab060eaa232a142c1f65809770b35d966
+Reviewed-on: https://gerrit.st.com/56793
+Reviewed-by: Hugues FRUCHET <hugues.fruchet@st.com>
+Tested-by: Hugues FRUCHET <hugues.fruchet@st.com>
+---
+ sys/v4l2/gstv4l2object.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/sys/v4l2/gstv4l2object.c b/sys/v4l2/gstv4l2object.c
+index 5de969f..42a7728 100644
+--- a/sys/v4l2/gstv4l2object.c
++++ b/sys/v4l2/gstv4l2object.c
+@@ -3865,6 +3865,15 @@ gst_v4l2_object_decide_allocation (GstV4l2Object * obj, GstQuery * query)
+   has_video_meta =
+       gst_query_find_allocation_meta (query, GST_VIDEO_META_API_TYPE, NULL);
+ 
++  if (!has_video_meta) {
++    /* FIXME, GST_VIDEO_META_API_TYPE is not set in query, root cause is not
++     * understood, we force to always on as a workaround...
++     */
++    GST_WARNING_OBJECT (obj->element,
++        "No video meta in allocation query, forcing it...");
++    has_video_meta = TRUE;
++  }
++
+   can_share_own_pool = (has_video_meta || !obj->need_video_meta);
+ 
+   gst_v4l2_get_driver_min_buffers (obj);
+-- 
+2.7.4
+

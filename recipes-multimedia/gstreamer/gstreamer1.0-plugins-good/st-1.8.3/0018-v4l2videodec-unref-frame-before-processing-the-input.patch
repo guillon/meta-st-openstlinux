@@ -1,0 +1,122 @@
+From 749b739430271d3b7d79687cb9bb7afb709de2bc Mon Sep 17 00:00:00 2001
+From: Romuald JEANNE <romuald.jeanne@st.com>
+Date: Thu, 5 Jan 2017 14:36:03 +0100
+Subject: [PATCH 18/23] v4l2videodec: unref frame before processing the input
+ buffer
+
+In gst_v4l2_video_dec_handle_frame(), the frame shall be unreferenced
+before the input buffer is processed (gst_v4l2_buffer_pool_process):
+indeed, when the output buffer is pushed downstream (gst_v4l2_video_dec_loop
+-> gst_video_decoder_finish_frame), it shall be writable; for that, the
+frame must be released before pushing the output buffer. If the frame
+is unreferenced after the input buffer is processed, it might occur
+that it's not possible to release the frame in gst_video_decoder_finish_frame()
+because its reference counter is greater than 1.
+
+Change-Id: I9300f285b1d0b610ea28d4b10bfee059b200229c
+Reviewed-on: https://gerrit.st.com/59422
+Tested-by: Jean Christophe TROTIN <jean-christophe.trotin@st.com>
+Reviewed-by: Benjamin GAIGNARD <benjamin.gaignard@st.com>
+Reviewed-by: Jean Christophe TROTIN <jean-christophe.trotin@st.com>
+---
+ sys/v4l2/gstv4l2videodec.c | 43 +++++++++++++++++++++++++++++--------------
+ 1 file changed, 29 insertions(+), 14 deletions(-)
+
+diff --git a/sys/v4l2/gstv4l2videodec.c b/sys/v4l2/gstv4l2videodec.c
+index cd7daa6..2e027c8 100644
+--- a/sys/v4l2/gstv4l2videodec.c
++++ b/sys/v4l2/gstv4l2videodec.c
+@@ -526,8 +526,7 @@ gst_v4l2_video_dec_handle_frame (GstVideoDecoder * decoder,
+   GstV4l2Error error = GST_V4L2_ERROR_INIT;
+   GstV4l2VideoDec *self = GST_V4L2_VIDEO_DEC (decoder);
+   GstFlowReturn ret = GST_FLOW_OK;
+-  gboolean processed = FALSE;
+-  GstBuffer *tmp;
++  gboolean unref_frame = FALSE;
+ 
+   GST_DEBUG_OBJECT (self, "Handling frame %d", frame->system_frame_number);
+ 
+@@ -561,8 +560,8 @@ gst_v4l2_video_dec_handle_frame (GstVideoDecoder * decoder,
+     if (codec_data) {
+       gst_buffer_ref (codec_data);
+     } else {
+-      codec_data = gst_buffer_ref (frame->input_buffer);
+-      processed = TRUE;
++      codec_data = frame->input_buffer;
++      frame->input_buffer = NULL;
+     }
+ 
+     /* Ensure input internal pool is active */
+@@ -579,6 +578,14 @@ gst_v4l2_video_dec_handle_frame (GstVideoDecoder * decoder,
+         goto activate_failed;
+     }
+ 
++    /* the frame is no more needed: unref it before the input buffer is
++     * processed, so that the generated output buffer is writable when it's
++     * pushed downstream (see gst_v4l2_video_dec_loop) */
++    if (!frame->input_buffer) {
++      gst_video_codec_frame_unref (frame);
++      unref_frame = TRUE;
++    }
++
+     GST_VIDEO_DECODER_STREAM_UNLOCK (decoder);
+     ret =
+         gst_v4l2_buffer_pool_process (GST_V4L2_BUFFER_POOL (self->
+@@ -694,13 +701,25 @@ gst_v4l2_video_dec_handle_frame (GstVideoDecoder * decoder,
+       goto start_task_failed;
+   }
+ 
+-  if (!processed) {
++  if (frame->input_buffer) {
++    /* The frame is no more needed: unref it before the input buffer is
++     * processed, so that the generated output buffer is writable when it's
++     * pushed downstream (see gst_v4l2_video_dec_loop).
++     * Note that a reference to the input buffer must be kept until it's
++     * processed
++     */
++    gst_buffer_ref (frame->input_buffer);
++    gst_video_codec_frame_unref (frame);
++    unref_frame = TRUE;
++
+     GST_VIDEO_DECODER_STREAM_UNLOCK (decoder);
+     ret =
+         gst_v4l2_buffer_pool_process (GST_V4L2_BUFFER_POOL (self->v4l2output->
+             pool), &frame->input_buffer);
+     GST_VIDEO_DECODER_STREAM_LOCK (decoder);
+ 
++    gst_buffer_unref (frame->input_buffer);
++
+     if (ret == GST_FLOW_FLUSHING) {
+       if (g_atomic_int_get (&self->processing) == FALSE)
+         ret = self->output_flow;
+@@ -710,15 +729,6 @@ gst_v4l2_video_dec_handle_frame (GstVideoDecoder * decoder,
+     }
+   }
+ 
+-  /* No need to keep input arround */
+-  tmp = frame->input_buffer;
+-  frame->input_buffer = gst_buffer_new ();
+-  gst_buffer_copy_into (frame->input_buffer, tmp,
+-      GST_BUFFER_COPY_FLAGS | GST_BUFFER_COPY_TIMESTAMPS |
+-      GST_BUFFER_COPY_META, 0, 0);
+-  gst_buffer_unref (tmp);
+-
+-  gst_video_codec_frame_unref (frame);
+   return ret;
+ 
+   /* ERRORS */
+@@ -761,6 +771,11 @@ process_failed:
+   }
+ drop:
+   {
++    /* the input buffer processing fails: own again the frame before
++     * dropping it
++     */
++    if (unref_frame)
++      gst_video_codec_frame_ref (frame);
+     gst_video_decoder_drop_frame (decoder, frame);
+     return ret;
+   }
+-- 
+2.7.4
+

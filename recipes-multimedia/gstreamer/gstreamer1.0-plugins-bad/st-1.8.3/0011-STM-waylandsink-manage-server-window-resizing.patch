@@ -1,0 +1,107 @@
+From 401c5cbdeee0f7b063b76584fcd7123c2fee82c7 Mon Sep 17 00:00:00 2001
+From: Vincent Abriou <vincent.abriou@st.com>
+Date: Tue, 2 Aug 2016 15:50:42 +0200
+Subject: [PATCH 11/24] STM: waylandsink: manage server window resizing
+
+When the server informs waylandsink of a surface resize (which typically
+occurs when the user resizes the sink window) apply the changes using
+the scaler wayland interface.
+
+Change-Id: I7a438cb60d3ad3d35e8e9e4151f96cba2f6c21ff
+Signed-off-by: Fabien Dessenne <fabien.dessenne@st.com>
+---
+ ext/wayland/wlwindow.c | 31 ++++++++++++++++++++++++++++++-
+ ext/wayland/wlwindow.h |  6 ++++++
+ 2 files changed, 36 insertions(+), 1 deletion(-)
+
+diff --git a/ext/wayland/wlwindow.c b/ext/wayland/wlwindow.c
+index 1bb6382..bf3bcab 100644
+--- a/ext/wayland/wlwindow.c
++++ b/ext/wayland/wlwindow.c
+@@ -46,6 +46,17 @@ static void
+ handle_configure (void *data, struct wl_shell_surface *shell_surface,
+     uint32_t edges, int32_t width, int32_t height)
+ {
++  GstWlWindow *window = data;
++
++  if (edges & WL_SHELL_SURFACE_RESIZE_TOP)
++    window->y += window->video_height - height;
++  if (edges & WL_SHELL_SURFACE_RESIZE_LEFT)
++    window->x += window->video_width - width;
++
++  window->video_width = width;
++  window->video_height = height;
++
++  window->pending_configure = TRUE;
+ }
+ 
+ static void
+@@ -127,6 +138,10 @@ gst_wl_window_new_internal (GstWlDisplay * display)
+   window->video_viewport = wp_viewporter_get_viewport (display->viewporter,
+       window->video_surface);
+ 
++  window->x = 0;
++  window->y = 0;
++  window->pending_configure = FALSE;
++
+   /* draw the area_subsurface */
+   gst_video_info_set_format (&info,
+       /* we want WL_SHM_FORMAT_XRGB8888 */
+@@ -146,6 +161,7 @@ gst_wl_window_new_internal (GstWlDisplay * display)
+       display, &info);
+   gwlbuf = gst_buffer_add_wl_buffer (buf, wlbuf, display);
+   gst_wl_buffer_attach (gwlbuf, window->area_surface);
++  window->area_buf = gwlbuf;
+ 
+   /* at this point, the GstWlBuffer keeps the buffer
+    * alive and will free it on wl_buffer::release */
+@@ -291,15 +307,28 @@ gst_wl_window_render (GstWlWindow * window, GstWlBuffer * buffer,
+ 
+   wl_surface_damage (window->video_surface, 0, 0, window->surface_width,
+       window->surface_height);
++
++  if (G_UNLIKELY (window->pending_configure))
++    wp_viewport_set_destination (window->video_viewport, window->video_width,
++        window->video_height);
++
+   wl_surface_commit (window->video_surface);
+ 
+-  if (G_UNLIKELY (info)) {
++  if (G_UNLIKELY (info) || G_UNLIKELY (window->pending_configure)) {
+     /* commit also the parent (area_surface) in order to change
+      * the position of the video_subsurface */
++    wl_surface_attach (window->area_surface, window->area_buf->wlbuffer,
++        window->x, window->y);
++    wp_viewport_set_destination (window->area_viewport, window->video_width,
++        window->video_height);
+     wl_surface_damage (window->area_surface, 0, 0, window->render_rectangle.w,
+         window->render_rectangle.h);
+     wl_surface_commit (window->area_surface);
+     wl_subsurface_set_desync (window->video_subsurface);
++
++    window->x = 0;
++    window->y = 0;
++    window->pending_configure = FALSE;
+   }
+ 
+   wl_display_flush (window->display->display);
+diff --git a/ext/wayland/wlwindow.h b/ext/wayland/wlwindow.h
+index 8018df4..fde52fc 100644
+--- a/ext/wayland/wlwindow.h
++++ b/ext/wayland/wlwindow.h
+@@ -56,6 +56,12 @@ struct _GstWlWindow
+   gint video_width, video_height;
+   /* the size of the video_(sub)surface */
+   gint surface_width, surface_height;
++  /* the offset when reconfiguring the surface */
++  gint x, y;
++
++  gboolean pending_configure;
++
++  GstWlBuffer *area_buf;
+ };
+ 
+ struct _GstWlWindowClass
+-- 
+2.7.4
+

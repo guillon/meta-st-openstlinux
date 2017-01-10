@@ -1,0 +1,26 @@
+From 357849799024a463b04dc61d3b5988fd8b01410f Mon Sep 17 00:00:00 2001
+From: Bryce Harrington <bryce@osg.samsung.com>
+Date: Thu, 22 Sep 2016 17:38:39 -0700
+Subject: [PATCH 02/61] configure: Also update libweston version to match
+ weston
+
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 6398b2a..f35e887 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -5,7 +5,7 @@ m4_define([weston_version],
+           [weston_major_version.weston_minor_version.weston_micro_version])
+ m4_define([libweston_major_version], [1])
+ m4_define([libweston_minor_version], [12])
+-m4_define([libweston_patch_version], [0])
++m4_define([libweston_patch_version], [90])
+ 
+ AC_PREREQ([2.64])
+ AC_INIT([weston],
+-- 
+2.7.4
+

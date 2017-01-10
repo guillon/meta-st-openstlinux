@@ -1,0 +1,687 @@
+From 7a07ac42e7f30b478ca166fff05a8ff9fd4d72f7 Mon Sep 17 00:00:00 2001
+From: yannick Fertre <yannick.fertre@st.com>
+Date: Tue, 20 Jan 2015 15:17:54 +0100
+Subject: [PATCH 08/15] lib4l-hva: Implementation of h264 header encoder
+
+Change-Id: I67db1ddd51fbd2735d498e220ad0a28419633bcd
+Signed-off-by: yannick Fertre <yannick.fertre@st.com>
+Reviewed-on: https://gerrit.st.com/20754
+Reviewed-by: Karine BOCLAUD <karine.boclaud-ext@st.com>
+---
+ lib/libv4l-hva/Makefile.am       |   3 +
+ lib/libv4l-hva/libv4l-hva-h264.c | 383 +++++++++++++++++++++++++++++++++++++++
+ lib/libv4l-hva/libv4l-hva.c      | 129 ++++++++++++-
+ lib/libv4l-hva/libv4l-hva.h      |  65 +++++++
+ 4 files changed, 579 insertions(+), 1 deletion(-)
+ create mode 100644 lib/libv4l-hva/libv4l-hva-h264.c
+
+diff --git a/lib/libv4l-hva/Makefile.am b/lib/libv4l-hva/Makefile.am
+index 762583e..c5e4459 100644
+--- a/lib/libv4l-hva/Makefile.am
++++ b/lib/libv4l-hva/Makefile.am
+@@ -4,6 +4,9 @@ endif
+ 
+ libv4l_hva_la_SOURCES = libv4l-hva.c
+ 
++##### H264 encoder #####
++libv4l_hva_la_SOURCES += libv4l-hva-h264.c
++
+ ##### gst library #####
+ libv4l_hva_la_SOURCES += \
+ 	gst/base/gstbitwriter.c \
+diff --git a/lib/libv4l-hva/libv4l-hva-h264.c b/lib/libv4l-hva/libv4l-hva-h264.c
+new file mode 100644
+index 0000000..1a8c9db
+--- /dev/null
++++ b/lib/libv4l-hva/libv4l-hva-h264.c
+@@ -0,0 +1,383 @@
++/*
++ * Copyright (C) 2014 STMicroelectronics SA
++ *
++ * License Terms:  GNU General Public License (GPL) version 2
++ *
++ * Author: <yannick.fertre@st.com> for STMicroelectronics.
++ */
++
++#include <errno.h>
++#include <stdlib.h>
++#include <string.h>
++
++#include "libv4l-hva.h"
++#include <gst/vaapi/gstvaapiencoder_objects.h>
++#include <gst/vaapi/gstvaapiencoder_h264.h>
++
++/**
++ * struct hva_h264_meta
++ *
++ * @level: video level
++ * @profile: video profile
++ * @entropy_mode: entropy mode (CABAC or CAVLC)
++ * @bitrate_mode: bitrate mode (constant bitrate or variable bitrate)
++ * @gop_size: groupe of picture size
++ * @bitrate: bitrate
++ * @cpb_size: coded picture buffer size
++ * @intra_refresh: activate intra refresh
++ * @dct8x8: enable transform mode 8x8
++ * @qpmin: defines the minimum quantizer
++ * @qpmax: defines the maximum quantizer
++ * @format: stream format
++ * @sar_idc: sample aspect ratio index
++ * @sar_enable: enable sample aspect ratio
++ */
++struct hva_h264_meta {
++	/* controls */
++	enum v4l2_mpeg_video_h264_level level;
++	enum v4l2_mpeg_video_h264_profile profile;
++	enum v4l2_mpeg_video_h264_entropy_mode entropy_mode;
++	enum v4l2_mpeg_video_bitrate_mode bitrate_mode;
++	uint32_t gop_size;
++	uint32_t bitrate;
++	uint32_t cpb_size;
++	int intra_refresh;
++	int dct8x8;
++	uint32_t qpmin;
++	uint32_t qpmax;
++	/* stream format  */
++	struct v4l2_format format;
++	enum v4l2_mpeg_video_h264_vui_sar_idc sar_idc;
++	int sar_enable;
++};
++
++static const GstVaapiProfile
++to_vaapi_profile (enum v4l2_mpeg_video_h264_profile profile)
++{
++	switch (profile) {
++		case V4L2_MPEG_VIDEO_H264_PROFILE_BASELINE:
++			return GST_VAAPI_PROFILE_H264_BASELINE;
++		case V4L2_MPEG_VIDEO_H264_PROFILE_CONSTRAINED_BASELINE:
++			return GST_VAAPI_PROFILE_H264_CONSTRAINED_BASELINE;
++		case V4L2_MPEG_VIDEO_H264_PROFILE_MAIN:
++			return GST_VAAPI_PROFILE_H264_MAIN;
++		case V4L2_MPEG_VIDEO_H264_PROFILE_EXTENDED:
++			return GST_VAAPI_PROFILE_H264_EXTENDED;
++		case V4L2_MPEG_VIDEO_H264_PROFILE_HIGH:
++			return GST_VAAPI_PROFILE_H264_HIGH;
++		case V4L2_MPEG_VIDEO_H264_PROFILE_HIGH_10:
++			return GST_VAAPI_PROFILE_H264_HIGH10;
++		case V4L2_MPEG_VIDEO_H264_PROFILE_HIGH_422:
++			return GST_VAAPI_PROFILE_H264_HIGH_422;
++		case V4L2_MPEG_VIDEO_H264_PROFILE_MULTIVIEW_HIGH:
++			return GST_VAAPI_PROFILE_H264_MULTIVIEW_HIGH;
++		case V4L2_MPEG_VIDEO_H264_PROFILE_STEREO_HIGH:
++			return GST_VAAPI_PROFILE_H264_STEREO_HIGH;
++		default:
++			GST_WARNING ("Invalid V4L2 profile (%d), default to baseline"
++				" profile", profile);
++			return GST_VAAPI_PROFILE_H264_BASELINE;
++	}
++}
++
++static int
++to_vaapi_level_idc (enum v4l2_mpeg_video_h264_level level)
++{
++	switch (level) {
++		case V4L2_MPEG_VIDEO_H264_LEVEL_1_0: return 10;
++		case V4L2_MPEG_VIDEO_H264_LEVEL_1B:  return  9;
++		case V4L2_MPEG_VIDEO_H264_LEVEL_1_1: return 11;
++		case V4L2_MPEG_VIDEO_H264_LEVEL_1_2: return 12;
++		case V4L2_MPEG_VIDEO_H264_LEVEL_1_3: return 13;
++		case V4L2_MPEG_VIDEO_H264_LEVEL_2_0: return 20;
++		case V4L2_MPEG_VIDEO_H264_LEVEL_2_1: return 21;
++		case V4L2_MPEG_VIDEO_H264_LEVEL_2_2: return 22;
++		case V4L2_MPEG_VIDEO_H264_LEVEL_3_0: return 30;
++		case V4L2_MPEG_VIDEO_H264_LEVEL_3_1: return 31;
++		case V4L2_MPEG_VIDEO_H264_LEVEL_3_2: return 32;
++		case V4L2_MPEG_VIDEO_H264_LEVEL_4_0: return 40;
++		case V4L2_MPEG_VIDEO_H264_LEVEL_4_1: return 41;
++		case V4L2_MPEG_VIDEO_H264_LEVEL_4_2: return 42;
++		case V4L2_MPEG_VIDEO_H264_LEVEL_5_0: return 50;
++		case V4L2_MPEG_VIDEO_H264_LEVEL_5_1: return 51;
++		default:
++			GST_WARNING ("Invalid V4L2 level (%d), default to level 4.0", level);
++			return 40;
++		}
++}
++
++static int
++hva_h264_set_ctrl(void *priv, struct v4l2_ext_controls *ctrls)
++{
++	struct hva_h264_meta *meta;
++	int i = 0;
++
++	V4L2_LOG("> %s count %d\n", __func__, ctrls->count);
++
++	if (priv)
++		meta = (struct hva_h264_meta *)priv;
++	else
++		return -EINVAL;
++
++	for (i=0; i < ctrls->count; i++) {
++		switch (ctrls->controls[i].id) {
++		case V4L2_CID_MPEG_VIDEO_H264_LEVEL:
++			meta->level = ctrls->controls[i].value;
++			V4L2_LOG("V4L2_CID_MPEG_VIDEO_H264_LEVEL %d\n",
++				ctrls->controls[i].value);
++		break;
++		case V4L2_CID_MPEG_VIDEO_H264_PROFILE:
++			meta->profile = ctrls->controls[i].value;
++			V4L2_LOG("V4L2_CID_MPEG_VIDEO_H264_PROFILE %d\n",
++				ctrls->controls[i].value);
++		break;
++		case V4L2_CID_MPEG_VIDEO_GOP_SIZE:
++			meta->gop_size = ctrls->controls[i].value;
++			V4L2_LOG("V4L2_CID_MPEG_VIDEO_GOP_SIZE %d\n",
++				ctrls->controls[i].value);
++		break;
++		case V4L2_CID_MPEG_VIDEO_BITRATE_MODE:
++			meta->bitrate_mode = ctrls->controls[i].value;
++			V4L2_LOG("V4L2_CID_MPEG_VIDEO_BITRATE_MODE %d\n",
++				ctrls->controls[i].value);
++		break;
++		case V4L2_CID_MPEG_VIDEO_H264_ENTROPY_MODE:
++			meta->entropy_mode = ctrls->controls[i].value;
++			V4L2_LOG("V4L2_CID_MPEG_VIDEO_H264_ENTROPY_MODE %d\n",
++				ctrls->controls[i].value);
++		break;
++		case V4L2_CID_MPEG_VIDEO_BITRATE:
++			meta->bitrate = ctrls->controls[i].value;
++			V4L2_LOG("V4L2_CID_MPEG_VIDEO_BITRATE %d\n",
++				ctrls->controls[i].value);
++		break;
++		case V4L2_CID_MPEG_VIDEO_H264_CPB_SIZE:
++			meta->cpb_size = ctrls->controls[i].value;
++			V4L2_LOG("V4L2_CID_MPEG_VIDEO_H264_CPB_SIZE %d\n",
++				ctrls->controls[i].value);
++		break;
++		case V4L2_CID_MPEG_VIDEO_CYCLIC_INTRA_REFRESH_MB:
++			meta->intra_refresh = ctrls->controls[i].value;
++			V4L2_LOG("V4L2_CID_MPEG_VIDEO_CYCLIC_INTRA_REFRESH_MB %d\n",
++				ctrls->controls[i].value);
++		break;
++		case V4L2_CID_MPEG_VIDEO_H264_8X8_TRANSFORM:
++			meta->dct8x8 = ctrls->controls[i].value;
++			V4L2_LOG("V4L2_CID_MPEG_VIDEO_H264_8X8_TRANSFORM %d\n",
++				ctrls->controls[i].value);
++		break;
++		case V4L2_CID_MPEG_VIDEO_H264_MIN_QP:
++			meta->qpmin = ctrls->controls[i].value;
++			V4L2_LOG("V4L2_CID_MPEG_VIDEO_H264_MIN_QP %d\n",
++				ctrls->controls[i].value);
++		break;
++		case V4L2_CID_MPEG_VIDEO_H264_MAX_QP:
++			meta->qpmax = ctrls->controls[i].value;
++			V4L2_LOG("V4L2_CID_MPEG_VIDEO_H264_MAX_QP %d\n",
++				ctrls->controls[i].value);
++		break;
++		case V4L2_CID_MPEG_VIDEO_H264_VUI_SAR_IDC:
++			meta->sar_idc = ctrls->controls[i].value;
++			V4L2_LOG("V4L2_CID_MPEG_VIDEO_H264_VUI_SAR_IDC %d\n",
++				ctrls->controls[i].value);
++		break;
++		case V4L2_CID_MPEG_VIDEO_H264_VUI_SAR_ENABLE:
++			meta->sar_enable = ctrls->controls[i].value;
++			V4L2_LOG("V4L2_CID_MPEG_VIDEO_H264_VUI_SAR_ENABLE %d\n",
++				ctrls->controls[i].value);
++		break;
++		default:
++			V4L2_LOG_ERR("VIDIOC_S_EXT_CTRLS(): Unsupported control id %d\n",
++				ctrls->controls[i].id);
++		break;
++		}
++	}
++
++	V4L2_LOG("< %s\n", __func__);
++
++	return 0;
++}
++
++static int
++hva_h264_get_sps_pps(void *priv, uint8_t **data, size_t *size,
++	struct v4l2_format *format, struct v4l2_ext_controls *ctrls)
++{
++	struct hva_h264_meta *meta;
++	uint8_t *buf = *data;
++	size_t sps_size = 0;
++	size_t pps_size = 0;
++	int ret = 0;
++
++	GstVaapiEncoderH264 enc_h264;
++	GstVaapiEncPicture picture;
++	GstVaapiEncSequence sequence;
++	VAEncSequenceParameterBufferH264 seq_param;
++	VAEncPictureParameterBufferH264 pic_param;
++	GstMapInfo sps_info, pps_info;
++
++	V4L2_LOG("> %s \n", __func__);
++
++	if (priv)
++		meta = (struct hva_h264_meta *)priv;
++	else
++		return -EINVAL;
++
++	/* update controls */
++	hva_h264_set_ctrl(priv, ctrls);
++
++	memset (&enc_h264, 0, sizeof(enc_h264));
++	memset (&picture, 0, sizeof(picture));
++	memset (&sequence, 0, sizeof(sequence));
++	memset (&seq_param, 0, sizeof(VAEncSequenceParameterBufferH264));
++	memset (&pic_param, 0, sizeof(VAEncPictureParameterBufferH264));
++
++	enc_h264.profile = to_vaapi_profile (meta->profile);
++	enc_h264.init_qp = 28;
++	enc_h264.min_qp = meta->qpmin;
++	enc_h264.num_slices = 1;
++	enc_h264.cpb_length = meta->cpb_size * 1000 / 8;
++	enc_h264.num_views = 1;
++	enc_h264.cpb_length_bits = meta->cpb_size * 1000;
++	enc_h264.bitrate_bits = meta->bitrate * 1000;
++	enc_h264.use_dct8x8 = meta->dct8x8;
++
++	if (meta->entropy_mode == V4L2_MPEG_VIDEO_H264_ENTROPY_MODE_CABAC)
++		enc_h264.use_cabac = TRUE;
++	else
++		enc_h264.use_cabac = FALSE;
++
++	seq_param.level_idc = to_vaapi_level_idc (meta->level);
++
++	seq_param.intra_period = meta->gop_size;
++	seq_param.intra_idr_period = meta->gop_size;
++	seq_param.ip_period = meta->gop_size;
++	seq_param.bits_per_second = meta->bitrate*1000;
++	seq_param.max_num_ref_frames = 1;
++	seq_param.picture_width_in_mbs = (format->fmt.pix.width + 15) / 16;
++	seq_param.picture_height_in_mbs = (format->fmt.pix.height + 15) / 16;
++
++	/* set cropping parameters */
++	seq_param.frame_crop_right_offset = ((seq_param.picture_width_in_mbs * 16)
++										- format->fmt.pix.width) >> 1;
++	seq_param.frame_crop_bottom_offset = ((seq_param.picture_height_in_mbs * 16)
++										- format->fmt.pix.height) >> 1;
++
++	if (seq_param.frame_crop_right_offset || seq_param.frame_crop_bottom_offset)
++		seq_param.frame_cropping_flag = 1;
++
++	seq_param.vui_fields.bits.log2_max_mv_length_horizontal = 10;
++	seq_param.vui_fields.bits.log2_max_mv_length_vertical = 10;
++	seq_param.vui_parameters_present_flag = 1;
++	seq_param.vui_fields.bits.bitstream_restriction_flag = 1;
++	seq_param.seq_fields.bits.chroma_format_idc = 1;
++	seq_param.seq_fields.bits.pic_order_cnt_type = 2;
++	seq_param.seq_fields.bits.frame_mbs_only_flag = 1;
++	seq_param.vui_fields.bits.aspect_ratio_info_present_flag = meta->sar_enable;
++
++	if(meta->sar_enable)
++		seq_param.aspect_ratio_idc = meta->sar_idc;
++
++	sequence.param = &seq_param;
++
++	pic_param.chroma_qp_index_offset = 2;
++	pic_param.pic_init_qp = 26;
++
++	if (meta->entropy_mode == V4L2_MPEG_VIDEO_H264_ENTROPY_MODE_CABAC)
++		pic_param.pic_fields.bits.entropy_coding_mode_flag = 1;
++	else
++		pic_param.pic_fields.bits.entropy_coding_mode_flag = 0;
++
++	pic_param.pic_fields.bits.transform_8x8_mode_flag = meta->dct8x8;
++	pic_param.pic_fields.bits.deblocking_filter_control_present_flag = 1;
++
++	picture.param = &pic_param;
++
++	if (add_packed_sequence_header (&enc_h264, &picture, &sequence) == FALSE) {
++		V4L2_LOG_ERR ("%s: couldn't add sequence header", __func__);
++		return -EINVAL;
++	} else
++		V4L2_LOG("%s sequence header created\n", __func__);
++
++	if (add_packed_picture_header (&enc_h264, &picture) == FALSE) {
++		V4L2_LOG_ERR ("%s: couldn't add picture header", __func__);
++		return -EINVAL;
++	} else
++		V4L2_LOG("%s picture header created\n", __func__);
++
++	gst_buffer_map (enc_h264.sps_data, &sps_info, GST_MAP_READ);
++	gst_buffer_map (enc_h264.pps_data, &pps_info, GST_MAP_READ);
++
++	sps_size = 4 + sps_info.size;
++	pps_size = 4 + pps_info.size;
++
++	/* SPS */
++	V4L2_LOG("sps size %d\n", sps_info.size + 4);
++	memcpy (buf + 4, sps_info.data, sps_info.size);
++
++	/* start code */
++	buf[0] = 0x00; buf[1] = 0x00; buf[2] = 0x00;buf[3] = 0x01;
++
++	buf += sps_size;
++
++	/* PPS */
++	V4L2_LOG("pps size %d\n", pps_info.size + 4);
++	memcpy (buf + 4 , pps_info.data, pps_info.size);
++
++	/* start code */
++	buf[0] = 0x00; buf[1] = 0x00; buf[2] = 0x00;buf[3] = 0x01;
++
++	gst_buffer_unmap (enc_h264.sps_data, &sps_info);
++	gst_buffer_unmap (enc_h264.pps_data, &pps_info);
++
++	*size = sps_size + pps_size;
++
++	V4L2_LOG("< %s data %p size %d\n", __func__, *data, *size);
++
++	return ret;
++}
++
++static int hva_h264_start(void **priv)
++{
++	struct hva_h264_meta *meta;
++	int ret = 0;
++
++	V4L2_LOG("> %s\n", __func__);
++
++	/* allocate a private context for the H264 header encoder */
++	meta = calloc(1, sizeof(struct hva_h264_meta));
++	if (!meta) {
++		V4L2_LOG_ERR
++		    ("%s: couldn't allocate memory for the H264"
++		     " private context\n", __func__);
++		ret = -EINVAL;
++	}
++
++	/* initialize meta data */
++	meta->level = V4L2_MPEG_VIDEO_H264_LEVEL_4_2;
++	meta->profile = V4L2_MPEG_VIDEO_H264_PROFILE_BASELINE;
++
++	*priv = meta;
++
++	V4L2_LOG("< %s: priv %p\n", __func__, *priv);
++	return ret;
++}
++
++static void hva_h264_stop(void *priv)
++{
++	V4L2_LOG("> %s\n", __func__);
++
++	if (priv) {
++		free(priv);
++	}
++
++	V4L2_LOG("< %s\n", __func__);
++}
++
++const struct hva_metadata h264meta = {
++	.name = "h264",
++	.stream_format = V4L2_PIX_FMT_H264,
++	.start = hva_h264_start,
++	.stop = hva_h264_stop,
++	.get_sps_pps = hva_h264_get_sps_pps,
++};
++
+diff --git a/lib/libv4l-hva/libv4l-hva.c b/lib/libv4l-hva/libv4l-hva.c
+index 5d2b037..3ecb823 100644
+--- a/lib/libv4l-hva/libv4l-hva.c
++++ b/lib/libv4l-hva/libv4l-hva.c
+@@ -28,6 +28,13 @@
+ 
+ #define buf_to_str(buf) ((buf == VIDIOC_QBUF) ? "QBUF" : "DQBUF")
+ 
++/* registering of metadata builders */
++extern const struct hva_metadata h264meta;
++
++const struct hva_metadata *hva_meta[] = {
++	&h264meta
++};
++
+ static int hva_querybuf(struct hva_plugin *hva, int fd, unsigned long int cmd,
+ 	struct v4l2_buffer *buffer)
+ {
+@@ -43,10 +50,43 @@ static int hva_querybuf(struct hva_plugin *hva, int fd, unsigned long int cmd,
+ 		return ret;
+ 	}
+ 
++	if (buffer->type == V4L2_BUF_TYPE_VIDEO_CAPTURE) {
++		/* mmap stream buffers (aka access unit buffer) */
++		struct hva_buffer *au = &hva->aus[buffer->index];
++
++		au->size = buffer->length;
++		au->vaddr = (void *)SYS_MMAP(NULL, buffer->length,
++			PROT_READ | PROT_WRITE, MAP_SHARED, fd, buffer->m.offset);
++
++		if (!au->vaddr) {
++			V4L2_LOG_ERR("%s: failed to mmap buffer %d on %s data stream\n",
++				__func__, buffer->index, type_to_str(buffer->type));
++			return -EINVAL;
++		}
++	}
++
+ 	V4L2_LOG("< %s\n", __func__);
+ 	return ret;
+ }
+ 
++static int hva_dqbuf(struct hva_plugin *hva, int fd, unsigned long int cmd,
++					 struct v4l2_buffer *buffer)
++{
++	int ret;
++
++	V4L2_LOG("> %s\n", __func__);
++
++	ret = SYS_IOCTL(fd, cmd, buffer);
++	if (ret) {
++		V4L2_LOG_ERR("%s: failed to dequeue buffer on %s data stream\n",
++			__func__, type_to_str(buffer->type));
++		return ret;
++	}
++
++	V4L2_LOG("< %s: dequeue buffer index %d on %s (%u) data stream\n", __func__,
++			 buffer->index, type_to_str(buffer->type), buffer->type);
++	return ret;
++}
+ 
+ static int hva_qbuf(struct hva_plugin *hva, int fd, unsigned long int cmd,
+ 	struct v4l2_buffer *buffer)
+@@ -56,6 +96,14 @@ static int hva_qbuf(struct hva_plugin *hva, int fd, unsigned long int cmd,
+ 	V4L2_LOG("> %s: queue buffer index %d on %s (%u) data stream\n", __func__,
+ 		buffer->index, type_to_str(buffer->type), buffer->type);
+ 
++	if (buffer->type  == V4L2_BUF_TYPE_VIDEO_CAPTURE) {
++		uint8_t *b = hva->aus[buffer->index].vaddr;
++
++		/* copy sps/pps header only on source pad */
++		hva->meta->get_sps_pps(hva->meta_priv, &b, &buffer->bytesused,
++							   &hva->fmt, &hva->ctrls);
++	}
++
+ 	ret = SYS_IOCTL(fd, cmd, buffer);
+ 	if (ret) {
+ 		V4L2_LOG_ERR("%s: failed to queue buffer on %s data stream\n",
+@@ -63,6 +111,77 @@ static int hva_qbuf(struct hva_plugin *hva, int fd, unsigned long int cmd,
+ 		return ret;
+ 	}
+ 
++	V4L2_LOG("< %s\n", __func__);
++	return ret;
++}
++
++static int hva_set_ext_ctrls(struct hva_plugin *hva, int fd,
++							 unsigned long int cmd,
++							 struct v4l2_ext_controls *ctrls)
++{
++	int ret;
++
++	V4L2_LOG("> %s: set external controls\n", __func__);
++
++	if (hva->ctrls.controls)
++		free(hva->ctrls.controls);
++
++	hva->ctrls.controls = calloc(ctrls->count, sizeof(struct v4l2_ext_control));
++	if (!hva->ctrls.controls) {
++		V4L2_LOG_ERR("%s: couldn't allocate memory for controls", __func__);
++		return -EINVAL;
++	}
++
++	memcpy(hva->ctrls.controls, ctrls->controls, ctrls->count *
++		   sizeof(struct v4l2_ext_control));
++
++	hva->ctrls.count = ctrls->count;
++
++	ret = SYS_IOCTL(fd, cmd, ctrls);
++	if (ret) {
++		V4L2_LOG_ERR("%s: failed to set controls\n", __func__);
++		return ret;
++	}
++
++	V4L2_LOG("< %s\n", __func__);
++	return ret;
++}
++
++static int hva_set_fmt(struct hva_plugin *hva, int fd, unsigned long int cmd,
++					   struct v4l2_format *fmt)
++{
++	int ret;
++	V4L2_LOG("> %s: set format\n", __func__);
++
++	/* copy only stream format */
++	if (fmt->type  == V4L2_BUF_TYPE_VIDEO_CAPTURE) {
++		int i = 0;
++
++		for (i = 0; i < (sizeof(hva_meta) / sizeof(*hva_meta)); i++) {
++			if (hva_meta[i]->stream_format == fmt->fmt.pix.pixelformat) {
++				/* set the right metadata builder methods depending on format */
++				hva->meta = (struct hva_metadata *)hva_meta[i];
++				break;
++			}
++		}
++
++		if(!hva->meta){
++			V4L2_LOG_ERR("%s: Invalid metadata\n", __func__);
++			return -EINVAL;
++		}
++
++		/* copy stream format (w, h, fmt, ...) */
++		memcpy(&hva->fmt, fmt, sizeof(struct v4l2_format));
++
++		hva->meta->start(&hva->meta_priv);
++	}
++
++	ret = SYS_IOCTL(fd, cmd, fmt);
++	if (ret) {
++		V4L2_LOG_ERR("%s: failed to set format on %s data stream\n",
++			__func__, type_to_str(fmt->type));
++		return ret;
++	}
+ 
+ 	V4L2_LOG("< %s\n", __func__);
+ 	return ret;
+@@ -146,10 +265,12 @@ static void *hva_plugin_init(int fd)
+ static void hva_plugin_close(void *dev_ops_priv)
+ {
+ 	struct hva_plugin *hva = dev_ops_priv;
+-	int i;
+ 
+ 	V4L2_LOG("> %s: close the HVA libv4l plugin\n", __func__);
+ 
++	if (hva->ctrls.controls)
++		free(hva->ctrls.controls);
++
+ 	if (hva)
+ 		free(hva);
+ 
+@@ -167,6 +288,12 @@ static int hva_plugin_ioctl(void *dev_ops_priv, int fd,
+ 		return hva_querybuf(hva, fd, cmd, arg);
+ 	case VIDIOC_QBUF:
+ 		return hva_qbuf(hva, fd, cmd, arg);
++	case VIDIOC_DQBUF:
++		return hva_dqbuf(hva, fd, cmd, arg);
++	case VIDIOC_S_EXT_CTRLS:
++		return hva_set_ext_ctrls(hva, fd, cmd, arg);
++	case VIDIOC_S_FMT:
++		return hva_set_fmt(hva, fd, cmd, arg);
+ 	case VIDIOC_STREAMON:
+ 		return hva_streamon(hva, fd, cmd, arg);
+ 	case VIDIOC_STREAMOFF:
+diff --git a/lib/libv4l-hva/libv4l-hva.h b/lib/libv4l-hva/libv4l-hva.h
+index 30dc0d2..338bbab 100644
+--- a/lib/libv4l-hva/libv4l-hva.h
++++ b/lib/libv4l-hva/libv4l-hva.h
+@@ -19,12 +19,77 @@
+  * HVA driver */
+ #define HVA_NAME	"hva"
+ 
++#ifndef HVA_DEBUG
++#undef V4L2_LOG
++#define V4L2_LOG(...)
++#endif
++
++/* fix maximum of buffer to 32 */
++#define NB_MAX_BUF 32
++
++/**
++ * struct hva_buffer - structure.
++ *
++ * @size:	size of buffer
++ * @vaddr:	virtual address
++ */
++struct hva_buffer {
++	size_t size;
++	void *vaddr;
++};
++
++struct hva_metadata {
++	const char *name;
++	unsigned int stream_format;
++
++	/**
++	 * start() - start the header encoder
++	* @priv:      (in/out) pointer to a private context
++	*
++	* Initialize the header encoder. Return a pointer to the encoder
++	* private context.
++	*/
++	int (*start) (void **priv);
++
++	/**
++	 * stop() - stop the header encoder
++	 * @priv: (in/out) pointer to the encoder private context
++	 *
++	 * Release the header encoder.
++	 */
++	void (*stop) (void *priv);
++
++	/**
++	 * get_sps_pps() - get the sps/pps frame header
++	 * @priv: (in) pointer to the encoder private context
++	 * @data: (in/out) pointer to the sps/pps header
++	 * @size: (in/out) pointer to the size of sps/pps header
++	 * @format: (in) stream format
++	 * @ctrls: (in) external controls
++	 *
++	 * Fill sps/pps frame header & return size of frame header
++	 */
++	int (*get_sps_pps) (void *priv, uint8_t **data, size_t *size,
++						struct v4l2_format *format,
++						struct v4l2_ext_controls *ctrls);
++};
+ 
+ /**
+  * struct hva_plugin
++ *
++ * @aus: array of access unit
++ * @fmt: stream format
++ * @ctrls: external controls
++ * @meta: local metadata
++ * @meta_priv: private data
+  */
+ 
+ struct hva_plugin {
++	struct hva_buffer aus[NB_MAX_BUF];
++	struct v4l2_format fmt;
++	struct v4l2_ext_controls ctrls;
++	struct hva_metadata *meta;
++	void *meta_priv;
+ };
+ 
+ #endif /* LIBV4L_HVA_H */
+-- 
+2.7.4
+

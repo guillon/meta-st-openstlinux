@@ -1,0 +1,34 @@
+From 6e549cc97fc5bc5240a8e5b54e20636484fb18d2 Mon Sep 17 00:00:00 2001
+From: Hugues Fruchet <hugues.fruchet@st.com>
+Date: Mon, 25 May 2015 13:43:39 +0200
+Subject: [PATCH 13/15] libv4l-hva: fix sps/pps memory leak
+
+Change-Id: I06df2e3048893b65b7f8cb0ba41e8b5e995c0629
+Reviewed-on: https://gerrit.st.com/30402
+Reviewed-by: Hugues FRUCHET <hugues.fruchet@st.com>
+Tested-by: Hugues FRUCHET <hugues.fruchet@st.com>
+---
+ lib/libv4l-hva/libv4l-hva-h264.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/lib/libv4l-hva/libv4l-hva-h264.c b/lib/libv4l-hva/libv4l-hva-h264.c
+index 0f00207..5aaf221 100644
+--- a/lib/libv4l-hva/libv4l-hva-h264.c
++++ b/lib/libv4l-hva/libv4l-hva-h264.c
+@@ -345,6 +345,13 @@ hva_h264_get_sps_pps(void *priv, uint8_t **data, size_t *size,
+ 	gst_buffer_unmap (enc_h264.sps_data, &sps_info);
+ 	gst_buffer_unmap (enc_h264.pps_data, &pps_info);
+ 
++	/* release the buffers (copy/paste from
++	 * gst_vaapi_encoder_h264_finalize)
++	 */
++	gst_buffer_replace (&enc_h264.sps_data, NULL);
++	gst_buffer_replace (&enc_h264.subset_sps_data, NULL);
++	gst_buffer_replace (&enc_h264.pps_data, NULL);
++
+ 	*size = sps_size + pps_size;
+ 
+ 	V4L2_LOG("< %s data %p size %d\n", __func__, *data, *size);
+-- 
+2.7.4
+

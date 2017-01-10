@@ -1,0 +1,93 @@
+From 983286a39be1b1e0d1fd3a2e373f841fc7fc23f6 Mon Sep 17 00:00:00 2001
+From: Christophe Priouzeau <christophe.priouzeau@linaro.org>
+Date: Wed, 6 Apr 2016 15:49:29 +0200
+Subject: [PATCH 06/13] STM: encoding: add dot file dumping for pipeline graph
+ debugging
+
+Change-Id: Id36d2ffc5e5886f58023a3e801fc68690f6750e1
+Signed-off-by: Sudip Jain <sudip.jain@st.com>
+---
+ tests/examples/encoding/encoding.c | 30 +++++++++++++++++++++++++-----
+ 1 file changed, 25 insertions(+), 5 deletions(-)
+
+diff --git a/tests/examples/encoding/encoding.c b/tests/examples/encoding/encoding.c
+index a7f80af..db33485 100644
+--- a/tests/examples/encoding/encoding.c
++++ b/tests/examples/encoding/encoding.c
+@@ -34,6 +34,12 @@
+ 
+ static gboolean silent = FALSE;
+ 
++typedef struct
++{
++  GMainLoop *loop;
++  GstElement *pipeline;
++} GstEncoding;
++
+ static void
+ list_codecs (void)
+ {
+@@ -253,17 +259,25 @@ autoplug_continue_cb (GstElement * uridecodebin, GstPad * somepad,
+ }
+ 
+ static void
+-bus_message_cb (GstBus * bus, GstMessage * message, GMainLoop * mainloop)
++bus_message_cb (GstBus * bus, GstMessage * message, GstEncoding * encoding)
+ {
+   switch (GST_MESSAGE_TYPE (message)) {
++    case GST_MESSAGE_ASYNC_DONE:
++      /* dump graph on preroll */
++      GST_DEBUG_BIN_TO_DOT_FILE_WITH_TS (GST_BIN (encoding->pipeline),
++          GST_DEBUG_GRAPH_SHOW_ALL, "encoding.async-done");
++      g_print ("Async done\n");
++      break;
+     case GST_MESSAGE_ERROR:
+-      g_print ("ERROR\n");
++      GST_DEBUG_BIN_TO_DOT_FILE_WITH_TS (GST_BIN (encoding->pipeline),
++          GST_DEBUG_GRAPH_SHOW_ALL, "encoding.error");
++      g_print ("Error\n");
+       gst_bus_set_flushing (bus, TRUE);
+-      g_main_loop_quit (mainloop);
++      g_main_loop_quit (encoding->loop);
+       break;
+     case GST_MESSAGE_EOS:
+       g_print ("Done\n");
+-      g_main_loop_quit (mainloop);
++      g_main_loop_quit (encoding->loop);
+       break;
+     default:
+       break;
+@@ -273,6 +287,7 @@ bus_message_cb (GstBus * bus, GstMessage * message, GMainLoop * mainloop)
+ static void
+ transcode_file (gchar * uri, gchar * outputuri, GstEncodingProfile * prof)
+ {
++  GstEncoding *encoding;
+   GstElement *pipeline;
+   GstElement *src;
+   GstElement *ebin;
+@@ -281,6 +296,8 @@ transcode_file (gchar * uri, gchar * outputuri, GstEncodingProfile * prof)
+   GstCaps *profilecaps, *rescaps;
+   GMainLoop *mainloop;
+ 
++  encoding = g_new0 (GstEncoding, 1);
++
+   g_print (" Input URI  : %s\n", uri);
+   g_print (" Output URI : %s\n", outputuri);
+ 
+@@ -320,9 +337,12 @@ transcode_file (gchar * uri, gchar * outputuri, GstEncodingProfile * prof)
+ 
+   mainloop = g_main_loop_new (NULL, FALSE);
+ 
++  encoding->loop = mainloop;
++  encoding->pipeline = pipeline;
++
+   bus = gst_pipeline_get_bus ((GstPipeline *) pipeline);
+   gst_bus_add_signal_watch (bus);
+-  g_signal_connect (bus, "message", G_CALLBACK (bus_message_cb), mainloop);
++  g_signal_connect (bus, "message", G_CALLBACK (bus_message_cb), encoding);
+ 
+   if (gst_element_set_state (pipeline,
+           GST_STATE_PLAYING) == GST_STATE_CHANGE_FAILURE) {
+-- 
+2.7.4
+
