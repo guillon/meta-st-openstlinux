@@ -76,6 +76,10 @@ VIRTUAL-RUNTIME_initscripts = "systemd-compat-units"
 LICENSE_FLAGS_WHITELIST += " commercial"
 
 #--------------------------
+#Add the manifest and the licenses file on image generated
+COPY_LIC_MANIFEST = "1"
+
+#--------------------------
 # Preferred version
 
 # gstreamer configuration
