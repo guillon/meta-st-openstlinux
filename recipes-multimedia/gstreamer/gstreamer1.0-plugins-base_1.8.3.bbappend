@@ -1,28 +1,20 @@
-DEFAULT_PREFERENCE = "-1"
+FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}/st-1.8.3:"
 
-include gstreamer1.0-plugins-base.inc
-
-# Untill patch task is fixed for devtool usage
-include gstreamer1.0-fixdevtool.inc
-
-LIC_FILES_CHKSUM = "file://COPYING;md5=c54ce9345727175ff66d17b67ff51f58 \
-                    file://COPYING.LIB;md5=6762ed442b3822387a51c92d928ead0d \
-                    file://common/coverage/coverage-report.pl;beginline=2;endline=17;md5=a4e1830fce078028c8f0974161272607"
-
-SRCBRANCH = "lms-1.8.3"
-SRC_URI = "${ST_GIT_SERVER_URI}/oeivi/oe/multimedia/gst-plugins-base${ST_GIT_SERVER_PROTOCOL};branch=${SRCBRANCH};name=base"
-SRC_URI_append = " git://anongit.freedesktop.org/gstreamer/common;destsuffix=git/common;name=common"
-
-PV = "st-1.8.3"
-PR = "git${SRCPV}.r0"
-
-UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>(\d+(\.\d+)+))"
-
-SRCREV_base = "f65b6400cb289567aa91ca7535172eba35e9b826"
-SRCREV_common = "f363b3205658a38e84fa77f19dee218cd4445275"
-SRCREV_FORMAT = "base"
-
-S = "${WORKDIR}/git"
+SRC_URI_append = " \
+    file://0001-STM-playbin-force-the-default_flag-value.patch \
+    file://0002-STM-encodebin-enables-hardware-scaling.patch \
+    file://0003-STM-subtitleoverlay-enable-specific-colorspace-for-s.patch \
+    file://0004-STM-tools-gst-play-latency-option.patch \
+    file://0005-STM-streamsplitter-push-pending-events-before-serial.patch \
+    file://0006-STM-encoding-add-dot-file-dumping-for-pipeline-graph.patch \
+    file://0007-STM-alsasink-endianess-fix-for-iec61937.patch \
+    file://0008-STM-iec61937-incoherent-endianness-in-payload.patch \
+    file://0009-STM-alsasink-fix-iec958-format-detection.patch \
+    file://0010-STM-iec61937-force-hw_param-channels-to-stereo.patch \
+    file://0011-STM-iec61937-set-iec958-boolean-before-use-it.patch \
+    file://0012-PATCH-WIP-allocators-define-GST_CAPS_FEATURE_MEMORY_.patch \
+    file://0013-STM-encoding-fix-merge-problem-enables-hardware-scal.patch \
+    "
 
 PACKAGECONFIG ?= " \
     ${GSTREAMER_ORC} \

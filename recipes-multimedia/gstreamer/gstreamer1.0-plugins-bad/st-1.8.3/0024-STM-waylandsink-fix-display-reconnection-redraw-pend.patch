@@ -1,0 +1,45 @@
+From 94a1114506cf573b0ab4cebd40426ca4ef4f277f Mon Sep 17 00:00:00 2001
+From: Fabien Dessenne <fabien.dessenne@st.com>
+Date: Fri, 6 Jan 2017 16:41:50 +0100
+Subject: [PATCH 24/24] STM: waylandsink: fix display reconnection (redraw
+ pending)
+
+Reset redraw_pending at display disconnection, so we can reconnect later
+from a clean state (avoid endless buffer drops).
+Add a log to inform us of dropped buffers.
+
+Change-Id: Id2cd8b147349ad285567ad44e1902ba1ea49f5a2
+Signed-off-by: Fabien Dessenne <fabien.dessenne@st.com>
+Reviewed-on: https://gerrit.st.com/61212
+Reviewed-on: https://gerrit.st.com/63122
+---
+ ext/wayland/gstwaylandsink.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/ext/wayland/gstwaylandsink.c b/ext/wayland/gstwaylandsink.c
+index 91a14fb..61c5527 100644
+--- a/ext/wayland/gstwaylandsink.c
++++ b/ext/wayland/gstwaylandsink.c
+@@ -391,6 +391,7 @@ gst_wayland_sink_change_state (GstElement * element, GstStateChange transition)
+        */
+       if (sink->display && !sink->window) {     /* -> the window was toplevel */
+         g_clear_object (&sink->display);
++        g_atomic_int_set (&sink->redraw_pending, FALSE);
+       }
+       g_mutex_unlock (&sink->display_lock);
+       g_clear_object (&sink->pool);
+@@ -731,8 +732,10 @@ gst_wayland_sink_render (GstBaseSink * bsink, GstBuffer * buffer)
+   }
+ 
+   /* drop buffers until we get a frame callback */
+-  if (g_atomic_int_get (&sink->redraw_pending) == TRUE)
++  if (g_atomic_int_get (&sink->redraw_pending) == TRUE) {
++    GST_LOG_OBJECT (sink, "buffer %p dropped (redraw pending)", buffer);
+     goto done;
++  }
+ 
+   /* make sure that the application has called set_render_rectangle() */
+   if (G_UNLIKELY (sink->window->render_rectangle.w == 0))
+-- 
+2.7.4
+

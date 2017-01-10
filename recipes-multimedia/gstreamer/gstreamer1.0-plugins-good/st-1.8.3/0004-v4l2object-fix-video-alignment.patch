@@ -1,0 +1,64 @@
+From d71e6cdc72da534206250c2bcfdc249f3dd1c750 Mon Sep 17 00:00:00 2001
+From: Hugues Fruchet <hugues.fruchet@st.com>
+Date: Fri, 29 Jul 2016 17:11:31 +0200
+Subject: [PATCH 04/23] v4l2object: fix video alignment
+
+Padding right and bottom conditions were missing
+to enable video meta, causing visual artefacts with
+unaligned videos.
+Set also missing GST_BUFFER_POOL_OPTION_VIDEO_ALIGNMENT if
+alignment is there.
+
+Change-Id: I578e95369af63eb49960fccf955cd2426fbaf121
+Reviewed-on: https://gerrit.st.com/56794
+Reviewed-by: Hugues FRUCHET <hugues.fruchet@st.com>
+Tested-by: Hugues FRUCHET <hugues.fruchet@st.com>
+---
+ sys/v4l2/gstv4l2object.c | 17 ++++++++++++++++-
+ 1 file changed, 16 insertions(+), 1 deletion(-)
+
+diff --git a/sys/v4l2/gstv4l2object.c b/sys/v4l2/gstv4l2object.c
+index 42a7728..a6363c9 100644
+--- a/sys/v4l2/gstv4l2object.c
++++ b/sys/v4l2/gstv4l2object.c
+@@ -2982,7 +2982,8 @@ store_info:
+ 
+   /* to avoid copies we need video meta if top or left padding */
+   v4l2object->need_video_meta =
+-      ((align->padding_top + align->padding_left) != 0);
++      ((align->padding_top + align->padding_left +
++          align->padding_right + align->padding_bottom) != 0);
+ 
+   /* ... or if stride is non "standard" */
+   if (!standard_stride)
+@@ -3997,6 +3998,13 @@ gst_v4l2_object_decide_allocation (GstV4l2Object * obj, GstQuery * query)
+         GST_BUFFER_POOL_OPTION_VIDEO_META);
+   }
+ 
++  if (!(obj->align.padding_left + obj->align.padding_top +
++          obj->align.padding_right + obj->align.padding_bottom == 0)) {
++    gst_buffer_pool_config_add_option (config,
++        GST_BUFFER_POOL_OPTION_VIDEO_ALIGNMENT);
++    gst_buffer_pool_config_set_video_alignment (config, &obj->align);
++  }
++
+   gst_buffer_pool_config_set_allocator (config, allocator, &params);
+   gst_buffer_pool_config_set_params (config, caps, size, own_min, 0);
+ 
+@@ -4034,6 +4042,13 @@ gst_v4l2_object_decide_allocation (GstV4l2Object * obj, GstQuery * query)
+           GST_BUFFER_POOL_OPTION_VIDEO_META);
+     }
+ 
++    if (!(obj->align.padding_left + obj->align.padding_top +
++            obj->align.padding_right + obj->align.padding_bottom == 0)) {
++      gst_buffer_pool_config_add_option (config,
++          GST_BUFFER_POOL_OPTION_VIDEO_ALIGNMENT);
++      gst_buffer_pool_config_set_video_alignment (config, &obj->align);
++    }
++
+     if (!gst_buffer_pool_set_config (other_pool, config)) {
+       config = gst_buffer_pool_get_config (other_pool);
+ 
+-- 
+2.7.4
+

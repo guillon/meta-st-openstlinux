@@ -1,0 +1,440 @@
+From f491e5d842ae19466844f0b9ab3255f21042ff3c Mon Sep 17 00:00:00 2001
+From: Scott D Phillips <scott.d.phillips@intel.com>
+Date: Tue, 14 Jun 2016 16:34:35 -0700
+Subject: [PATCH 06/24] wayland: Update from scaler to viewporter protocol
+
+Signed-off-by: Scott D Phillips <scott.d.phillips@intel.com>
+
+https://bugzilla.gnome.org/show_bug.cgi?id=767671
+---
+ configure.ac            |  18 +++--
+ ext/wayland/Makefile.am |  35 +++++---
+ ext/wayland/scaler.xml  | 210 ------------------------------------------------
+ ext/wayland/wldisplay.c |   7 +-
+ ext/wayland/wldisplay.h |   4 +-
+ ext/wayland/wlwindow.c  |  12 +--
+ ext/wayland/wlwindow.h  |   4 +-
+ 7 files changed, 47 insertions(+), 243 deletions(-)
+ delete mode 100644 ext/wayland/scaler.xml
+
+diff --git a/configure.ac b/configure.ac
+index 5e85e56..d24b6e5 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -2172,13 +2172,17 @@ translit(dnm, m, l) AM_CONDITIONAL(USE_WAYLAND, true)
+ AC_PATH_PROG([wayland_scanner], [wayland-scanner])
+ AG_GST_CHECK_FEATURE(WAYLAND, [wayland sink], wayland , [
+   PKG_CHECK_MODULES(WAYLAND, wayland-client >= 1.4.0, [
+-    if test "x$wayland_scanner" != "x"; then
+-      HAVE_WAYLAND="yes"
+-    else
+-      AC_MSG_RESULT([wayland-scanner is required to build the wayland plugin])
+-      HAVE_WAYLAND="no"
+-    fi
+-    ],
++    PKG_CHECK_MODULES(WAYLAND_PROTOCOLS, wayland-protocols >= 1.4, [
++      if test "x$wayland_scanner" != "x"; then
++        HAVE_WAYLAND="yes"
++        AC_SUBST(WAYLAND_PROTOCOLS_DATADIR, `$PKG_CONFIG --variable=pkgdatadir wayland-protocols`)
++      else
++        AC_MSG_RESULT([wayland-scanner is required to build the wayland plugin])
++        HAVE_WAYLAND="no"
++      fi
++      ],
++      [ HAVE_WAYLAND="no"
++    ])],
+     [ HAVE_WAYLAND="no"
+   ])
+ ])
+diff --git a/ext/wayland/Makefile.am b/ext/wayland/Makefile.am
+index c742bfc..7787153 100644
+--- a/ext/wayland/Makefile.am
++++ b/ext/wayland/Makefile.am
+@@ -7,7 +7,7 @@ libgstwaylandsink_la_SOURCES =  \
+ 	wldisplay.c \
+ 	wlwindow.c \
+ 	wlvideoformat.c \
+-	scaler-protocol.c
++	viewporter-protocol.c
+ 
+ libgstwaylandsink_la_CFLAGS = $(GST_CFLAGS) $(GST_PLUGINS_BASE_CFLAGS) \
+                                $(WAYLAND_CFLAGS) $(GST_PLUGINS_BAD_CFLAGS)
+@@ -27,23 +27,32 @@ noinst_HEADERS = \
+ 	wldisplay.h \
+ 	wlwindow.h \
+ 	wlvideoformat.h \
+-	scaler-client-protocol.h
++	viewporter-client-protocol.h
+ 
+-EXTRA_DIST = scaler.xml
+-CLEANFILES = scaler-protocol.c scaler-client-protocol.h
++CLEANFILES = viewporter-protocol.c viewporter-client-protocol.h
+ 
+-%-protocol.c : %.xml
+-	$(wayland_scanner) code < $< > $@
++gstwaylandsink.c: viewporter-client-protocol.h
+ 
+-%-client-protocol.h : %.xml
+-	$(wayland_scanner) client-header < $< > $@
++wlshmallocator.c: viewporter-client-protocol.h
+ 
+-gstwaylandsink.c: scaler-client-protocol.h
++wlbuffer.c: viewporter-client-protocol.h
+ 
+-wlshmallocator.c: scaler-client-protocol.h
++wldisplay.c: viewporter-client-protocol.h
+ 
+-wlbuffer.c: scaler-client-protocol.h
++wlwindow.c: viewporter-client-protocol.h
+ 
+-wldisplay.c: scaler-client-protocol.h
++.SECONDEXPANSION:
+ 
+-wlwindow.c: scaler-client-protocol.h
++define protostability
++$(if $(findstring unstable,$1),unstable,stable)
++endef
++
++define protoname
++$(shell echo $1 | sed 's/\([a-z\-]\+\)-[a-z]\+-v[0-9]\+/\1/')
++endef
++
++%-protocol.c : $(WAYLAND_PROTOCOLS_DATADIR)/$$(call protostability,$$*)/$$(call protoname,$$*)/$$*.xml
++	$(AM_V_GEN)$(wayland_scanner) code < $< > $@
++
++%-client-protocol.h : $(WAYLAND_PROTOCOLS_DATADIR)/$$(call protostability,$$*)/$$(call protoname,$$*)/$$*.xml
++	$(AM_V_GEN)$(wayland_scanner) client-header < $< > $@
+diff --git a/ext/wayland/scaler.xml b/ext/wayland/scaler.xml
+deleted file mode 100644
+index e21ae5b..0000000
+--- a/ext/wayland/scaler.xml
++++ /dev/null
+@@ -1,210 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<protocol name="scaler">
+-
+-  <copyright>
+-    Copyright © 2013-2014 Collabora, Ltd.
+-
+-    Permission to use, copy, modify, distribute, and sell this
+-    software and its documentation for any purpose is hereby granted
+-    without fee, provided that the above copyright notice appear in
+-    all copies and that both that copyright notice and this permission
+-    notice appear in supporting documentation, and that the name of
+-    the copyright holders not be used in advertising or publicity
+-    pertaining to distribution of the software without specific,
+-    written prior permission.  The copyright holders make no
+-    representations about the suitability of this software for any
+-    purpose.  It is provided "as is" without express or implied
+-    warranty.
+-
+-    THE COPYRIGHT HOLDERS DISCLAIM ALL WARRANTIES WITH REGARD TO THIS
+-    SOFTWARE, INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND
+-    FITNESS, IN NO EVENT SHALL THE COPYRIGHT HOLDERS BE LIABLE FOR ANY
+-    SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+-    WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN
+-    AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,
+-    ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF
+-    THIS SOFTWARE.
+-  </copyright>
+-
+-  <interface name="wl_scaler" version="2">
+-    <description summary="surface cropping and scaling">
+-      The global interface exposing surface cropping and scaling
+-      capabilities is used to instantiate an interface extension for a
+-      wl_surface object. This extended interface will then allow
+-      cropping and scaling the surface contents, effectively
+-      disconnecting the direct relationship between the buffer and the
+-      surface size.
+-    </description>
+-
+-    <request name="destroy" type="destructor">
+-      <description summary="unbind from the cropping and scaling interface">
+-	Informs the server that the client will not be using this
+-	protocol object anymore. This does not affect any other objects,
+-	wl_viewport objects included.
+-      </description>
+-    </request>
+-
+-    <enum name="error">
+-      <entry name="viewport_exists" value="0"
+-             summary="the surface already has a viewport object associated"/>
+-    </enum>
+-
+-    <request name="get_viewport">
+-      <description summary="extend surface interface for crop and scale">
+-	Instantiate an interface extension for the given wl_surface to
+-	crop and scale its content. If the given wl_surface already has
+-	a wl_viewport object associated, the viewport_exists
+-	protocol error is raised.
+-      </description>
+-
+-      <arg name="id" type="new_id" interface="wl_viewport"
+-           summary="the new viewport interface id"/>
+-      <arg name="surface" type="object" interface="wl_surface"
+-           summary="the surface"/>
+-    </request>
+-  </interface>
+-
+-  <interface name="wl_viewport" version="2">
+-    <description summary="crop and scale interface to a wl_surface">
+-      An additional interface to a wl_surface object, which allows the
+-      client to specify the cropping and scaling of the surface
+-      contents.
+-
+-      This interface allows to define the source rectangle (src_x,
+-      src_y, src_width, src_height) from where to take the wl_buffer
+-      contents, and scale that to destination size (dst_width,
+-      dst_height). This state is double-buffered, and is applied on the
+-      next wl_surface.commit.
+-
+-      The two parts of crop and scale state are independent: the source
+-      rectangle, and the destination size. Initially both are unset, that
+-      is, no scaling is applied. The whole of the current wl_buffer is
+-      used as the source, and the surface size is as defined in
+-      wl_surface.attach.
+-
+-      If the destination size is set, it causes the surface size to become
+-      dst_width, dst_height. The source (rectangle) is scaled to exactly
+-      this size. This overrides whatever the attached wl_buffer size is,
+-      unless the wl_buffer is NULL. If the wl_buffer is NULL, the surface
+-      has no content and therefore no size. Otherwise, the size is always
+-      at least 1x1 in surface coordinates.
+-
+-      If the source rectangle is set, it defines what area of the
+-      wl_buffer is taken as the source. If the source rectangle is set and
+-      the destination size is not set, the surface size becomes the source
+-      rectangle size rounded up to the nearest integer. If the source size
+-      is already exactly integers, this results in cropping without scaling.
+-
+-      The coordinate transformations from buffer pixel coordinates up to
+-      the surface-local coordinates happen in the following order:
+-        1. buffer_transform (wl_surface.set_buffer_transform)
+-        2. buffer_scale (wl_surface.set_buffer_scale)
+-        3. crop and scale (wl_viewport.set*)
+-      This means, that the source rectangle coordinates of crop and scale
+-      are given in the coordinates after the buffer transform and scale,
+-      i.e. in the coordinates that would be the surface-local coordinates
+-      if the crop and scale was not applied.
+-
+-      If the source rectangle is partially or completely outside of the
+-      wl_buffer, then the surface contents are undefined (not void), and
+-      the surface size is still dst_width, dst_height.
+-
+-      The x, y arguments of wl_surface.attach are applied as normal to
+-      the surface. They indicate how many pixels to remove from the
+-      surface size from the left and the top. In other words, they are
+-      still in the surface-local coordinate system, just like dst_width
+-      and dst_height are.
+-
+-      If the wl_surface associated with the wl_viewport is destroyed,
+-      the wl_viewport object becomes inert.
+-
+-      If the wl_viewport object is destroyed, the crop and scale
+-      state is removed from the wl_surface. The change will be applied
+-      on the next wl_surface.commit.
+-    </description>
+-
+-    <request name="destroy" type="destructor">
+-      <description summary="remove scaling and cropping from the surface">
+-	The associated wl_surface's crop and scale state is removed.
+-	The change is applied on the next wl_surface.commit.
+-      </description>
+-    </request>
+-
+-    <enum name="error">
+-      <entry name="bad_value" value="0"
+-             summary="negative or zero values in width or height"/>
+-    </enum>
+-
+-    <request name="set">
+-      <description summary="set the crop and scale state">
+-	Set both source rectangle and destination size of the associated
+-	wl_surface. See wl_viewport for the description, and relation to
+-	the wl_buffer size.
+-
+-	The bad_value protocol error is raised if src_width or
+-	src_height is negative, or if dst_width or dst_height is not
+-	positive.
+-
+-	The crop and scale state is double-buffered state, and will be
+-	applied on the next wl_surface.commit.
+-
+-	Arguments dst_x and dst_y do not exist here, use the x and y
+-	arguments to wl_surface.attach. The x, y, dst_width, and dst_height
+-	define the surface-local coordinate system irrespective of the
+-	attached wl_buffer size.
+-      </description>
+-
+-      <arg name="src_x" type="fixed" summary="source rectangle x"/>
+-      <arg name="src_y" type="fixed" summary="source rectangle y"/>
+-      <arg name="src_width" type="fixed" summary="source rectangle width"/>
+-      <arg name="src_height" type="fixed" summary="source rectangle height"/>
+-      <arg name="dst_width" type="int" summary="surface width"/>
+-      <arg name="dst_height" type="int" summary="surface height"/>
+-    </request>
+-
+-    <request name="set_source" since="2">
+-      <description summary="set the source rectangle for cropping">
+-	Set the source rectangle of the associated wl_surface. See
+-	wl_viewport for the description, and relation to the wl_buffer
+-	size.
+-
+-	If width is -1.0 and height is -1.0, the destination size is unset
+-	instead. Any other pair of values for width and height that
+-	contains zero or negative values raises the bad_value protocol
+-	error.
+-
+-	The crop and scale state is double-buffered state, and will be
+-	applied on the next wl_surface.commit.
+-      </description>
+-
+-      <arg name="x" type="fixed" summary="source rectangle x"/>
+-      <arg name="y" type="fixed" summary="source rectangle y"/>
+-      <arg name="width" type="fixed" summary="source rectangle width"/>
+-      <arg name="height" type="fixed" summary="source rectangle height"/>
+-    </request>
+-
+-    <request name="set_destination" since="2">
+-      <description summary="set the surface size for scaling">
+-	Set the destination size of the associated wl_surface. See
+-	wl_viewport for the description, and relation to the wl_buffer
+-	size.
+-
+-	If width is -1 and height is -1, the destination size is unset
+-	instead. Any other pair of values for width and height that
+-	contains zero or negative values raises the bad_value protocol
+-	error.
+-
+-	The crop and scale state is double-buffered state, and will be
+-	applied on the next wl_surface.commit.
+-
+-	Arguments x and y do not exist here, use the x and y arguments to
+-	wl_surface.attach. The x, y, width, and height define the
+-	surface-local coordinate system irrespective of the attached
+-	wl_buffer size.
+-      </description>
+-
+-      <arg name="width" type="int" summary="surface width"/>
+-      <arg name="height" type="int" summary="surface height"/>
+-    </request>
+-  </interface>
+-</protocol>
+diff --git a/ext/wayland/wldisplay.c b/ext/wayland/wldisplay.c
+index 3318095..08c0e77 100644
+--- a/ext/wayland/wldisplay.c
++++ b/ext/wayland/wldisplay.c
+@@ -161,8 +161,9 @@ registry_handle_global (void *data, struct wl_registry *registry,
+   } else if (g_strcmp0 (interface, "wl_shm") == 0) {
+     self->shm = wl_registry_bind (registry, id, &wl_shm_interface, 1);
+     wl_shm_add_listener (self->shm, &shm_listener, self);
+-  } else if (g_strcmp0 (interface, "wl_scaler") == 0) {
+-    self->scaler = wl_registry_bind (registry, id, &wl_scaler_interface, 2);
++  } else if (g_strcmp0 (interface, "wp_viewporter") == 0) {
++    self->viewporter =
++        wl_registry_bind (registry, id, &wp_viewporter_interface, 1);
+   }
+ }
+ 
+@@ -266,7 +267,7 @@ gst_wl_display_new_existing (struct wl_display * display,
+   VERIFY_INTERFACE_EXISTS (subcompositor, "wl_subcompositor");
+   VERIFY_INTERFACE_EXISTS (shell, "wl_shell");
+   VERIFY_INTERFACE_EXISTS (shm, "wl_shm");
+-  VERIFY_INTERFACE_EXISTS (scaler, "wl_scaler");
++  VERIFY_INTERFACE_EXISTS (viewporter, "wp_viewporter");
+ 
+ #undef VERIFY_INTERFACE_EXISTS
+ 
+diff --git a/ext/wayland/wldisplay.h b/ext/wayland/wldisplay.h
+index e9df749..9cbb500 100644
+--- a/ext/wayland/wldisplay.h
++++ b/ext/wayland/wldisplay.h
+@@ -23,7 +23,7 @@
+ 
+ #include <gst/gst.h>
+ #include <wayland-client.h>
+-#include "scaler-client-protocol.h"
++#include "viewporter-client-protocol.h"
+ 
+ G_BEGIN_DECLS
+ 
+@@ -51,7 +51,7 @@ struct _GstWlDisplay
+   struct wl_subcompositor *subcompositor;
+   struct wl_shell *shell;
+   struct wl_shm *shm;
+-  struct wl_scaler *scaler;
++  struct wp_viewporter *viewporter;
+   GArray *shm_formats;
+ 
+   /* private */
+diff --git a/ext/wayland/wlwindow.c b/ext/wayland/wlwindow.c
+index 79000ae..1bb6382 100644
+--- a/ext/wayland/wlwindow.c
++++ b/ext/wayland/wlwindow.c
+@@ -80,14 +80,14 @@ gst_wl_window_finalize (GObject * gobject)
+     wl_shell_surface_destroy (self->shell_surface);
+   }
+ 
+-  wl_viewport_destroy (self->video_viewport);
++  wp_viewport_destroy (self->video_viewport);
+   wl_subsurface_destroy (self->video_subsurface);
+   wl_surface_destroy (self->video_surface);
+ 
+   if (self->area_subsurface) {
+     wl_subsurface_destroy (self->area_subsurface);
+   }
+-  wl_viewport_destroy (self->area_viewport);
++  wp_viewport_destroy (self->area_viewport);
+   wl_surface_destroy (self->area_surface);
+ 
+   g_clear_object (&self->display);
+@@ -122,9 +122,9 @@ gst_wl_window_new_internal (GstWlDisplay * display)
+       window->video_surface, window->area_surface);
+   wl_subsurface_set_desync (window->video_subsurface);
+ 
+-  window->area_viewport = wl_scaler_get_viewport (display->scaler,
++  window->area_viewport = wp_viewporter_get_viewport (display->viewporter,
+       window->area_surface);
+-  window->video_viewport = wl_scaler_get_viewport (display->scaler,
++  window->video_viewport = wp_viewporter_get_viewport (display->viewporter,
+       window->video_surface);
+ 
+   /* draw the area_subsurface */
+@@ -249,7 +249,7 @@ gst_wl_window_resize_video_surface (GstWlWindow * window, gboolean commit)
+   gst_video_sink_center_rect (src, dst, &res, TRUE);
+ 
+   wl_subsurface_set_position (window->video_subsurface, res.x, res.y);
+-  wl_viewport_set_destination (window->video_viewport, res.w, res.h);
++  wp_viewport_set_destination (window->video_viewport, res.w, res.h);
+ 
+   if (commit) {
+     wl_surface_damage (window->video_surface, 0, 0, res.w, res.h);
+@@ -321,7 +321,7 @@ gst_wl_window_set_render_rectangle (GstWlWindow * window, gint x, gint y,
+     wl_subsurface_set_position (window->area_subsurface, x, y);
+ 
+   /* change the size of the area */
+-  wl_viewport_set_destination (window->area_viewport, w, h);
++  wp_viewport_set_destination (window->area_viewport, w, h);
+ 
+   if (window->video_width != 0) {
+     wl_subsurface_set_sync (window->video_subsurface);
+diff --git a/ext/wayland/wlwindow.h b/ext/wayland/wlwindow.h
+index e22cb26..8018df4 100644
+--- a/ext/wayland/wlwindow.h
++++ b/ext/wayland/wlwindow.h
+@@ -44,10 +44,10 @@ struct _GstWlWindow
+   GstWlDisplay *display;
+   struct wl_surface *area_surface;
+   struct wl_subsurface *area_subsurface;
+-  struct wl_viewport *area_viewport;
++  struct wp_viewport *area_viewport;
+   struct wl_surface *video_surface;
+   struct wl_subsurface *video_subsurface;
+-  struct wl_viewport *video_viewport;
++  struct wp_viewport *video_viewport;
+   struct wl_shell_surface *shell_surface;
+ 
+   /* the size and position of the area_(sub)surface */
+-- 
+2.7.4
+

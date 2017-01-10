@@ -1,0 +1,46 @@
+From 3d0c57a5edb69f723d315ce417873a6dc4cf615e Mon Sep 17 00:00:00 2001
+From: Fabien Dessenne <fabien.dessenne@st.com>
+Date: Tue, 30 Aug 2016 17:11:38 +0200
+Subject: [PATCH 17/24] STM: waylandsink: fix build warnings
+
+- Use the correct zwp_linux listener request function.
+- Add an include for gst_dmabuf_memory_get_fd()
+
+Change-Id: Iea978576d5b8fb47704dfd59fb08d4fdc70d88d9
+Signed-off-by: Fabien Dessenne <fabien.dessenne@st.com>
+Reviewed-on: https://gerrit.st.com/57398
+---
+ ext/wayland/wldisplay.c     | 3 +--
+ ext/wayland/wllinuxdmabuf.c | 2 ++
+ 2 files changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/ext/wayland/wldisplay.c b/ext/wayland/wldisplay.c
+index 12b9f9f..7ee99bd 100644
+--- a/ext/wayland/wldisplay.c
++++ b/ext/wayland/wldisplay.c
+@@ -245,8 +245,7 @@ registry_handle_global (void *data, struct wl_registry *registry,
+   } else if (g_strcmp0 (interface, "zwp_linux_dmabuf_v1") == 0) {
+     self->dmabuf =
+         wl_registry_bind (registry, id, &zwp_linux_dmabuf_v1_interface, 1);
+-    zwp_linux_buffer_params_v1_add_listener (self->dmabuf, &dmabuf_listener,
+-        self);
++    zwp_linux_dmabuf_v1_add_listener (self->dmabuf, &dmabuf_listener, self);
+   }
+ }
+ 
+diff --git a/ext/wayland/wllinuxdmabuf.c b/ext/wayland/wllinuxdmabuf.c
+index 1df91c9..5e5d804 100644
+--- a/ext/wayland/wllinuxdmabuf.c
++++ b/ext/wayland/wllinuxdmabuf.c
+@@ -26,6 +26,8 @@
+ #include "wllinuxdmabuf.h"
+ #include "wlvideoformat.h"
+ 
++#include <gst/allocators/allocators.h>
++
+ GST_DEBUG_CATEGORY_EXTERN (gstwayland_debug);
+ #define GST_CAT_DEFAULT gstwayland_debug
+ 
+-- 
+2.7.4
+

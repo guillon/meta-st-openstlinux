@@ -1,0 +1,48 @@
+From 4ccd92e0f2cc878ba2b25ec0881af0f67e8e72bd Mon Sep 17 00:00:00 2001
+From: Jean-Christophe Trotin <jean-christophe.trotin@st.com>
+Date: Tue, 3 Jan 2017 15:25:43 +0100
+Subject: [PATCH 22/24] STM: waylandsink: specify the minimum number of buffers
+
+If DMABuf memory has been negotiated, the waylandsink plugin shall
+propose a NULL pool configured with a minimum number of buffers and a
+size, so that the upstream element takes into account this request
+when it configures its pool of shared buffers.
+
+Warning: do not take this commit on gstreamer-1.10 as this bug is
+fixed in the 1.10 version where the pool is always proposed (shm and
+dmabuf)
+
+https://stintbugzilla.st.com/show_bug.cgi?id=107485
+
+Change-Id: If6417ea561bb4d4900ec7222571a827362cb9e8d
+Reviewed-on: https://gerrit.st.com/62444
+Reviewed-by: Jean Christophe TROTIN <jean-christophe.trotin@st.com>
+Tested-by: Jean Christophe TROTIN <jean-christophe.trotin@st.com>
+---
+ ext/wayland/gstwaylandsink.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/ext/wayland/gstwaylandsink.c b/ext/wayland/gstwaylandsink.c
+index 2b51b20..d21266a 100644
+--- a/ext/wayland/gstwaylandsink.c
++++ b/ext/wayland/gstwaylandsink.c
+@@ -607,6 +607,16 @@ gst_wayland_sink_propose_allocation (GstBaseSink * bsink, GstQuery * query)
+     gst_query_add_allocation_param (query, gst_wl_shm_allocator_get (), NULL);
+ 
+     gst_structure_free (config);
++  } else {
++    GstCaps *caps;
++    GstVideoInfo info;
++
++    gst_query_parse_allocation (query, &caps, NULL);
++    gst_video_info_from_caps (&info, caps);
++
++    /* No pool is proposed, but a minimum number of buffers and a size are
++     * requested */
++    gst_query_add_allocation_pool (query, NULL, info.size, 3, 0);
+   }
+ 
+   return TRUE;
+-- 
+2.7.4
+

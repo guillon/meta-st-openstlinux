@@ -79,11 +79,11 @@ LICENSE_FLAGS_WHITELIST += " commercial"
 # Preferred version
 
 # gstreamer configuration
-PREFERRED_VERSION_gstreamer1.0 ?= "st%"
-PREFERRED_VERSION_gstreamer1.0-plugins-base ?= "st%"
-PREFERRED_VERSION_gstreamer1.0-plugins-good ?= "st%"
+PREFERRED_VERSION_gstreamer1.0 ?= "1.8.3%"
+PREFERRED_VERSION_gstreamer1.0-plugins-base ?= "1.8.3%"
+PREFERRED_VERSION_gstreamer1.0-plugins-good ?= "1.8.3%"
 PREFERRED_VERSION_gstreamer1.0-plugins-ugly ?= "1.8.3"
-PREFERRED_VERSION_gstreamer1.0-plugins-bad ?= "st%"
+PREFERRED_VERSION_gstreamer1.0-plugins-bad ?= "1.8.3%"
 PREFERRED_VERSION_gst-player ?= "1.8"
 
 # v4l-utils

@@ -1,0 +1,24 @@
+94a1114 STM: waylandsink: fix display reconnection (redraw pending)
+4a683c5 STM: waylandsink: use buffer video meta
+4ccd92e STM: waylandsink: specify the minimum number of buffers
+a25389a glupload: enable memory:DMABuf feature in caps
+da13632 STM: waylandsink: memory:DMABuf preferred while negotiation
+da67121 STM: waylandsink: fix bad no_wl_buffer statement
+672e71b STM: waylandsink: support dmabuf YUY2 and I420 pixel formats
+3d0c57a STM: waylandsink: fix build warnings
+4b52f3b STM: waylandsink: support linux dmabuf protocol
+a783ae7 STM: waylandsink: ranked as primary
+98163d1 STM: waylandsink: fix RGB888 SHM format conversion
+c140cb2 STM: waylandsink: rendering window size setting
+aef11a2 STM: waylandsink: support fullscreen
+401c5cb STM: waylandsink: manage server window resizing
+a31c000 STM: waylandsink: set video alignment
+53c5a4e STM: waylandsink: increase bufferpool size
+8851b84 STM: waylandsink: disable last-sample sink feature
+96e2a12 wayland: fix wayland-protocols path
+f491e5d wayland: Update from scaler to viewporter protocol
+f44aea4 STM: videoparser: h265: fix all au boundary issues
+b3a2eb7 STM: codecparser: h265: correct frame height for interlaced streams
+7de7a4a STM: h265parse: ignore and continue decode if out of range vui params found
+f0948b4 STM: dvbbasebin: optional support of target device in uri
+7ac213d STM: h264parse: update src caps if resolution change

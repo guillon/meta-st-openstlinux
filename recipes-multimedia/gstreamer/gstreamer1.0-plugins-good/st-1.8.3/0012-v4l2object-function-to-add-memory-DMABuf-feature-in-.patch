@@ -1,0 +1,74 @@
+From 2099e5dae869c56a61ad4a26f9818d665c5094cd Mon Sep 17 00:00:00 2001
+From: Jean-Christophe Trotin <jean-christophe.trotin@st.com>
+Date: Thu, 20 Oct 2016 14:04:01 +0200
+Subject: [PATCH 12/23] v4l2object: function to add memory:DMABuf feature in
+ caps
+
+The gst_v4l2_object_add_dmabuf_feature_in_caps() function ensures that
+each caps structure whose name is "video/x-raw" supports both DMABuf
+and SystemMemory features.
+
+Change-Id: Id429d0610259c47b9be58a6bb98f1b12fba4cb3c
+Reviewed-on: https://gerrit.st.com/59362
+Reviewed-by: Jean Christophe TROTIN <jean-christophe.trotin@st.com>
+Tested-by: Jean Christophe TROTIN <jean-christophe.trotin@st.com>
+Tested-by: Vincent ABRIOU <vincent.abriou@st.com>
+Reviewed-by: Vincent ABRIOU <vincent.abriou@st.com>
+---
+ sys/v4l2/gstv4l2object.c | 26 ++++++++++++++++++++++++++
+ sys/v4l2/gstv4l2object.h |  2 ++
+ 2 files changed, 28 insertions(+)
+
+diff --git a/sys/v4l2/gstv4l2object.c b/sys/v4l2/gstv4l2object.c
+index c9649e5..1e6de1d 100644
+--- a/sys/v4l2/gstv4l2object.c
++++ b/sys/v4l2/gstv4l2object.c
+@@ -3846,6 +3846,32 @@ gst_v4l2_object_get_caps (GstV4l2Object * v4l2object, GstCaps * filter)
+   return ret;
+ }
+ 
++void
++gst_v4l2_object_add_dmabuf_feature_in_caps (GstCaps * caps)
++{
++  guint i, num_structures;
++  GstCapsFeatures *f;
++  GstStructure *alt, *structure;
++
++  if (!caps)
++    return;
++
++  /* Each caps structure whose name is "video/x-raw" supports both
++   * DMABuf and SystemMemory features
++   */
++  num_structures = gst_caps_get_size (caps);
++  for (i = 0; i < num_structures; i++) {
++    structure = gst_caps_get_structure (caps, i);
++    if (!strncmp (gst_structure_get_name (structure), "video/x-raw", 11)) {
++      alt = gst_structure_copy (structure);
++      gst_caps_append_structure (caps, alt);
++      f = gst_caps_get_features (caps, i);
++      gst_caps_features_remove (f, GST_CAPS_FEATURE_MEMORY_SYSTEM_MEMORY);
++      gst_caps_features_add (f, GST_CAPS_FEATURE_MEMORY_DMABUF);
++    }
++  }
++}
++
+ gboolean
+ gst_v4l2_object_decide_allocation (GstV4l2Object * obj, GstQuery * query)
+ {
+diff --git a/sys/v4l2/gstv4l2object.h b/sys/v4l2/gstv4l2object.h
+index 7117d43..4c33e96 100644
+--- a/sys/v4l2/gstv4l2object.h
++++ b/sys/v4l2/gstv4l2object.h
+@@ -271,6 +271,8 @@ gboolean      gst_v4l2_object_acquire_format (GstV4l2Object * v4l2object,
+ 
+ gboolean      gst_v4l2_object_set_crop    (GstV4l2Object * obj);
+ 
++void          gst_v4l2_object_add_dmabuf_feature_in_caps (GstCaps * caps);
++
+ gboolean      gst_v4l2_object_decide_allocation (GstV4l2Object * v4l2object,
+                                                  GstQuery * query);
+ 
+-- 
+2.7.4
+
