@@ -18,4 +18,5 @@ SRC_URI_append = " \
     file://0015-v4l-utils-libv4l-hva-new-ops-set_ctrl-added.patch \
     "
 
+DEPENDS += "gstreamer1.0-plugins-base"
 
