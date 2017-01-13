@@ -16,6 +16,9 @@ SRC_URI_append = " \
     file://0013-libv4l-hva-fix-sps-pps-memory-leak.patch \
     file://0014-v4l-utils-libv4l-hva-fix-for-T8x8-for-stereo-profile.patch \
     file://0015-v4l-utils-libv4l-hva-new-ops-set_ctrl-added.patch \
+    file://0016-refresh-V4L2-header-files-with-parsed-MPEG-2-support.patch \
+    file://0017-add-libv4l-codecparsers-plugin-for-video-bitstream-p.patch \
+    file://0018-libv4l-codecparsers-add-GStreamer-mpeg2-parser.patch \
     "
 
 DEPENDS += "gstreamer1.0-plugins-base"

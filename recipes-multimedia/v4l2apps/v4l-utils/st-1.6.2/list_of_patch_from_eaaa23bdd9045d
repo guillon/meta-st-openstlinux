@@ -1,3 +1,6 @@
+37f96ff libv4l-codecparsers: add GStreamer mpeg2 parser
+b022944 add libv4l-codecparsers plugin for video bitstream parsing
+20995bc refresh V4L2 header files with parsed MPEG-2 support
 f0928bc v4l-utils: libv4l-hva: new ops 'set_ctrl' added
 833d3d3 v4l-utils: libv4l-hva: fix for T8x8 for stereo profile
 6e549cc libv4l-hva: fix sps/pps memory leak
