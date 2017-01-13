@@ -24,6 +24,8 @@ SRC_URI_append = " \
     file://0021-v4l2transform-keep-colorimetry-and-chroma-site-field.patch \
     file://0022-v4l2transform-set-the-output-format-from-imported-po.patch \
     file://0023-v4l2allocator-unref-memory-before-the-buffer-is-queu.patch \
+    file://0024-v4l2object-allows-a-single-OUTPUT-buffer.patch \
+    file://0025-v4l2-fix-missing-v4l2_calls-indirection.patch \
     "
 
 PACKAGECONFIG ?= " \

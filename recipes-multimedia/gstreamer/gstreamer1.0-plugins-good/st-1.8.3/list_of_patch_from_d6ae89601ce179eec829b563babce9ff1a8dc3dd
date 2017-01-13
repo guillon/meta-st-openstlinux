@@ -1,3 +1,5 @@
+2afe848 v4l2: fix missing v4l2_calls indirection
+e326198 v4l2object: allows a single OUTPUT buffer
 6607c62 v4l2allocator: unref memory before the buffer is queued
 bb88a36 v4l2transform: set the output format from imported pool video info
 bf05fd0 v4l2transform: keep colorimetry and chroma-site fields if passthrough
