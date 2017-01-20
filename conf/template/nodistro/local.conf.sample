@@ -267,17 +267,16 @@ BB_DISKMON_DIRS = "\
 
 
 
-#-----------------------------------
+# =========================================================================
 #   ST SPecific
-#
-
+# =========================================================================
 #
 # CONF_VERSION is increased each time build/conf/ changes incompatibly and is used to
 # track the version of this file when it was generated. This can safely be ignored if
 # this doesn't mean anything to you.
 CONF_VERSION = "1"
 
-#support of devshell
+# Support of devshell
 INHERIT += "devshell"
 
 # Remove the old image before the new one generated to save disk space
@@ -287,11 +286,13 @@ RM_OLD_IMAGE = "1"
 INHERIT += "buildhistory"
 BUILDHISTORY_COMMIT = "1"
 
-# clean up working directory after build
+# Clean up working directory after build
 #INHERIT += "rm_work"
 
-# to generate debug image with all symbol
+# To generate debug image with all symbol
 #IMAGE_GEN_DEBUGFS = "1"
 
-#Meta ST source code location:
-ST_LOCAL_SRC = '${OEROOT}/sources/'
+# =========================================================================
+# Set EULA acceptance
+# =========================================================================
+#ACCEPT_EULA_##MACHINE## = "##_EULA_ACCEPT##"
