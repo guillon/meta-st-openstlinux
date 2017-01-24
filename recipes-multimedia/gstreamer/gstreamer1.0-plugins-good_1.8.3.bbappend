@@ -26,6 +26,7 @@ SRC_URI_append = " \
     file://0023-v4l2allocator-unref-memory-before-the-buffer-is-queu.patch \
     file://0024-v4l2object-allows-a-single-OUTPUT-buffer.patch \
     file://0025-v4l2-fix-missing-v4l2_calls-indirection.patch \
+    file://0026-v4l2object-use-G_SELECTION-instead-of-G_CROP-in-gst_.patch \
     "
 
 PACKAGECONFIG ?= " \
