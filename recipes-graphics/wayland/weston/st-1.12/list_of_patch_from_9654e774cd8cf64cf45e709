@@ -1,3 +1,7 @@
+1f5fdbb compositor: force repaint immediately on receiving the pageflip completion event
+234faf0 compositor-st: release buffer when drmModeSetPlane fails
+bcb863b compositor-st: lastly call DRM_IOCTL_MODE_PAGE_FLIP in drm_output_repaint
+7fe2474 compositor-st: don't repaint  primary plane if no damage
 9654e77 compositor-st: use backend_user_data to store dmabuf handles
 3c41c1c linux-dmabuf: add backend private data in linux_dmabuf_buffer structure
 25aa330 compositor-st: drmModeSetPlane error management

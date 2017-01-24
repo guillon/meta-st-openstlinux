@@ -61,6 +61,10 @@ SRC_URI_append = " \
     file://0059-compositor-st-drmModeSetPlane-error-management.patch \
     file://0060-linux-dmabuf-add-backend-private-data-in-linux_dmabu.patch \
     file://0061-compositor-st-use-backend_user_data-to-store-dmabuf-.patch \
+    file://0062-compositor-st-don-t-repaint-primary-plane-if-no-dama.patch \
+    file://0063-compositor-st-lastly-call-DRM_IOCTL_MODE_PAGE_FLIP-i.patch \
+    file://0064-compositor-st-release-buffer-when-drmModeSetPlane-fa.patch \
+    file://0065-compositor-force-repaint-immediately-on-receiving-th.patch \
     "
 
 # Weston on KMS
