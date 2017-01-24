@@ -1,0 +1,59 @@
+From 646ca71131dabc8e015dcdd329ace13e782a69e8 Mon Sep 17 00:00:00 2001
+From: Hugues Fruchet <hugues.fruchet@st.com>
+Date: Fri, 13 Jan 2017 17:47:52 +0100
+Subject: [PATCH] fixup! libv4l-codecparsers: add GStreamer mpeg2 parser
+
+Stop parsing at first slice encountered.
+
+Change-Id: I9fe1fc4f7c30a835ea1194165741e50675e2f643
+Reviewed-on: https://gerrit.st.com/63565
+Reviewed-by: Hugues FRUCHET <hugues.fruchet@st.com>
+Tested-by: Hugues FRUCHET <hugues.fruchet@st.com>
+---
+ lib/libv4l-codecparsers/libv4l-cparsers-mpeg2.c | 9 +++------
+ 1 file changed, 3 insertions(+), 6 deletions(-)
+
+diff --git a/lib/libv4l-codecparsers/libv4l-cparsers-mpeg2.c b/lib/libv4l-codecparsers/libv4l-cparsers-mpeg2.c
+index b62bb5c..1c0398a 100644
+--- a/lib/libv4l-codecparsers/libv4l-cparsers-mpeg2.c
++++ b/lib/libv4l-codecparsers/libv4l-cparsers-mpeg2.c
+@@ -85,8 +85,6 @@ static const struct v4l2_ext_control mpeg2_metas[] = {
+ 
+ /* Potential improvements:
+  * - parsing errors tracing (trace in case of gst_parse_xxx fails)
+- * - do not parse all access unit (currently needed to detect the
+- *   second slice of a field interlaced bitstream)
+  */
+ unsigned int mpeg2_decode_header(void *au_addr,
+ 								 unsigned int au_size,
+@@ -171,10 +169,6 @@ unsigned int mpeg2_decode_header(void *au_addr,
+ 
+ 		case GST_MPEG_VIDEO_PACKET_SLICE_MIN:
+ 			/* New slice encountered */
+-			/* Improvement: we can avoid to parse too much data here by stopping
+-			* at first slice encountered but not in the case of field
+-			* interlaced where 2 slices are expected
+-			*/
+ 			if (slice_index > 1) {
+ 				CPARSERS_LOG_ERR("%s: more than 2 slices detected @offset=%d, ignoring this slice...\n",
+ 							  __func__, packet_data.offset);
+@@ -186,6 +180,8 @@ unsigned int mpeg2_decode_header(void *au_addr,
+ 
+ 			CPARSERS_LOG_DEBUG("%s: START OF SLICE @ offset=%d\n", __func__, packet_data.offset);
+ 			meta_found = true;
++			goto done;
++
+ 			break;
+ 
+ 		case GST_MPEG_VIDEO_PACKET_USER_DATA:
+@@ -347,6 +343,7 @@ unsigned int mpeg2_decode_header(void *au_addr,
+ 		}
+ 	}
+ 
++done:
+ 	return meta_found;
+ }
+ 
+-- 
+2.7.4
+

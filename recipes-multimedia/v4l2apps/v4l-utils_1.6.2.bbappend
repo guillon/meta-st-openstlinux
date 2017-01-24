@@ -19,6 +19,7 @@ SRC_URI_append = " \
     file://0016-refresh-V4L2-header-files-with-parsed-MPEG-2-support.patch \
     file://0017-add-libv4l-codecparsers-plugin-for-video-bitstream-p.patch \
     file://0018-libv4l-codecparsers-add-GStreamer-mpeg2-parser.patch \
+    file://0019-fixup-libv4l-codecparsers-add-GStreamer-mpeg2-parser.patch \
     "
 
 DEPENDS += "gstreamer1.0-plugins-base"
