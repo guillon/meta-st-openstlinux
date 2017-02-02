@@ -291,8 +291,3 @@ BUILDHISTORY_COMMIT = "1"
 
 # To generate debug image with all symbol
 #IMAGE_GEN_DEBUGFS = "1"
-
-# =========================================================================
-# Set EULA acceptance
-# =========================================================================
-#ACCEPT_EULA_##MACHINE## = "##_EULA_ACCEPT##"
