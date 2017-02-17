@@ -93,12 +93,6 @@ PREFERRED_VERSION_gst-player ?= "1.8"
 # v4l-utils
 #PREFERRED_VERSION_v4l-utils ?= "st%"
 
-# optee
-#NOTE: defined default version for optee release
-OPTEE_VERS ?= "2.2.0"
-PREFERRED_VERSION_optee-client ?= "${OPTEE_VERS}%"
-PREFERRED_VERSION_optee-test ?= "${OPTEE_VERS}%"
-
 #X11 addons
 IMAGE_INSTALL_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'xf86-video-modesetting', '', d)} "
 
