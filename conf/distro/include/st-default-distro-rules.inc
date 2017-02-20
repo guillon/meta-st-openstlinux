@@ -44,6 +44,7 @@ INCOMPATIBLE_LICENSE = "GPLv3.0 GPLv3 GPL-3.0 GPLv3+ LGPLv3.0 LGPLv3 LGPL-3.0 LG
 #mpfr: used at compilation time
 #libmpc used at compilation time
 OPENSDK_WHITELIST_GPLv3 = "binutils ccache less autoconf gcc mpfr libmpc"
+OPENSDK_WHITELIST_GPLv3 =+ "sysprof"
 WHITELIST_GPLv3.0+ = "${OPENSDK_WHITELIST_GPLv3}"
 WHITELIST_LGPLv3.0 = "${OPENSDK_WHITELIST_GPLv3}"
 WHITELIST_GPL-3.0 = "${OPENSDK_WHITELIST_GPLv3}"
