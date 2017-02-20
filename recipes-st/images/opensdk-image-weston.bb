@@ -56,6 +56,8 @@ IMAGE_X11_DISPLAY_PART = " \
 # INSTALL addons
 #
 CORE_IMAGE_EXTRA_INSTALL += " \
+    systemd-networkd-configuration \
+    \
     ${@bb.utils.contains('DISTRO_FEATURES', 'bluetooth', 'bluez5', '', d)} \
     \
     packagegroup-framework-tools-core    \
