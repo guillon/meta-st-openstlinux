@@ -12,8 +12,8 @@
 
 DISTRO = "st-opensdk"
 DISTRO_NAME = "ST OpenSDK (A Yocto Project 2.1 based Distro)"
-DISTRO_VERSION = "2.1"
-DISTRO_CODENAME = "krogoth"
+DISTRO_VERSION = "2.2"
+DISTRO_CODENAME = "morty"
 
 SDK_VENDOR = "-stopensdk_SDK"
 SDK_VERSION := "${@'${DISTRO_VERSION}'.replace('snapshot-${DATE}','snapshot')}"
@@ -83,15 +83,15 @@ COPY_LIC_MANIFEST = "1"
 # Preferred version
 
 # gstreamer configuration
-PREFERRED_VERSION_gstreamer1.0 ?= "1.8.3%"
-PREFERRED_VERSION_gstreamer1.0-plugins-base ?= "1.8.3%"
-PREFERRED_VERSION_gstreamer1.0-plugins-good ?= "1.8.3%"
-PREFERRED_VERSION_gstreamer1.0-plugins-ugly ?= "1.8.3"
-PREFERRED_VERSION_gstreamer1.0-plugins-bad ?= "1.8.3%"
+#PREFERRED_VERSION_gstreamer1.0 ?= "1.8.3%"
+#PREFERRED_VERSION_gstreamer1.0-plugins-base ?= "1.8.3%"
+#PREFERRED_VERSION_gstreamer1.0-plugins-good ?= "1.8.3%"
+#PREFERRED_VERSION_gstreamer1.0-plugins-ugly ?= "1.8.3"
+#PREFERRED_VERSION_gstreamer1.0-plugins-bad ?= "1.8.3%"
 PREFERRED_VERSION_gst-player ?= "1.8"
 
 # v4l-utils
-#PREFERRED_VERSION_v4l-utils ?= "st%"
+#PREFERRED_VERSION_v4l-utils ?= "1.6.2"
 
 #X11 addons
 IMAGE_INSTALL_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'xf86-video-modesetting', '', d)} "
