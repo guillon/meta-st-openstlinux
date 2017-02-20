@@ -7,5 +7,5 @@ SRC_URI_append = " \
 "
 
 do_configure_prepend() {
-	${S}/autogen.sh --noconfigure
+    ${S}/autogen.sh --noconfigure
 }

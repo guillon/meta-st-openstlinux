@@ -48,6 +48,12 @@ do_configure_prepend() {
     ${S}/autogen.sh --noconfigure
 }
 
+do_install_append() {
+    install -d ${D}${libdir}/pkgconfig ${D}${includedir}/gstreamer-1.0/wayland
+    install -m 644 ${B}/pkgconfig/gstreamer-wayland.pc ${D}${libdir}/pkgconfig/gstreamer-wayland-1.0.pc
+    install -m 644 ${S}/gst-libs/gst/wayland/wayland.h ${D}${includedir}/gstreamer-1.0/wayland
+}
+
 # In 1.6.2, the "--enable-hls" configure option generated an installable package
 # called "gstreamer1.0-plugins-bad-fragmented". In 1.7.1 that HLS plugin package
 # has become "gstreamer1.0-plugins-bad-hls". See:
