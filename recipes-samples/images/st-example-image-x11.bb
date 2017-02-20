@@ -1,4 +1,4 @@
-SUMMARY = "OpenSDK multimedia image based on X11."
+SUMMARY = "ST example of image based on X11."
 LICENSE = "MIT"
 
 inherit core-image distro_features_check
@@ -56,14 +56,6 @@ IMAGE_X11_DISPLAY_PART = " \
     "
 
 #
-# Optee part addons
-#
-IMAGE_OPTEE_PART = " \
-    ${@bb.utils.contains('COMBINED_FEATURES', 'optee', 'packagegroup-optee-core', '', d)} \
-    ${@bb.utils.contains('COMBINED_FEATURES', 'optee', 'packagegroup-optee-test', '', d)} \
-    "
-
-#
 # INSTALL addons
 #
 CORE_IMAGE_EXTRA_INSTALL += " \
@@ -83,6 +75,4 @@ CORE_IMAGE_EXTRA_INSTALL += " \
     ${IMAGE_MM_PART}                    \
     \
     ${IMAGE_X11_DISPLAY_PART}           \
-    \
-    ${IMAGE_OPTEE_PART}                 \
     "
