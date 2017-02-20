@@ -7,6 +7,9 @@ LIC_FILES_CHKSUM = "file://Notice.md;md5=445126761b17c6ff8957f3a3dbf7fa54"
 SRC_URI = "git://github.com/OP-TEE/optee_test.git"
 SRCREV = "a4653559d989d5006f67f4498be4cb090be12f79"
 
+
+SRC_URI =+ "file://0001-Correct-unused-const-variable.patch"
+
 PV = "2.3.0"
 PR = "git${SRCPV}.r0"
 
@@ -26,7 +29,7 @@ EXTRA_OEMAKE += "TA_DEV_KIT_DIR=${STAGING_INCDIR}/optee/export-ta_arm32"
 EXTRA_OEMAKE += "OPTEE_CLIENT_EXPORT=${STAGING_EXECPREFIXDIR}"
 
 do_compile() {
-    unset LDFLAGS
+    #unset LDFLAGS
     oe_runmake
 }
 
