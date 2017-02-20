@@ -1,3 +1,4 @@
+
 From d5fb6dddf7d2748593b9b06a0a5fa1b4e258aafe Mon Sep 17 00:00:00 2001
 From: Fabien Dessenne <fabien.dessenne@st.com>
 Date: Fri, 5 Sep 2014 12:00:59 +0200
@@ -161,4 +162,3 @@ index 509ba5e..b6e3fb5 100644
  /* Querying supported format values. */
 -- 
 1.9.1
-
