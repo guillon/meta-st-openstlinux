@@ -18,8 +18,8 @@ SRC_URI += " file://psplash-drm-start.service "
 
 inherit systemd
 
-SYSTEMD_PACKAGES = "${@base_contains('DISTRO_FEATURES','systemd','${PN}','',d)}"
-SYSTEMD_SERVICE_${PN} = "${@base_contains('DISTRO_FEATURES','systemd','psplash-drm-start.service','',d)}"
+SYSTEMD_PACKAGES = "${@bb.utils.contains('DISTRO_FEATURES','systemd','${PN}','',d)}"
+SYSTEMD_SERVICE_${PN} = "${@bb.utils.contains('DISTRO_FEATURES','systemd','psplash-drm-start.service','',d)}"
 
 S = "${WORKDIR}"
 
@@ -30,12 +30,12 @@ do_compile() {
     oe_runmake psplash
 }
 do_install() {
-    install -d ${D}/usr/bin/
-    install -m 755 ${WORKDIR}/psplash-drm ${D}/usr/bin
+    install -d ${D}${bindir}
+    install -m 755 ${WORKDIR}/psplash-drm ${D}${bindir}
 
-    install -m 755 ${WORKDIR}/psplash-drm-quit ${D}/usr/bin
+    install -m 755 ${WORKDIR}/psplash-drm-quit ${D}${bindir}
 
-    if ${@base_contains('DISTRO_FEATURES','systemd','true','false',d)}; then
+    if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
         install -d ${D}${systemd_unitdir}/system
         install -m 644 ${WORKDIR}/*.service ${D}/${systemd_unitdir}/system
     fi
