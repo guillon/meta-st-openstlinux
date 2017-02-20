@@ -108,7 +108,6 @@ RDEPENDS_packagegroup-framework-tools-audio = "\
     ${@bb.utils.contains('DISTRO_FEATURES', 'alsa', 'alsa-lib', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'alsa', 'alsa-utils', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'alsa', 'alsa-plugins', '', d)} \
-    ${@bb.utils.contains('DISTRO_FEATURES', 'alsa', 'fftwf', '', d)} \
     pulseaudio \
     pulseaudio-server \
     pulseaudio-misc \
