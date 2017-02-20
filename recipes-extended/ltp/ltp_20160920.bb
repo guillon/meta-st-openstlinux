@@ -68,7 +68,7 @@ EXTRA_OECONF += " --without-tirpc "
 # then delete the header, then "make -j XX" and watch regen.sh run multiple
 # times. Its easier to generate this once here instead.
 do_compile_prepend () {
-	( make -C ${B}/testcases/kernel include/linux_syscall_numbers.h )
+    ( make -C ${B}/testcases/kernel include/linux_syscall_numbers.h )
 }
 
 do_install(){
