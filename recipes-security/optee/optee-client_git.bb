@@ -8,6 +8,8 @@ LICENSE = "BSD"
 SRC_URI = "git://github.com/OP-TEE/optee_client.git"
 SRCREV = "365657667f8968f40237480169fea44fa3fb9949"
 
+SRC_URI =+ "file://0001-Usage-of-LDLAGS.patch"
+
 PV = "2.3.0"
 PR = "git${SRCPV}.r0"
 
