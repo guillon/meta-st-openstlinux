@@ -23,11 +23,11 @@ inherit autotools pkgconfig distro_features_check
 ANY_OF_DISTRO_FEATURES = "${GTK3DISTROFEATURES}"
 
 do_configure_prepend() {
-	touch ${S}/ChangeLog
+    touch ${S}/ChangeLog
 }
 
 do_install_append() {
-	install -m 0644 -D ${WORKDIR}/gst-player.desktop ${D}${datadir}/applications/gst-player.desktop
+    install -m 0644 -D ${WORKDIR}/gst-player.desktop ${D}${datadir}/applications/gst-player.desktop
 }
 
 RDEPENDS_${PN} = "gstreamer1.0-plugins-base-playback"
