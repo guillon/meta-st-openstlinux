@@ -80,23 +80,23 @@ PACKAGECONFIG[colord] = "--enable-colord,--disable-colord,colord"
 PACKAGECONFIG[clients] = "--enable-clients --enable-simple-clients --enable-demo-clients-install,--disable-clients --disable-simple-clients"
 
 do_install_append() {
-	# Weston doesn't need the .la files to load modules, so wipe them
-	rm -f ${D}/${libdir}/libweston-*/*.la
-	rm -f ${D}/${libdir}/weston/*.la
-	rm -f ${D}/${libdir}/*.la
+    # Weston doesn't need the .la files to load modules, so wipe them
+    rm -f ${D}/${libdir}/libweston-*/*.la
+    rm -f ${D}/${libdir}/weston/*.la
+    rm -f ${D}/${libdir}/*.la
 
-	# If X11, ship a desktop file to launch it
-	if [ "${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'x11', '', d)}" = "x11" ]; then
-		install -d ${D}${datadir}/applications
-		install ${WORKDIR}/weston.desktop ${D}${datadir}/applications
+    # If X11, ship a desktop file to launch it
+    if [ "${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'x11', '', d)}" = "x11" ]; then
+        install -d ${D}${datadir}/applications
+        install ${WORKDIR}/weston.desktop ${D}${datadir}/applications
 
-		install -d ${D}${datadir}/icons/hicolor/48x48/apps
-		install ${WORKDIR}/weston.png ${D}${datadir}/icons/hicolor/48x48/apps
-	fi
+        install -d ${D}${datadir}/icons/hicolor/48x48/apps
+        install ${WORKDIR}/weston.png ${D}${datadir}/icons/hicolor/48x48/apps
+    fi
 
-	if [ "${@bb.utils.contains('PACKAGECONFIG', 'xwayland', 'yes', 'no', d)}" = "yes" ]; then
-		install -Dm 644 ${WORKDIR}/xwayland.weston-start ${D}${datadir}/weston-start/xwayland
-	fi
+    if [ "${@bb.utils.contains('PACKAGECONFIG', 'xwayland', 'yes', 'no', d)}" = "yes" ]; then
+        install -Dm 644 ${WORKDIR}/xwayland.weston-start ${D}${datadir}/weston-start/xwayland
+    fi
 }
 
 PACKAGE_BEFORE_PN += "${@bb.utils.contains('PACKAGECONFIG', 'xwayland', '${PN}-xwayland', '', d)}"
