@@ -19,8 +19,8 @@ CACHED_CONFIGUREVARS += " ax_cv_PTHREAD_PRIO_INHERIT=no"
 
 # Pulse audio configuration files installation
 do_install_append() {
-    install -d ${D}/etc/profile.d
-    install -m 0644 ${WORKDIR}/pulse_profile.sh ${D}/etc/profile.d/
+    install -d ${D}${sysconfdir}/profile.d
+    install -m 0644 ${WORKDIR}/pulse_profile.sh ${D}${sysconfdir}/profile.d/
 }
 
 FILES_${PN} += "/etc/profile.d"
