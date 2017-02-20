@@ -12,43 +12,6 @@
 # variable as required.
 
 #
-# Parallelism Options
-#
-# These two options control how much parallelism BitBake should use. The first
-# option determines how many tasks bitbake should run in parallel:
-#
-#BB_NUMBER_THREADS ?= "4"
-#
-# Default to setting automatically based on cpu count
-#BB_NUMBER_THREADS ?= "${@oe.utils.cpu_count()}"
-#
-# The second option controls how many processes make should run in parallel when
-# running compile tasks:
-#
-#PARALLEL_MAKE ?= "-j 4"
-#
-# Default to setting automatically based on cpu count
-#PARALLEL_MAKE ?= "-j ${@oe.utils.cpu_count()}"
-#
-# For a quad-core machine, BB_NUMBER_THREADS = "4", PARALLEL_MAKE = "-j 4" would
-# be appropriate for example.
-
-
-# ENABLE_BINARY_LOCALE_GENERATION controls the generation of binary locale
-# packages at build time using qemu-native. Disabling it (by setting it to 0)
-# will save some build time at the expense of breaking i18n on devices with
-# less than 128MB RAM.
-ENABLE_BINARY_LOCALE_GENERATION = ""
-
-# Set GLIBC_GENERATE_LOCALES to the locales you wish to generate should you not
-# wish to perform the time-consuming step of generating all LIBC locales.
-# NOTE: If removing en_US.UTF-8 you will also need to uncomment, and set
-# appropriate value for IMAGE_LINGUAS.
-# WARNING: this may break localisation!
-GLIBC_GENERATE_LOCALES = "en_GB.UTF-8 en_US.UTF-8"
-IMAGE_LINGUAS ?= "en-gb"
-
-#
 # Machine Selection
 #
 # You need to select a specific machine to target the build with. There are a selection
@@ -130,7 +93,7 @@ DISTRO ??= "nodistro"
 #  - 'package_rpm' for rpm style packages
 # E.g.: PACKAGE_CLASSES ?= "package_rpm package_deb package_ipk"
 # We default to ipk:
-PACKAGE_CLASSES ?= "package_deb"
+PACKAGE_CLASSES ?= "package_ipk"
 
 #
 # SDK target architecture
@@ -177,8 +140,7 @@ EXTRA_IMAGE_FEATURES ?= "debug-tweaks"
 #   - 'image-swab' to perform host system intrusion detection
 # NOTE: if listing mklibs & prelink both, then make sure mklibs is before prelink
 # NOTE: mklibs also needs to be explicitly enabled for a given image, see local.conf.extended
-# image-prelink disabled for now due to issues with IFUNC symbol relocation
-USER_CLASSES ?= "buildstats image-mklibs"
+USER_CLASSES ?= "buildstats image-mklibs image-prelink"
 
 
 #
@@ -258,15 +220,6 @@ PACKAGECONFIG_append_pn-qemu-native = " sdl"
 PACKAGECONFIG_append_pn-nativesdk-qemu = " sdl"
 #ASSUME_PROVIDED += "libsdl-native"
 
-# Additional image generation features
-#
-# The following is a list of classes to import to use in the generation of images
-# currently an example class is image_types_uboot
-# IMAGE_CLASSES = " image_types_uboot"
-
-
-
-
 # =========================================================================
 #   ST SPecific
 # =========================================================================
@@ -275,6 +228,20 @@ PACKAGECONFIG_append_pn-nativesdk-qemu = " sdl"
 # track the version of this file when it was generated. This can safely be ignored if
 # this doesn't mean anything to you.
 CONF_VERSION = "1"
+
+# Set GLIBC_GENERATE_LOCALES to the locales you wish to generate should you not
+# wish to perform the time-consuming step of generating all LIBC locales.
+# NOTE: If removing en_US.UTF-8 you will also need to uncomment, and set
+# appropriate value for IMAGE_LINGUAS.
+# WARNING: this may break localisation!
+GLIBC_GENERATE_LOCALES = "en_GB.UTF-8 en_US.UTF-8"
+IMAGE_LINGUAS ?= "en-gb"
+
+# Additional image generation features
+#
+# The following is a list of classes to import to use in the generation of images
+# currently an example class is image_types_uboot
+# IMAGE_CLASSES = " image_types_uboot"
 
 # Support of devshell
 INHERIT += "devshell"
@@ -291,3 +258,6 @@ BUILDHISTORY_COMMIT = "1"
 
 # To generate debug image with all symbol
 #IMAGE_GEN_DEBUGFS = "1"
+
+# force the usage of debian package
+PACKAGE_CLASSES = "package_deb"
