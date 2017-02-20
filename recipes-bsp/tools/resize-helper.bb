@@ -26,8 +26,8 @@ SYSTEMD_SERVICE_${PN} = "resize-helper.service"
 SYSTEMD_AUTO_ENABLE_${PN} = "enable"
 
 do_install() {
-    install -d ${D}${systemd_unitdir}/system ${D}/sbin
+    install -d ${D}${systemd_unitdir}/system ${D}${base_sbindir}
     install -m 0644 ${WORKDIR}/resize-helper.service ${D}${systemd_unitdir}/system
-    install -m 0755 ${WORKDIR}/resize-helper ${D}/sbin/
+    install -m 0755 ${WORKDIR}/resize-helper ${D}${base_sbindir}
 }
 
