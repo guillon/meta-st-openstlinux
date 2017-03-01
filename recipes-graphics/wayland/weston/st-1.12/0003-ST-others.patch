@@ -1,63 +1,17 @@
-From d8b17bc45277941c4a4a30fc5da3bc9a6145c3bb Mon Sep 17 00:00:00 2001
-From: Quentin Glidic <sardemff7+git@sardemff7.net>
-Date: Sun, 10 Jul 2016 11:00:55 +0200
-Subject: [PATCH 05/61] share/cairo-util: Use wl_pointer_button_state enum
- directly
+From bc8c1f65a5e8e86ce37a2790c3f09adc79b58117 Mon Sep 17 00:00:00 2001
+From: Christophe Priouzeau <christophe.priouzeau@st.com>
+Date: Fri, 3 Feb 2017 13:21:58 +0100
+Subject: [PATCH 3/4] ST others
 
-This silences two warnings:
-
-clients/window.c:2450:20: warning: implicit conversion from enumeration
-type 'enum wl_pointer_button_state' to different enumeration type 'enum
-frame_button_state' [-Wenum-conversion]
-                                              button, state);
-                                                      ^~~~~
-
-clients/window.c:2453:15: warning: implicit conversion from enumeration
-type 'enum wl_pointer_button_state' to different enumeration type 'enum
-frame_button_state' [-Wenum-conversion]
-                                                button, state);
-                                                        ^~~~~
-
-Warning produced by Clang 3.8.
-
-Signed-off-by: Quentin Glidic <sardemff7+git@sardemff7.net>
-Reviewed-by: Giulio Camuffo <giuliocamuffo@gmail.com>
 ---
- libweston/compositor-wayland.c |  9 ++-------
- shared/cairo-util.h            | 10 +++-------
- shared/frame.c                 | 12 ++++++------
- xwayland/window-manager.c      |  5 +++--
- 4 files changed, 14 insertions(+), 22 deletions(-)
+ shared/cairo-util.h                   | 10 +++-------
+ shared/frame.c                        | 12 ++++++------
+ shared/platform.h                     |  2 +-
+ shared/string-helpers.h               |  1 +
+ tools/zunitc/src/zuc_junit_reporter.c |  8 +++++++-
+ xwayland/window-manager.c             |  5 +++--
+ 6 files changed, 21 insertions(+), 17 deletions(-)
 
-diff --git a/libweston/compositor-wayland.c b/libweston/compositor-wayland.c
-index c223baa..0375a11 100644
---- a/libweston/compositor-wayland.c
-+++ b/libweston/compositor-wayland.c
-@@ -1363,22 +1363,17 @@ input_handle_motion(void *data, struct wl_pointer *pointer,
- static void
- input_handle_button(void *data, struct wl_pointer *pointer,
- 		    uint32_t serial, uint32_t time, uint32_t button,
--		    uint32_t state_w)
-+		    enum wl_pointer_button_state state)
- {
- 	struct wayland_input *input = data;
--	enum wl_pointer_button_state state = state_w;
--	enum frame_button_state fstate;
- 	enum theme_location location;
- 
- 	if (!input->output)
- 		return;
- 
- 	if (input->output->frame) {
--		fstate = state == WL_POINTER_BUTTON_STATE_PRESSED ?
--			FRAME_BUTTON_PRESSED : FRAME_BUTTON_RELEASED;
--
- 		location = frame_pointer_button(input->output->frame, input,
--						button, fstate);
-+						button, state);
- 
- 		if (frame_status(input->output->frame) & FRAME_STATUS_MOVE) {
- 
 diff --git a/shared/cairo-util.h b/shared/cairo-util.h
 index 4fee087..84cf005 100644
 --- a/shared/cairo-util.h
@@ -155,6 +109,59 @@ index 9cd44c6..eb0cd77 100644
  		if (button)
  			frame_button_release(button);
  	}
+diff --git a/shared/platform.h b/shared/platform.h
+index 1eb96fd..30db1a6 100644
+--- a/shared/platform.h
++++ b/shared/platform.h
+@@ -33,9 +33,9 @@
+ #include <wayland-egl.h>
+ #include <EGL/egl.h>
+ #include <EGL/eglext.h>
+-#endif
+ 
+ #include "weston-egl-ext.h"
++#endif
+ 
+ #ifdef  __cplusplus
+ extern "C" {
+diff --git a/shared/string-helpers.h b/shared/string-helpers.h
+index 5dc75d6..c8ce449 100644
+--- a/shared/string-helpers.h
++++ b/shared/string-helpers.h
+@@ -28,6 +28,7 @@
+ 
+ #include <stdbool.h>
+ #include <stdlib.h>
++#include <stdint.h>
+ #include <errno.h>
+ #include <assert.h>
+ 
+diff --git a/tools/zunitc/src/zuc_junit_reporter.c b/tools/zunitc/src/zuc_junit_reporter.c
+index 369f035..5c6b762 100644
+--- a/tools/zunitc/src/zuc_junit_reporter.c
++++ b/tools/zunitc/src/zuc_junit_reporter.c
+@@ -53,6 +53,12 @@
+ 
+ #define ISO_8601_FORMAT "%Y-%m-%dT%H:%M:%SZ"
+ 
++#if LIBXML_VERSION >= 20904
++#define STRPRINTF_CAST
++#else
++#define STRPRINTF_CAST BAD_CAST
++#endif
++
+ /**
+  * Internal data.
+  */
+@@ -68,7 +74,7 @@ static void
+ set_attribute(xmlNodePtr node, const char *name, int value)
+ {
+ 	xmlChar scratch[MAX_64BIT_STRLEN + 1] = {};
+-	xmlStrPrintf(scratch, sizeof(scratch), BAD_CAST "%d", value);
++	xmlStrPrintf(scratch, sizeof(scratch), STRPRINTF_CAST "%d", value);
+ 	xmlSetProp(node, BAD_CAST name, scratch);
+ }
+ 
 diff --git a/xwayland/window-manager.c b/xwayland/window-manager.c
 index 4fab602..0e26d7c 100644
 --- a/xwayland/window-manager.c

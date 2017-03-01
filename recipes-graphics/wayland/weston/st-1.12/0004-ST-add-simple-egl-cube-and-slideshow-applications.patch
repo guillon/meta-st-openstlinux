@@ -1,69 +1,22 @@
-From 3b9271bc8dbcfcbc2a164ec5d1ea78fb1265776c Mon Sep 17 00:00:00 2001
-From: Vincent Abriou <vincent.abriou@st.com>
-Date: Mon, 10 Oct 2016 13:51:06 +0200
-Subject: [PATCH 35/61] [DEMO]: add simple-egl-cube and slideshow applications
+From 9cd7335fd3d627d433f4093263bddf467e3d8204 Mon Sep 17 00:00:00 2001
+From: Christophe Priouzeau <christophe.priouzeau@st.com>
+Date: Fri, 3 Feb 2017 13:22:21 +0100
+Subject: [PATCH 4/4] ST add simple-egl-cube and slideshow applications
 
-Change-Id: Icdb15eb8d7fd4ea81f86a7d31ee0abf57bb46d9a
-Signed-off-by: Vincent Abriou <vincent.abriou@st.com>
 ---
- Makefile.am               |   15 +-
  clients/esTransform.c     |  239 ++++++++++
  clients/esUtil.h          |  304 ++++++++++++
+ clients/simple-capture.c  |  192 ++++++++
  clients/simple-egl-cube.c | 1127 +++++++++++++++++++++++++++++++++++++++++++++
  clients/slideshow.c       |  581 +++++++++++++++++++++++
- 5 files changed, 2265 insertions(+), 1 deletion(-)
+ clients/stacking.c        |    3 +-
+ 6 files changed, 2445 insertions(+), 1 deletion(-)
  create mode 100644 clients/esTransform.c
  create mode 100644 clients/esUtil.h
+ create mode 100644 clients/simple-capture.c
  create mode 100644 clients/simple-egl-cube.c
  create mode 100644 clients/slideshow.c
 
-diff --git a/Makefile.am b/Makefile.am
-index 6366c6f..ae277ae 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -503,6 +503,7 @@ endif
- demo_clients =					\
- 	weston-flower				\
- 	weston-image				\
-+	weston-slideshow			\
- 	weston-cliptest				\
- 	weston-dnd				\
- 	weston-smoke				\
-@@ -574,7 +575,7 @@ weston_multi_resource_LDADD = $(SIMPLE_CLIENT_LIBS) libshared.la $(CLOCK_GETTIME
- endif
- 
- if BUILD_SIMPLE_EGL_CLIENTS
--demo_clients += weston-simple-egl
-+demo_clients += weston-simple-egl weston-simple-egl-cube
- weston_simple_egl_SOURCES = clients/simple-egl.c
- nodist_weston_simple_egl_SOURCES =		\
- 	protocol/xdg-shell-unstable-v6-protocol.c		\
-@@ -583,6 +584,14 @@ nodist_weston_simple_egl_SOURCES =		\
- 	protocol/ivi-application-client-protocol.h
- weston_simple_egl_CFLAGS = $(AM_CFLAGS) $(SIMPLE_EGL_CLIENT_CFLAGS)
- weston_simple_egl_LDADD = $(SIMPLE_EGL_CLIENT_LIBS) -lm
-+weston_simple_egl_cube_SOURCES = clients/simple-egl-cube.c
-+nodist_weston_simple_egl_cube_SOURCES =		\
-+	protocol/xdg-shell-unstable-v6-protocol.c		\
-+	protocol/xdg-shell-unstable-v6-client-protocol.h	\
-+	clients/esTransform.c				\
-+	clients/esUtil.h
-+weston_simple_eg_cube_CFLAGS = $(AM_CFLAGS) $(SIMPLE_EGL_CLIENT_CFLAGS)
-+weston_simple_egl_cube_LDADD = $(SIMPLE_EGL_CLIENT_LIBS) -lm
- endif
- 
- if BUILD_SIMPLE_DMABUF_INTEL_CLIENT
-@@ -667,6 +676,10 @@ weston_image_SOURCES = clients/image.c
- weston_image_LDADD = libtoytoolkit.la
- weston_image_CFLAGS = $(AM_CFLAGS) $(CLIENT_CFLAGS)
- 
-+weston_slideshow_SOURCES = clients/slideshow.c
-+weston_slideshow_LDADD = libtoytoolkit.la
-+weston_slideshow_CFLAGS = $(AM_CFLAGS) $(CLIENT_CFLAGS)
-+
- weston_cliptest_SOURCES =				\
- 	clients/cliptest.c				\
- 	libweston/vertex-clipping.c			\
 diff --git a/clients/esTransform.c b/clients/esTransform.c
 new file mode 100644
 index 0000000..599f9ed
@@ -619,6 +572,204 @@ index 0000000..af8e0cd
 +
 +#endif // ESUTIL_H
 +
+diff --git a/clients/simple-capture.c b/clients/simple-capture.c
+new file mode 100644
+index 0000000..d0b6550
+--- /dev/null
++++ b/clients/simple-capture.c
+@@ -0,0 +1,192 @@
++/*
++ * Copyright (C) STMicroelectronics SA 2015
++ * Author: Fabien Dessenne <fabien.dessenne@st.com> for STMicroelectronics.
++ *
++ * Permission to use, copy, modify, distribute, and sell this software and
++ * its documentation for any purpose is hereby granted without fee, provided
++ * that the above copyright notice appear in all copies and that both that
++ * copyright notice and this permission notice appear in supporting
++ * documentation, and that the name of the copyright holders not be used in
++ * advertising or publicity pertaining to distribution of the software
++ * without specific, written prior permission.  The copyright holders make
++ * no representations about the suitability of this software for any
++ * purpose.  It is provided "as is" without express or implied warranty.
++ *
++ * THE COPYRIGHT HOLDERS DISCLAIM ALL WARRANTIES WITH REGARD TO THIS
++ * SOFTWARE, INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND
++ * FITNESS, IN NO EVENT SHALL THE COPYRIGHT HOLDERS BE LIABLE FOR ANY
++ * SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER
++ * RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF
++ * CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
++ * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
++ */
++
++#include "config.h"
++
++#include <stdlib.h>
++#include <stdio.h>
++#include <string.h>
++#include <unistd.h>
++#include <sys/param.h>
++
++#include <wayland-client.h>
++#include "capture-client-protocol.h"
++
++struct capture {
++	struct wl_display *display;
++	struct wl_registry *registry;
++	struct wl_output *output;
++	struct wl_capture *capture;
++	unsigned int output_width, output_height;
++	int nb;
++};
++
++static void
++capture_update(void *data, struct wl_capture *wl_capture,  struct wl_output *output,
++	       int32_t dmabuf_fd, uint32_t width, uint32_t height, uint32_t stride,
++	       uint32_t format, uint32_t msecs)
++{
++	struct capture *cap = data;
++
++	cap->nb++;
++
++	fprintf(stderr, "   Got buffer #%d  ts=%d.%03d %.4s %dx%d fd=%d\n",
++			cap->nb, msecs / 1000, msecs % 1000,
++			(char *)&format, width, height, dmabuf_fd);
++
++	/* Do whatever we want, for example mmap the dmabuf and copy its content
++	 * into a file */
++
++	close(dmabuf_fd);
++}
++
++static const struct wl_capture_listener capture_listener = {
++	capture_update
++};
++
++static void
++display_handle_geometry(void *data, struct wl_output *wl_output,
++			int x, int y, int phy_w, int phy_h, int subpixel,
++			const char *make, const char *model, int transform)
++{
++	/* ignored */
++}
++
++static void
++display_handle_mode(void *data, struct wl_output *wl_output,  uint32_t flags,
++		    int width, int height, int refresh)
++{
++	struct capture *cap = data;
++
++	if (flags & WL_OUTPUT_MODE_CURRENT) {
++		fprintf(stderr, " Using output %dx%d\n", width, height);
++		cap->output_width = width;
++		cap->output_height = height;
++	}
++}
++
++static const struct wl_output_listener output_listener = {
++	display_handle_geometry,
++	display_handle_mode
++};
++
++static void
++handle_global(void *data, struct wl_registry *registry,
++	      uint32_t name, const char *interface, uint32_t version)
++{
++	struct capture *cap = data;
++
++	if (strcmp(interface, "wl_output") == 0) {
++		/* Use the first output */
++		if (!cap->output) {
++			cap->output = wl_registry_bind(registry, name, &wl_output_interface, 1);
++			wl_output_add_listener(cap->output, &output_listener, cap);
++		}
++	} else if (strcmp(interface, "wl_capture") == 0) {
++		cap->capture = wl_registry_bind(registry, name, &wl_capture_interface, 1);
++		wl_capture_add_listener(cap->capture, &capture_listener, cap);
++	}
++}
++
++static const struct wl_registry_listener registry_listener = {
++	handle_global
++};
++
++static int running = 1;
++
++static void
++signal_int(int signum)
++{
++       running = 0;
++}
++
++int
++main(int argc, char **argv)
++{
++	struct capture *cap;
++	struct sigaction sigint;
++	int err;
++
++	sigint.sa_handler = signal_int;
++	sigemptyset(&sigint.sa_mask);
++	sigint.sa_flags = SA_RESETHAND;
++	sigaction(SIGINT, &sigint, NULL);
++
++	cap = calloc(1, sizeof *cap);
++	if (!cap ) {
++		fprintf(stderr, " Error: out of memory\n");
++		exit(1);
++	}
++
++	cap->display = wl_display_connect(NULL);
++	if (!cap->display) {
++		fprintf(stderr, " Error: can't connect to display\n");
++		exit(1);
++	}
++
++	cap->registry = wl_display_get_registry(cap->display);
++	wl_registry_add_listener(cap->registry, &registry_listener, cap);
++	wl_display_dispatch(cap->display);
++	wl_display_roundtrip(cap->display);
++
++	if (!cap->output) {
++		fprintf(stderr, " Error: output protocol not supported\n");
++		exit(1);
++	}
++
++	if (!cap->capture) {
++		fprintf(stderr, " Error: capture protocol not supported\n");
++		exit(1);
++	}
++
++	fprintf(stderr, " Starting capture\n");
++	wl_capture_start(cap->capture, cap->output);
++
++	/* Check for error */
++	wl_display_roundtrip(cap->display);
++	err = wl_display_get_error(cap->display);
++	if (err) {
++		fprintf(stderr, " Error: start failed (%d)\n",err );
++		exit(1);
++	}
++
++	while (running)
++		wl_display_roundtrip(cap->display);
++
++	fprintf(stderr, " Stopping capture\n");
++
++	wl_capture_stop(cap->capture, cap->output);
++	wl_display_roundtrip(cap->display);
++
++	usleep(1000*1000);
++
++	wl_output_destroy(cap->output);
++	wl_capture_destroy(cap->capture);
++	wl_registry_destroy(cap->registry);
++	wl_display_flush(cap->display);
++	wl_display_disconnect(cap->display);
++
++	free(cap);
++
++	return 0;
++}
 diff --git a/clients/simple-egl-cube.c b/clients/simple-egl-cube.c
 new file mode 100644
 index 0000000..26844a8
@@ -2339,6 +2490,27 @@ index 0000000..21d43d3
 +
 +	return 0;
 +}
+diff --git a/clients/stacking.c b/clients/stacking.c
+index 4285a17..0682e60 100644
+--- a/clients/stacking.c
++++ b/clients/stacking.c
+@@ -32,6 +32,7 @@
+ 
+ #include <linux/input.h>
+ #include <cairo.h>
++#include <wayland-util.h>
+ 
+ #include "shared/helpers.h"
+ #include "window.h"
+@@ -184,7 +185,7 @@ fullscreen_handler(struct window *window, void *data)
+ 
+ static void
+ draw_string(cairo_t *cr,
+-            const char *fmt, ...) __attribute__((format (gnu_printf, 2, 3)));
++            const char *fmt, ...) WL_PRINTF(2, 3);
+ 
+ static void
+ draw_string(cairo_t *cr,
 -- 
 2.7.4
 
