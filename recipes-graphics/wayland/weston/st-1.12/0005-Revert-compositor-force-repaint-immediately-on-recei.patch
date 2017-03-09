@@ -1,0 +1,34 @@
+From bad0e4a036485d04a16060b66cacedd4551a7351 Mon Sep 17 00:00:00 2001
+From: Vincent Abriou <vincent.abriou@st.com>
+Date: Mon, 20 Feb 2017 16:50:17 +0100
+Subject: [PATCH] Revert "compositor: force repaint immediately on receiving
+ the pageflip completion event"
+
+The workaround has been done in the weston.ini file.
+This reverts commit 1f5fdbb40fc22731bb6a5454f7f1710cf808f01c.
+
+Change-Id: I22a2b80b55b212742f2850bae5a614b3d9076469
+Signed-off-by: Vincent Abriou <vincent.abriou@st.com>
+Reviewed-on: https://gerrit.st.com/65569
+---
+ libweston/compositor.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/libweston/compositor.c b/libweston/compositor.c
+index 9e7c34e..2057b0d 100644
+--- a/libweston/compositor.c
++++ b/libweston/compositor.c
+@@ -64,9 +64,7 @@
+ #include "version.h"
+ #include "plugin-registry.h"
+ 
+-/* Force repaint scheduling algorithm to repaint immediatly on receiving the
+- * pageflip completion event */
+-#define DEFAULT_REPAINT_WINDOW 100 /* milliseconds */
++#define DEFAULT_REPAINT_WINDOW 7 /* milliseconds */
+ 
+ static void
+ weston_output_transform_scale_init(struct weston_output *output,
+-- 
+2.7.4
+

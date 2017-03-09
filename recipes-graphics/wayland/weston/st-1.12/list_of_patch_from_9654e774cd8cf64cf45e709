@@ -1,3 +1,4 @@
+bad0e4a Revert "compositor: force repaint immediately on receiving the pageflip completion event"
 1f5fdbb compositor: force repaint immediately on receiving the pageflip completion event
 234faf0 compositor-st: release buffer when drmModeSetPlane fails
 bcb863b compositor-st: lastly call DRM_IOCTL_MODE_PAGE_FLIP in drm_output_repaint
