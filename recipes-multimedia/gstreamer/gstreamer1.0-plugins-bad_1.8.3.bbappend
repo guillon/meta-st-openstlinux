@@ -25,6 +25,8 @@ SRC_URI_append = " \
     file://0022-STM-waylandsink-specify-the-minimum-number-of-buffer.patch \
     file://0023-STM-waylandsink-use-buffer-video-meta.patch \
     file://0024-STM-waylandsink-fix-display-reconnection-redraw-pend.patch \
+    file://0025-STM-waylandsink-consider-buffer-size-when-copying-to.patch \
+    file://0026-STM-waylandsink-set-video-surface-opaque.patch \
     "
 
 PACKAGECONFIG ?= " \

@@ -1,3 +1,5 @@
+721d2f8 STM: waylandsink: set video surface opaque
+00a640d STM: waylandsink: consider buffer size when copying to wl shm pool
 94a1114 STM: waylandsink: fix display reconnection (redraw pending)
 4a683c5 STM: waylandsink: use buffer video meta
 4ccd92e STM: waylandsink: specify the minimum number of buffers
