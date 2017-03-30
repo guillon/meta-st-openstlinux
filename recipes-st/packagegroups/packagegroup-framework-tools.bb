@@ -38,6 +38,7 @@ RDEPENDS_packagegroup-framework-tools-core = "\
     ntp             \
     systemtap       \
     gptfdisk        \
+    ckermit         \
 "
 RDEPENDS_packagegroup-framework-tools-core-extra = "\
     tslib-calibrate \
