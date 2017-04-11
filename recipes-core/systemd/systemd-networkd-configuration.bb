@@ -9,14 +9,34 @@ DEPENDS = "systemd"
 PR = "r0"
 
 SRC_URI = " \
-    file://50-wired.network \
+    file://50-wired.network.all \
+    file://50-wired.network.nfs \
     file://51-wireless.network.sample \
+    \
+    file://verify_eth0.sh \
+    file://st-check-nfs.service \
     "
+
+inherit systemd
+
+SYSTEMD_PACKAGES = "${@bb.utils.contains('DISTRO_FEATURES','systemd','${PN}','',d)}"
+SYSTEMD_SERVICE_${PN} = "st-check-nfs.service"
+SYSTEMD_AUTO_ENABLE_${PN} = "enable"
 
 do_install() {
     install -d ${D}${systemd_unitdir}/network
-    install -m 644 ${WORKDIR}/50-wired.network ${D}${systemd_unitdir}/network
+    install -m 644 ${WORKDIR}/50-wired.network.all ${D}${systemd_unitdir}/network
+    install -m 644 ${WORKDIR}/50-wired.network.nfs ${D}${systemd_unitdir}/network
     install -m 644 ${WORKDIR}/51-wireless.network.sample ${D}${systemd_unitdir}/network
+
+    if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
+        install -d ${D}${systemd_unitdir}/system
+        install -m 644 ${WORKDIR}/st-check-nfs.service ${D}${systemd_unitdir}/system
+    fi
+
+    install -d ${D}${base_sbindir}/
+    install -m 755 ${WORKDIR}/verify_eth0.sh ${D}${base_sbindir}/verify_eth0.sh
+
 }
 
-FILES_${PN} = "${systemd_unitdir}/network"
+FILES_${PN} = "${systemd_unitdir}/network ${systemd_unitdir}/system ${base_sbindir}"
