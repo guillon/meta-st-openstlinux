@@ -14,7 +14,6 @@ PV = "2.3.0"
 PR = "git${SRCPV}.r0"
 
 S = "${WORKDIR}/git"
-B = "${S}"
 
 DEPENDS = "optee-os optee-client"
 
