@@ -26,6 +26,7 @@ PROVIDES = "${PACKAGES}"
 RDEPENDS_packagegroup-framework-tools-core = "\
     grep            \
     util-linux      \
+    util-linux-lscpu \
     procps          \
     kbd             \
     file            \
