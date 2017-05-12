@@ -1,7 +1,7 @@
-From 208e099d43ba88e80e0f5fa34838779efe9408c9 Mon Sep 17 00:00:00 2001
+From b216435bb362df10c45f544b78d8c884eaa901fd Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 8 Jan 2016 07:01:02 +0000
-Subject: [PATCH 10/19] Define _GNU_SOURCE for MREMAP_MAYMOVE definition
+Subject: [PATCH 21/32] Define _GNU_SOURCE for MREMAP_MAYMOVE definition
 
 musl guards MREMAP_MAYMOVE with _GNU_SOURCE unlike glibc which uses
 __USE_GNU
@@ -67,5 +67,5 @@ index 12e3829..9b39f8b 100644
  #include "test.h"
  
 -- 
-2.7.4
+2.7.0
 

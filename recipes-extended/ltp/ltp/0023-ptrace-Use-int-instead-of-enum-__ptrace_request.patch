@@ -1,7 +1,7 @@
-From f058d494d6c8c420f8a6663bf4b5dac40f3e181d Mon Sep 17 00:00:00 2001
+From 560347f77236616a635b4a997a0596b8da4d0799 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 8 Jan 2016 07:08:25 +0000
-Subject: [PATCH 11/19] ptrace: Use int instead of enum __ptrace_request
+Subject: [PATCH 23/32] ptrace:  Use int instead of enum __ptrace_request
 
 __ptrace_request is only available with glibc
 
@@ -44,5 +44,5 @@ index ae538e9..85aa89d 100644
  	return strings[request];
  }
 -- 
-2.7.4
+2.7.0
 

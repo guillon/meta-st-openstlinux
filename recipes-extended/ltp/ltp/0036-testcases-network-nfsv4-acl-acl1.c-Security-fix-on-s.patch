@@ -1,8 +1,8 @@
-From 84e7667084b70d3564df56c2608a0bf09fb49286 Mon Sep 17 00:00:00 2001
+From 672a56be14426eae44864673c6c2afca0ab89d46 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?An=C3=ADbal=20Lim=C3=B3n?= <anibal.limon@linux.intel.com>
 Date: Fri, 13 May 2016 11:11:28 -0500
-Subject: [PATCH 19/19] testcases/network/nfsv4/acl/acl1.c: Security fix on
- string printf
+Subject: [PATCH] testcases/network/nfsv4/acl/acl1.c: Security fix on string
+ printf
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -37,5 +37,5 @@ index b8b67b4..7c7c506 100644
  	system(cmd);
  	acl2 = acl_get_file(path, ACL_TYPE_ACCESS);
 -- 
-2.7.4
+2.1.4
 

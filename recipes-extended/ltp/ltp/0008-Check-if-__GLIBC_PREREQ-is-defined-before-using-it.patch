@@ -1,12 +1,13 @@
-From a048d4c99c7c75fd765565ee49a61f1a4f701746 Mon Sep 17 00:00:00 2001
+From a3cbee31daae2466bc8dcac36b33a01352693346 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Thu, 7 Jan 2016 19:40:08 +0000
-Subject: [PATCH 06/19] Check if __GLIBC_PREREQ is defined before using it
+Subject: [PATCH 01/26] Check if __GLIBC_PREREQ is defined before using it
 
 __GLIBC_PREREQ is specific to glibc so it should be checked if it is
 defined or not.
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
 ---
  testcases/kernel/syscalls/accept4/accept4_01.c     |  9 ++++-
  testcases/kernel/syscalls/getcpu/getcpu01.c        | 40 +++++++++++++++++++++-
@@ -280,5 +281,5 @@ index 9d6a81a..4ed13b2 100644
  	QUICK_TEST(sched_getaffinity(0, len, (cpu_set_t *) - 1));
  	QUICK_TEST(sched_getaffinity(0, 0, mask));
 -- 
-2.7.4
+1.9.1
 

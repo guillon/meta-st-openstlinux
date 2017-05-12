@@ -1,7 +1,7 @@
-From abc7041e2cf8e0f3a0a6687e061eb56411e32c35 Mon Sep 17 00:00:00 2001
-From: Christophe Priouzeau <christophe.priouzeau@st.com>
-Date: Tue, 10 Jan 2017 09:58:44 +0100
-Subject: [PATCH 15/19] rt_sigaction.h: Use sighandler_t instead of 
+From 94557fb7e1293c61145c959b8c5ffecf4a2b1069 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 8 Jan 2016 07:24:44 +0000
+Subject: [PATCH 28/32] rt_sigaction.h: Use sighandler_t instead of
  __sighandler_t
 
 When _GNU_SOURCE is used then both typedefs are same and using
@@ -14,12 +14,12 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  2 files changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/include/lapi/rt_sigaction.h b/include/lapi/rt_sigaction.h
-index 66ccb3e..0c278fd 100644
+index 3a5a763..870918c 100644
 --- a/include/lapi/rt_sigaction.h
 +++ b/include/lapi/rt_sigaction.h
-@@ -41,7 +41,7 @@ struct kernel_sigaction {
- };
- #else
+@@ -34,7 +34,7 @@
+ #define INVAL_SA_PTR ((void *)-1)
+ 
  struct kernel_sigaction {
 -	__sighandler_t k_sa_handler;
 +	sighandler_t k_sa_handler;
@@ -39,5 +39,5 @@ index 37bc3a9..2ca7f7c 100644
 +
  include $(top_srcdir)/include/mk/generic_leaf_target.mk
 -- 
-2.7.4
+2.7.0
 

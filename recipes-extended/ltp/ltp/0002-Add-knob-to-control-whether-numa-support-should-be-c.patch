@@ -1,7 +1,7 @@
-From 68ce6f3bda30354df9749947bc1b1ffad3f8d4de Mon Sep 17 00:00:00 2001
+From 867ad5d5d64b9b27ee32148027532db0a00f6433 Mon Sep 17 00:00:00 2001
 From: "Roy.Li" <rongqing.li@windriver.com>
 Date: Thu, 7 Jan 2016 17:33:26 +0000
-Subject: [PATCH 01/19] Add knob to control whether numa support should be
+Subject: [PATCH 02/32] Add knob to control whether numa support should be
  checked
 
 otherwise undeterministic dependency will be generated
@@ -39,5 +39,5 @@ index 60ae07b..ed7078d 100644
 +AC_MSG_RESULT([$with_numa])
 +])
 -- 
-2.7.4
+2.7.0
 

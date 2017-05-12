@@ -1,7 +1,7 @@
-From 0c0b7d5af0680f57b51985962b344a5af682bf44 Mon Sep 17 00:00:00 2001
+From 0133a2b29d6f48d8e2bba6a3be581cdfa91311a6 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 8 Jan 2016 07:21:05 +0000
-Subject: [PATCH 14/19] crash01: Define _GNU_SOURCE
+Subject: [PATCH 26/32] crash01: Define _GNU_SOURCE
 
 Fixes musl build errors like
 error: 'SA_NOMASK' undeclared (first use in this function)
@@ -25,5 +25,5 @@ index 0574521..08a02e7 100644
  #include <stdlib.h>
  #include <string.h>
 -- 
-2.7.4
+2.7.0
 

@@ -1,18 +1,19 @@
-From a83f7a4421ca306735ea92d1a4adb6d5d648e024 Mon Sep 17 00:00:00 2001
-From: Christophe Priouzeau <christophe.priouzeau@st.com>
-Date: Tue, 10 Jan 2017 10:01:50 +0100
-Subject: [PATCH 16/19] lib: Use PTHREAD_MUTEX_RECURSIVE in place of 
+From 00ba7cdd0608b1507027428f9f87b1cb9747372b Mon Sep 17 00:00:00 2001
+From: Dengke Du <dengke.du@windriver.com>
+Date: Thu, 9 Feb 2017 15:54:53 +0800
+Subject: [PATCH] lib: Use PTHREAD_MUTEX_RECURSIVE in place of
  PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP for non-glibc
 
 e.g. musl does not implement the _NP mutex types
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Signed-off-by: Dengke Du <dengke.du@windriver.com>
 ---
  lib/tst_res.c | 4 ++++
  1 file changed, 4 insertions(+)
 
 diff --git a/lib/tst_res.c b/lib/tst_res.c
-index b388d0d..1c4df59 100644
+index 61daaeb..435224f 100644
 --- a/lib/tst_res.c
 +++ b/lib/tst_res.c
 @@ -79,7 +79,11 @@ int TEST_ERRNO;

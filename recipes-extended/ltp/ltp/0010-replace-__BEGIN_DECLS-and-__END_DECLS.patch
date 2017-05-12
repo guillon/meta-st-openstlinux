@@ -1,7 +1,7 @@
-From 73efde5247c7919ca374411ec48db6f75b15010f Mon Sep 17 00:00:00 2001
+From 0130f4146ced320aadb01b22e36b13d269a8ebba Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Thu, 7 Jan 2016 19:48:14 +0000
-Subject: [PATCH 07/19] replace __BEGIN_DECLS and __END_DECLS
+Subject: [PATCH 10/32] replace __BEGIN_DECLS and __END_DECLS
 
 They are not portable across libc implementations
 therefore replace them with expanded macros
@@ -69,5 +69,5 @@ index 51f5bfb..c61aef3 100644
  
  #endif /* __linux_sctp_h__ */
 -- 
-2.7.4
+2.7.0
 

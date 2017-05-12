@@ -1,7 +1,7 @@
-From 219061f4c733bce77ca879c3b7dadfa61ce6e125 Mon Sep 17 00:00:00 2001
+From 6e3058521b50d91d4b0569c4d491c5af5ff798b2 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Thu, 7 Jan 2016 18:22:38 +0000
-Subject: [PATCH 04/19] kernel/controllers: Link with libfts explicitly on musl
+Subject: [PATCH 05/32] kernel/controllers: Link with libfts explicitly on musl
 
 musl does not implement fts like glibc and therefore it depends on
 external implementation for all fts APIs
@@ -41,5 +41,5 @@ index 9e002f4..e0fcb9c 100644
  INSTALL_TARGETS		?= *.sh
  
 -- 
-2.7.4
+2.7.0
 

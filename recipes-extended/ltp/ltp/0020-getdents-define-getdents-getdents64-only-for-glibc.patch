@@ -1,7 +1,7 @@
-From 8fa494a914c19cd3820e8cda1abeb6dd57668ef7 Mon Sep 17 00:00:00 2001
+From aa3568e6ac28f377e75ce16b11e3c7738a373e53 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 8 Jan 2016 06:57:04 +0000
-Subject: [PATCH 09/19] getdents: define getdents/getdents64 only for glibc
+Subject: [PATCH 20/32] getdents: define getdents/getdents64 only for glibc
 
 getdents/getdents64 are implemented in musl and when we define static
 functions with same name, it errors out.
@@ -44,5 +44,5 @@ index abea655..db63d89 100644
 +#endif
  #endif /* GETDENTS_H */
 -- 
-2.7.4
+2.7.0
 

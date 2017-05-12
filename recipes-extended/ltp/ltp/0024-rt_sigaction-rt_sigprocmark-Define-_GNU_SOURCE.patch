@@ -1,7 +1,7 @@
-From 470ed3da8bc788f7728e92f448e9466b6a7bc195 Mon Sep 17 00:00:00 2001
+From e01e9862c248dc90a8ec6f2d06f8469d7a50cd8e Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 8 Jan 2016 07:14:58 +0000
-Subject: [PATCH 12/19] rt_sigaction/rt_sigprocmark: Define _GNU_SOURCE
+Subject: [PATCH 24/32] rt_sigaction/rt_sigprocmark: Define _GNU_SOURCE
 
 Fixes musl build failure e.g.
 error: 'SA_NOMASK' undeclared here (not in a function)
@@ -64,5 +64,5 @@ index 74e5a61..75c57fc 100644
  #include <signal.h>
  #include <errno.h>
 -- 
-2.7.4
+2.7.0
 

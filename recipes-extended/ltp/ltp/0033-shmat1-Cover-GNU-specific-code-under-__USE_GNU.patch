@@ -1,7 +1,7 @@
-From efe095b872aece680c50bbf5996b1dd974d0be3d Mon Sep 17 00:00:00 2001
+From 5e3dea669e5b0b769f322d54a3bb9f320b5327da Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Tue, 22 Mar 2016 15:47:14 +0000
-Subject: [PATCH 17/19] shmat1: Cover GNU specific code under __USE_GNU
+Subject: [PATCH 26/26] shmat1: Cover GNU specific code under __USE_GNU
 
 on x86, we use uc_mcontext element from sigcontext
 which is marked gnu-specific in glibc, this patch
@@ -9,6 +9,8 @@ adds this condition around the code
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
+Upstream-Status: Pending
+
  testcases/kernel/mem/mtest06/shmat1.c | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
@@ -35,5 +37,5 @@ index 0d6d7a4..bee69f6 100644
  		except = scp->trapno;
  		fprintf(stderr, "signal caught - [%d] ", signal);
 -- 
-2.7.4
+1.9.1
 
