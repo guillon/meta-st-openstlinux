@@ -29,7 +29,9 @@ BBLAYERS ?= " \
     ${OEROOT}/meta-openembedded/meta-multimedia \
     ${OEROOT}/meta-openembedded/meta-networking \
     ${OEROOT}/meta-openembedded/meta-python \
-  "
+    ${OEROOT}/meta-openembedded/meta-xfce \
+    ${OEROOT}/meta-openembedded/meta-gnome \
+"
 
 BBLAYERS_NON_REMOVABLE ?= " \
     ${@'${OPENEMBEDDED_NON_REMOVABLE}' if os.path.isfile('${OEROOT}/openembedded-core/meta/conf/layer.conf') else '${POKY_NON_REMOVABLE}'} \
@@ -44,4 +46,4 @@ BBLAYERS += "${@'${OEROOT}/meta-openembedded/meta-networking' if os.path.isfile(
 BBLAYERS += "${@'${OEROOT}/meta-qt5' if os.path.isfile('${OEROOT}/meta-qt5/conf/layer.conf') else ''}"
 
 # specific to framework
-BBLAYERS += "${@'${OEROOT}/meta-st/meta-st-framework' if os.path.isfile('${OEROOT}/meta-st/meta-st-framework/conf/layer.conf') else ''}"
+BBLAYERS += "${@'${OEROOT}/meta-st/meta-st-openstlinux' if os.path.isfile('${OEROOT}/meta-st/meta-st-openstlinux/conf/layer.conf') else ''}"
