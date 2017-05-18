@@ -39,7 +39,7 @@ HW_TRANSFORM_CONFIG = 'CFLAGS="-DCOLORSPACE=\\\\\\"autovideoconvert\\\\\\" \
                                -DVIDEOSCALE=\\\\\\"identity\\\\\\" \
                                -DVIDEORATE=\\\\\\"identity\\\\\\" "'
 
-CACHED_CONFIGUREVARS += "${@bb.utils.contains('DISTRO_FEATURES', 'swdecode', '', '${HW_TRANSFORM_CONFIG}', d)}"
+CACHED_CONFIGUREVARS += "${@bb.utils.contains('DISTRO_FEATURES', 'hwdecode', '${HW_TRANSFORM_CONFIG}', '', d)}"
 
 do_configure_prepend() {
     ${S}/autogen.sh --noconfigure
