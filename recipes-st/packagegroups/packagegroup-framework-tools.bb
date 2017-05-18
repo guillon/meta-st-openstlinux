@@ -123,10 +123,12 @@ RDEPENDS_packagegroup-framework-tools-audio = "\
 
 RDEPENDS_packagegroup-framework-tools-ui = "\
     ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'xvinfo', '', d)}    \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'gplv3', 'glmark2', '', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'gplv3', 'netdata', '', d)} \
 "
 RDEPENDS_packagegroup-framework-tools-ui-extra = "\
     ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'xvideo-tests', '', d)}  \
     ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'x11perf', '', d)}   \
     ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'fstests', '', d)}   \
-    gtkperf         \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'gtkperf', '', d)}   \
 "
