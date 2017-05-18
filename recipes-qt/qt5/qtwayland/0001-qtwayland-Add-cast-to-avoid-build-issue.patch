@@ -1,0 +1,40 @@
+From e444bbc9807174f42bae0eaa4ecacabf052f1a7c Mon Sep 17 00:00:00 2001
+From: Jean-Philippe ROMAIN <jean-philippe.romain@st.com>
+Date: Thu, 12 Jan 2017 09:19:49 +0100
+Subject: [PATCH] qtwayland: Add cast to avoid build issue
+
+Change-Id: I3bf21dd83f462e704128c9284a993b139308753b
+---
+ .../client/xcomposite-egl/qwaylandxcompositeeglwindow.cpp               | 2 +-
+ .../compositor/xcomposite-egl/xcompositeeglintegration.cpp              | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/hardwareintegration/client/xcomposite-egl/qwaylandxcompositeeglwindow.cpp b/src/hardwareintegration/client/xcomposite-egl/qwaylandxcompositeeglwindow.cpp
+index 329cc76..3b35d61 100644
+--- a/src/hardwareintegration/client/xcomposite-egl/qwaylandxcompositeeglwindow.cpp
++++ b/src/hardwareintegration/client/xcomposite-egl/qwaylandxcompositeeglwindow.cpp
+@@ -117,7 +117,7 @@ void QWaylandXCompositeEGLWindow::createEglSurface()
+     XCompositeRedirectWindow(m_glxIntegration->xDisplay(), m_xWindow, CompositeRedirectManual);
+     XMapWindow(m_glxIntegration->xDisplay(), m_xWindow);
+ 
+-    m_surface = eglCreateWindowSurface(m_glxIntegration->eglDisplay(), m_config, m_xWindow,0);
++    m_surface = eglCreateWindowSurface(m_glxIntegration->eglDisplay(), m_config, (EGLNativeWindowType)m_xWindow,0);
+     if (m_surface == EGL_NO_SURFACE) {
+         qFatal("Could not make eglsurface");
+     }
+diff --git a/src/hardwareintegration/compositor/xcomposite-egl/xcompositeeglintegration.cpp b/src/hardwareintegration/compositor/xcomposite-egl/xcompositeeglintegration.cpp
+index 86dd05f..ebd519c 100644
+--- a/src/hardwareintegration/compositor/xcomposite-egl/xcompositeeglintegration.cpp
++++ b/src/hardwareintegration/compositor/xcomposite-egl/xcompositeeglintegration.cpp
+@@ -114,7 +114,7 @@ void XCompositeEglClientBufferIntegration::bindTextureToBuffer(struct ::wl_resou
+     attribList.append(EGL_TEXTURE_2D);
+     attribList.append(EGL_NONE);
+ 
+-    EGLSurface surface = eglCreatePixmapSurface(mEglDisplay,config,pixmap,attribList.constData());
++    EGLSurface surface = eglCreatePixmapSurface(mEglDisplay,config,(EGLNativeWindowType)pixmap,attribList.constData());
+     if (surface == EGL_NO_SURFACE) {
+         qDebug() << "Failed to create eglsurface" << pixmap << compositorBuffer->window();
+     }
+-- 
+1.9.1
+
