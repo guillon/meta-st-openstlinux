@@ -1,0 +1,155 @@
+From 69f3a2186233c2b3b34d39f52d511fd98476b06f Mon Sep 17 00:00:00 2001
+From: Christophe Priouzeau <christophe.priouzeau@st.com>
+Date: Tue, 25 Oct 2016 09:37:26 +0200
+Subject: [PATCH] drm: automatic driver name detection
+
+Look for the drm driver using udev services.
+
+Signed-off-by: Vincent Abriou <vincent.abriou@st.com>
+---
+ src/native-state-drm.cpp | 73 +++++++++++++++++++++++++++++++++---------------
+ src/native-state-drm.h   |  5 ++++
+ src/wscript_build        |  4 +--
+ wscript                  |  1 +
+ 4 files changed, 59 insertions(+), 24 deletions(-)
+
+diff --git a/src/native-state-drm.cpp b/src/native-state-drm.cpp
+index 4df75ec..41b455d 100644
+--- a/src/native-state-drm.cpp
++++ b/src/native-state-drm.cpp
+@@ -194,31 +194,60 @@ NativeStateDRM::init_gbm()
+     return true;
+ }
+ 
++/* Open DRM without specifying the driver name */
++int
++NativeStateDRM::open_drm()
++{
++    struct udev *udev;
++    struct udev_enumerate *e;
++    struct udev_device *drm_device = NULL;
++    const char *path, *filename;
++    drm_client_t client;
++    int ret, fd;
++
++    udev = udev_new();
++    if (!udev)
++        return -1;
++
++    e = udev_enumerate_new(udev);
++    udev_enumerate_add_match_subsystem(e, "drm");
++    udev_enumerate_add_match_sysname(e, "card0");
++    udev_enumerate_scan_devices(e);
++    path = udev_list_entry_get_name(udev_enumerate_get_list_entry(e));
++    Log::debug("Found %s\n", path);
++    drm_device = udev_device_new_from_syspath(udev, path);
++    udev_enumerate_unref(e);
++
++    if (!drm_device)
++        return -1;
++
++    /* Open DRM device */
++    filename = udev_device_get_devnode(drm_device);
++    fd = open(filename, O_RDWR | O_CLOEXEC);
++    if (fd < 0)
++        return -1;
++
++    /* Check that we're the only opener and authed. */
++    client.idx = 0;
++    ret = drmIoctl(fd, DRM_IOCTL_GET_CLIENT, &client);
++    if ((ret) || (!client.auth))
++        goto err_close;
++
++    client.idx = 1;
++    ret = drmIoctl(fd, DRM_IOCTL_GET_CLIENT, &client);
++    if (ret != -1 || errno != EINVAL)
++        goto err_close;
++
++    return fd;
++err_close:
++    close(fd);
++    return -1;
++}
++
+ bool
+ NativeStateDRM::init()
+ {
+-    // TODO: Replace this with something that explicitly probes for the loaded
+-    // driver (udev?).
+-    static const char* drm_modules[] = {
+-        "i915",
+-        "nouveau",
+-        "radeon",
+-        "vmgfx",
+-        "omapdrm",
+-        "exynos"
+-    };
+-
+-    unsigned int num_modules(sizeof(drm_modules)/sizeof(drm_modules[0]));
+-    for (unsigned int m = 0; m < num_modules; m++) {
+-        fd_ = drmOpen(drm_modules[m], 0);
+-        if (fd_ < 0) {
+-            Log::debug("Failed to open DRM module '%s'\n", drm_modules[m]);
+-            continue;
+-        }
+-        Log::debug("Opened DRM module '%s'\n", drm_modules[m]);
+-        break;
+-    }
+-
++    fd_ = open_drm();
+     if (fd_ < 0) {
+         Log::error("Failed to find a suitable DRM device\n");
+         return false;
+diff --git a/src/native-state-drm.h b/src/native-state-drm.h
+index 3d8e7c4..178b06b 100644
+--- a/src/native-state-drm.h
++++ b/src/native-state-drm.h
+@@ -32,6 +32,10 @@
+ #include <drm.h>
+ #include <xf86drm.h>
+ #include <xf86drmMode.h>
++#include <errno.h>
++#include <fcntl.h>
++#include <libudev.h>
++#include <unistd.h>
+ 
+ class NativeStateDRM : public NativeState
+ {
+@@ -74,6 +78,7 @@ private:
+     DRMFBState* fb_get_from_bo(gbm_bo* bo);
+     bool init_gbm();
+     bool init();
++    int open_drm();
+     void cleanup();
+ 
+     int fd_;
+diff --git a/src/wscript_build b/src/wscript_build
+index bcca7a9..dff4b0b 100644
+--- a/src/wscript_build
++++ b/src/wscript_build
+@@ -21,8 +21,8 @@ flavor_sources = {
+ flavor_uselibs = {
+   'x11-gl' : ['x11', 'gl', 'matrix-gl'],
+   'x11-glesv2' : ['x11', 'egl', 'glesv2', 'matrix-glesv2'],
+-  'drm-gl' : ['drm', 'gbm', 'egl', 'gl', 'matrix-gl'],
+-  'drm-glesv2' : ['drm', 'gbm', 'egl', 'glesv2', 'matrix-glesv2'],
++  'drm-gl' : ['drm', 'gbm', 'egl', 'gl', 'matrix-gl', 'udev'],
++  'drm-glesv2' : ['drm', 'gbm', 'egl', 'glesv2', 'matrix-glesv2', 'udev'],
+   'mir-gl' : ['mirclient', 'egl', 'gl', 'matrix-gl'],
+   'mir-glesv2' : ['mirclient', 'egl', 'glesv2', 'matrix-glesv2'],
+   'wayland-gl' : ['wayland-client', 'wayland-egl', 'egl', 'gl', 'matrix-gl'],
+diff --git a/wscript b/wscript
+index e7eaed0..69c92ff 100644
+--- a/wscript
++++ b/wscript
+@@ -118,6 +118,7 @@ def configure(ctx):
+                 ('glesv2', 'glesv2', None, list_contains(Options.options.flavors, 'glesv2$')),
+                 ('libdrm','drm', None, list_contains(Options.options.flavors, 'drm')),
+                 ('gbm','gbm', None, list_contains(Options.options.flavors, 'drm')),
++                ('libudev','udev', None, list_contains(Options.options.flavors, 'drm')),
+                 ('mirclient','mirclient', '0.13', list_contains(Options.options.flavors, 'mir')),
+                 ('wayland-client','wayland-client', None, list_contains(Options.options.flavors, 'wayland')),
+                 ('wayland-egl','wayland-egl', None, list_contains(Options.options.flavors, 'wayland'))]
+-- 
+1.9.1
+
