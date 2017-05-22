@@ -30,46 +30,94 @@ IMAGE_DISPLAY_PART = " \
     "
 
 #
-# QT part addons
+# QT part Essentials
 #
-IMAGE_QT_PART = " \
-    qtbase                  \
-    qtbase-plugins          \
-    \
-    qtdeclarative           \
-    qtdeclarative-plugins   \
-    qtdeclarative-qmlplugins\
-    \
-    qtgraphicaleffects-qmlplugins \
-    \
-    qt3d                    \
-    qt3d-qmlplugins         \
-    \
-    qtscript                \
-    \
-    qtmultimedia            \
-    qtmultimedia-plugins    \
-    qtmultimedia-qmlplugins \
-    \
-    qtsvg                   \
-    qtsvg-plugins           \
-    \
-    qtlocation              \
-    qtlocation-qmlplugins   \
-    qtlocation-plugins      \
-    \
-    qt3d-examples           \
-    qtbase-examples         \
-    qtlocation-examples     \
-    \
-    qt5nmapcarousedemo      \
-    cinematicexperience     \
-    qt5everywheredemo       \
-    \
-    ${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'qtwayland', '', d)} \
-    "
+IMAGE_QT_MANDATORY_PART = " \
+   qtbase                  \
+   qtbase-plugins          \
+   qtbase-tools            \
+   \
+   qtdeclarative           \
+   qtdeclarative-plugins   \
+   qtdeclarative-qmlplugins\
+   qtdeclarative-tools     \
+   \
+   qtgraphicaleffects-qmlplugins \
+   \
+   qtmultimedia            \
+   qtmultimedia-plugins    \
+   qtmultimedia-qmlplugins \
+   \
+   qtscript                \
+   \
+   ${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'qtwayland', '', d)} \
+   ${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'qtwayland-plugins', '', d)} \
+   "
 
 #
+# QT part add-ons
+#
+IMAGE_QT_OPTIONAL_PART = " \
+   qtcanvas3d \
+   \
+   qt3d                    \
+   qt3d-qmlplugins         \
+   \
+   qtsvg                   \
+   qtsvg-plugins           \
+   \
+   qtlocation              \
+   qtlocation-qmlplugins   \
+   qtlocation-plugins      \
+   \
+   qtwebkit                \
+   \
+   qtquickcontrols         \
+   qtquickcontrols-qmlplugins \
+   qtscript                \
+   \
+   qtsensors               \
+   qtserialport            \
+   \
+   qtcharts                \
+   qtcharts-qmlplugins     \
+   \
+   qtlocation              \
+   qtlocation-plugins      \
+   qtlocation-qmlplugins   \
+   "
+
+#
+# QT part examples
+#
+IMAGE_QT_EXAMPLES_PART = " \
+   qtcanvas3d-examples \
+   qtbase-examples         \
+   qtdeclarative-examples  \
+   \
+   qtmultimedia-examples   \
+   \
+   ${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'qtwayland-examples', '', d)} \
+   \
+   qtwebkit-examples       \
+   \
+   qtquickcontrols-examples \
+   qtscript-examples       \
+   \
+   qtsensors-examples      \
+   qtserialport-examples   \
+   \
+   qtcharts-examples       \
+   \
+   qt3d-examples           \
+   \
+   qtlocation-examples     \
+   \
+   qt5nmapcarousedemo      \
+   cinematicexperience     \
+   qtsmarthome             \
+   "
+
 # INSTALL addons
 #
 CORE_IMAGE_EXTRA_INSTALL += " \
@@ -85,5 +133,7 @@ CORE_IMAGE_EXTRA_INSTALL += " \
     ${IMAGE_DISPLAY_PART}		    \
     ${IMAGE_MM_PART}			    \
     \
-    ${IMAGE_QT_PART}			    \
+    ${IMAGE_QT_MANDATORY_PART}		    \
+    ${IMAGE_QT_OPTIONAL_PART}		    \
+    ${IMAGE_QT_EXAMPLES_PART}		    \
     "
