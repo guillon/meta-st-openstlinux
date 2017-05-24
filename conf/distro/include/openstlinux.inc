@@ -10,17 +10,18 @@
 #      DISTRO_EXTRA_RRECOMMENDS [optional]
 #      TCLIBC [required if creating from scratch]
 
-DISTRO = "st-opensdk"
-DISTRO_NAME = "ST OpenSDK (A Yocto Project 2.1 based Distro)"
+DISTRO = "openstlinux"
+DISTRO_NAME = "ST OpenSTLinux (A Yocto Project 2.2 based Distro)"
 DISTRO_VERSION = "2.2"
 DISTRO_CODENAME = "morty"
 
-SDK_VENDOR = "-stopensdk_SDK"
+SDK_VENDOR = "-openstlinux_SDK"
 SDK_VERSION := "${@'${DISTRO_VERSION}'.replace('snapshot-${DATE}','snapshot')}"
 
 MAINTAINER = "Christophe Priouzeau <christophe.priouzeau@st.com>"
 
-TARGET_VENDOR = "-stopensdk"
+# Warning: TARGET_VENDOR does not contains a valid OS/ARCH name like : linux, arm
+TARGET_VENDOR = "-ostl"
 
 # Append distro name to each image name
 IMAGE_BASENAME_append = "-${DISTRO}"

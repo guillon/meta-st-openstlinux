@@ -33,24 +33,6 @@ CONNECTIVITY_CHECK_URIS ?= " \
 OELAYOUT_ABI = "11"
 
 #--------------------------
-# License settings
-#
-# We dont want (L)GPL-3.0+
-INCOMPATIBLE_LICENSE = "GPLv3.0 GPLv3 GPL-3.0 GPLv3+ LGPLv3.0 LGPLv3 LGPL-3.0 LGPLv3+"
-#binutils: used at compilation time
-#ccache: used at compilation time
-#autoconf: used at compilation time
-#gcc: used at compilation time
-#mpfr: used at compilation time
-#libmpc used at compilation time
-OPENSDK_WHITELIST_GPLv3 = "binutils ccache less autoconf gcc mpfr libmpc"
-OPENSDK_WHITELIST_GPLv3 =+ "sysprof"
-WHITELIST_GPLv3.0+ = "${OPENSDK_WHITELIST_GPLv3}"
-WHITELIST_LGPLv3.0 = "${OPENSDK_WHITELIST_GPLv3}"
-WHITELIST_GPL-3.0 = "${OPENSDK_WHITELIST_GPLv3}"
-WHITELIST_GPL-3.0+ = "${OPENSDK_WHITELIST_GPLv3}"
-
-#--------------------------
 # Package configuration
 #
 # Force the gpl functionnality usage for libav
