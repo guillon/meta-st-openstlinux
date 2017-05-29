@@ -59,8 +59,6 @@ CORE_IMAGE_EXTRA_INSTALL += " \
     \
     ${IMAGE_DISPLAY_PART}		    \
     ${IMAGE_MM_PART}			    \
-    \
-    ${IMAGE_QT_PART}			    \
     "
 
 EXTRA_USERS_PARAMS = "\
