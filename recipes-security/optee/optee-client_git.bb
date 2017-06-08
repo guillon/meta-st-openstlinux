@@ -6,11 +6,12 @@ LIC_FILES_CHKSUM ?= "file://LICENSE;md5=a6d62e1b5fef18a1854bd538e3160d7c"
 LICENSE = "BSD"
 
 SRC_URI = "git://github.com/OP-TEE/optee_client.git"
-SRCREV = "365657667f8968f40237480169fea44fa3fb9949"
+SRCREV = "1df4046bd729e866743454a18a71e72228e585fd"
 
 SRC_URI =+ "file://0001-Usage-of-LDLAGS.patch"
+SRC_URI =+ "file://0002-fix-gcc-warning.patch"
 
-PV = "2.3.0"
+PV = "2.4.0"
 PR = "git${SRCPV}.r0"
 
 S = "${WORKDIR}/git"

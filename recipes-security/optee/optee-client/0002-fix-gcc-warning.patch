@@ -1,0 +1,23 @@
+commit 47fe8351ef855922a6d72315346aa4b98f354cfa
+Author: Etienne Carriere <etienne.carriere@st.com>
+Date:   Wed May 10 14:57:43 2017 +0200
+
+    tee-supplicant: Fix build issue in tee_socket.c
+    
+    This change fixes a false-positive build issue.
+    
+    Signed-off-by: Etienne Carriere <etienne.carriere@st.com>
+
+diff --git a/tee-supplicant/src/tee_socket.c b/tee-supplicant/src/tee_socket.c
+index f892697..8934f0a 100644
+--- a/tee-supplicant/src/tee_socket.c
++++ b/tee-supplicant/src/tee_socket.c
+@@ -379,7 +379,7 @@ static TEEC_Result poll_with_timeout(struct pollfd *pfd, nfds_t nfds,
+ 				     uint32_t timeout)
+ {
+ 	struct timespec now;
+-	struct timespec until;
++	struct timespec until = { 0 };
+ 	int to = 0;
+ 	int r;
+ 
