@@ -60,6 +60,13 @@ IMAGE_OPTEE_PART = " \
     ${@bb.utils.contains('COMBINED_FEATURES', 'optee', 'packagegroup-optee-test', '', d)} \
     "
 
+#
+# TPM part addons
+#
+IMAGE_TPM_PART = " \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'tpm', 'packagegroup-security-tpm', '', d)} \
+    "
+
 
 #
 # INSTALL addons
@@ -83,4 +90,6 @@ CORE_IMAGE_EXTRA_INSTALL += " \
     ${IMAGE_X11_DISPLAY_PART}           \
     \
     ${IMAGE_OPTEE_PART}                 \
+    \
+    ${IMAGE_TPM_PART}                 \
     "
