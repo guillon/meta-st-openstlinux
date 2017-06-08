@@ -45,5 +45,13 @@ BBLAYERS += "${@'${OEROOT}/meta-openembedded/meta-networking' if os.path.isfile(
 # Qt5
 BBLAYERS += "${@'${OEROOT}/meta-qt5' if os.path.isfile('${OEROOT}/meta-qt5/conf/layer.conf') else ''}"
 
+# Security layer
+BBLAYERS += " \
+    ${@'${OEROOT}/meta-security \
+    ${OEROOT}/meta-openembedded/meta-perl \
+    ${OEROOT}/meta-openembedded/meta-filesystems' \
+    if os.path.isfile('${OEROOT}/meta-security/conf/layer.conf') else ''} \
+    "
+
 # specific to framework
 BBLAYERS += "${@'${OEROOT}/meta-st/meta-st-openstlinux' if os.path.isfile('${OEROOT}/meta-st/meta-st-openstlinux/conf/layer.conf') else ''}"

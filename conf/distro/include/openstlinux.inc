@@ -68,6 +68,10 @@ DISTRO_FEATURES_append = " x11"
 # add support of systemd
 DISTRO_FEATURES_append = " systemd "
 
+# add support of tpm
+#DISTRO_FEATURES_append = " tpm "
+
+
 # Disabling sysvinit
 DISTRO_FEATURES_BACKFILL_CONSIDERED += "sysvinit"
 
