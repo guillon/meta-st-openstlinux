@@ -64,7 +64,7 @@ IMAGE_OPTEE_PART = " \
 # TPM part addons
 #
 IMAGE_TPM_PART = " \
-    ${@bb.utils.contains('DISTRO_FEATURES', 'tpm', 'packagegroup-security-tpm', '', d)} \
+    ${@bb.utils.contains('COMBINED_FEATURES', 'tpm', 'packagegroup-security-tpm', '', d)} \
     "
 
 
