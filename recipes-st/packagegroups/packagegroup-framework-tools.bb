@@ -23,6 +23,7 @@ PACKAGES = "\
     "
 
 PROVIDES = "${PACKAGES}"
+
 RDEPENDS_packagegroup-framework-tools-core = "\
     grep            \
     util-linux      \
@@ -44,9 +45,21 @@ RDEPENDS_packagegroup-framework-tools-core = "\
 "
 RDEPENDS_packagegroup-framework-tools-core-extra = "\
     tslib-calibrate \
-    pointercal      \
+    pointercal \
+    \
+    acl \
+    bzip2 \
+    cronie \
+    rng-tools \
+    \
+    python-lxml \
+    python-modules \
+    python-nose \
+    python-pkgutil \
+    python-pytest \
+    python-setuptools \
+    python-unittest \
 "
-
 
 RDEPENDS_packagegroup-framework-tools-kernel = "\
     usbutils        \
@@ -72,11 +85,13 @@ RDEPENDS_packagegroup-framework-tools-kernel-extra = "\
     nbench-byte     \
     iozone3         \
     bonnie++        \
+    bonnie-scripts  \
     ltp             \
     elfutils        \
     formfactor      \
     \
     evtest          \
+    lirc \
 "
 
 RDEPENDS_packagegroup-framework-tools-network = "\
@@ -91,7 +106,6 @@ RDEPENDS_packagegroup-framework-tools-network = "\
     openssh-sftp    \
     ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'dhcp-client st-dhcp-client', '', d)} \
 "
-
 RDEPENDS_packagegroup-framework-tools-network-extra = "\
     iperf           \
     iperf3          \
@@ -106,7 +120,6 @@ RDEPENDS_packagegroup-framework-tools-network-extra = "\
     neard           \
 "
 
-
 RDEPENDS_packagegroup-framework-tools-audio = "\
     ${@bb.utils.contains('DISTRO_FEATURES', 'alsa', 'alsa-lib', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'alsa', 'alsa-utils', '', d)} \
@@ -119,6 +132,9 @@ RDEPENDS_packagegroup-framework-tools-audio = "\
     ${@bb.utils.contains('DISTRO_FEATURES', 'bluetooth', 'pulseaudio-module-bluetooth-policy', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'bluetooth', 'pulseaudio-module-bluez5-device', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'bluetooth', 'pulseaudio-module-bluez5-discover', '', d)} \
+"
+RDEPENDS_packagegroup-framework-tools-audio-extra = "\
+    ${@bb.utils.contains('DISTRO_FEATURES', 'alsa', 'alsa-utils-aplay', '', d)} \
 "
 
 RDEPENDS_packagegroup-framework-tools-ui = "\

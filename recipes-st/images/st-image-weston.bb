@@ -8,7 +8,14 @@ REQUIRED_DISTRO_FEATURES = "wayland"
 
 IMAGE_LINGUAS = "en-gb"
 
-IMAGE_FEATURES += "splash package-management ssh-server-dropbear hwcodecs tools-profile"
+IMAGE_FEATURES += "\
+    splash \
+    package-management \
+    ssh-server-dropbear \
+    hwcodecs \
+    tools-profile \
+    eclipse-debug\
+    "
 
 #
 # Multimedia part addons
@@ -81,8 +88,6 @@ CORE_IMAGE_EXTRA_INSTALL += " \
     packagegroup-framework-tools-network \
     packagegroup-framework-tools-audio   \
     packagegroup-framework-tools-ui      \
-    \
-    packagegroup-core-eclipse-debug     \
     \
     ${IMAGE_DISPLAY_PART}               \
     ${IMAGE_MM_PART}                    \
