@@ -1,8 +1,8 @@
-Meta-opensdk
+Meta-st-openstlinux
 ============
 
-Meta-OpenSDK is a layer containing the framework metadata for current versions
-of OpenSDK.
+Meta-st-openstlinux is a layer containing the framework metadata for current versions
+of OpenSTLinux.
 
 This layer relies on OpenEmbedded build system that is provided through
 Bitbake and OpenEmbedded-Core layers or Poky layer all part of the Yocto Project

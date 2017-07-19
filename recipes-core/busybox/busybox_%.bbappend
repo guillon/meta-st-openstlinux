@@ -2,7 +2,7 @@ FILESEXTRAPATHS_append := ":${THISDIR}/${PN}"
 
 SRC_URI += "file://${BUSYBOX_CONFIG_FRAGMENT}"
 
-BUSYBOX_CONFIG_FRAGMENT = "busybox-opensdk.cfg"
+BUSYBOX_CONFIG_FRAGMENT = "busybox-openstlinux.cfg"
 
 do_configure_append () {
     # merge specific configuration to newly generated .config
