@@ -10,13 +10,20 @@
 #      DISTRO_EXTRA_RRECOMMENDS [optional]
 #      TCLIBC [required if creating from scratch]
 
+# Init OPENSTLINUX_RELEASE flag to snapshot
+OPENSTLINUX_RELEASE ??= "snapshot"
+
 DISTRO = "openstlinux"
-DISTRO_NAME = "ST OpenSTLinux (A Yocto Project 2.2 based Distro)"
-DISTRO_VERSION = "2.2"
+DISTRO_NAME = "ST OpenSTLinux (A Yocto Project Based Distro)"
+DISTRO_VERSION = "2.2+${@bb.utils.contains('OPENSTLINUX_RELEASE', 'snapshot', 'snapshot-${DATE}', '${OPENSTLINUX_RELEASE}', d)}"
+# Don't include the DATE variable in the sstate package signatures
+DISTRO_VERSION[vardepsexclude] = "DATE"
 DISTRO_CODENAME = "morty"
 
 SDK_VENDOR = "-openstlinux_SDK"
 SDK_VERSION := "${@'${DISTRO_VERSION}'.replace('snapshot-${DATE}','snapshot')}"
+# Don't include the DATE variable in the sstate package signatures
+SDK_VERSION[vardepsexclude] = "DATE"
 
 MAINTAINER = "Christophe Priouzeau <christophe.priouzeau@st.com>"
 
@@ -29,6 +36,8 @@ IMAGE_BASENAME_append = "-${DISTRO}"
 # Add image name for generated SDK and set default SDK install folder
 SDK_NAME_PREFIX = "${DISTRO}-${IMAGE_LINK_NAME}"
 SDKPATH = "/opt/${DISTRO}/${SDK_VERSION}"
+# Don't include the DATE variable in the sstate package signatures
+SDKPATH[vardepsexclude] = "DATE"
 
 LOCALCONF_VERSION = "1"
 LAYER_CONF_VERSION ?= "6"
