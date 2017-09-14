@@ -1,4 +1,4 @@
-From 5ccc848351a1c7345720b13be1e27217fb1de23f Mon Sep 17 00:00:00 2001
+From 9bcc9eda2dde97870b8ee66ee5425dfba1d190c6 Mon Sep 17 00:00:00 2001
 From: Christophe Priouzeau <christophe.priouzeau@st.com>
 Date: Fri, 17 Feb 2017 11:41:15 +0100
 Subject: [PATCH 2/4] Correct X11 dependency
@@ -8,10 +8,10 @@ Subject: [PATCH 2/4] Correct X11 dependency
  1 file changed, 2 insertions(+)
 
 diff --git a/contrib/test/Makefile.am b/contrib/test/Makefile.am
-index 7f84435..cccdfae 100644
+index 4641e21..90c8605 100644
 --- a/contrib/test/Makefile.am
 +++ b/contrib/test/Makefile.am
-@@ -11,9 +11,11 @@ if HAVE_X11
+@@ -12,9 +12,11 @@ if HAVE_X11
  noinst_PROGRAMS += pixfmt-test
  endif
  

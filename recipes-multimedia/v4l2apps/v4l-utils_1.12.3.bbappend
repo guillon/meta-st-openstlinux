@@ -1,4 +1,4 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}/st-1.10.1:"
+FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}/st-1.12.3:"
 
 SRC_URI_append = " \
     file://0001-Add-autogen.sh.patch \

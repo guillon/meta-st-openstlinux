@@ -1,4 +1,4 @@
-From ede9fbe195e2b9778c992b08dc62df09d581b776 Mon Sep 17 00:00:00 2001
+From f7ca67bb3372c50f612ee3e0b71057358663c42d Mon Sep 17 00:00:00 2001
 From: Christophe Priouzeau <christophe.priouzeau@st.com>
 Date: Fri, 17 Feb 2017 11:40:43 +0100
 Subject: [PATCH 1/4] Add autogen.sh
