@@ -48,6 +48,7 @@ BBLAYERS += "${@'${OEROOT}/meta-qt5' if os.path.isfile('${OEROOT}/meta-qt5/conf/
 # Security layer
 BBLAYERS += " \
     ${@'${OEROOT}/meta-security \
+    ${OEROOT}/meta-security/meta-tpm \
     ${OEROOT}/meta-openembedded/meta-perl \
     ${OEROOT}/meta-openembedded/meta-filesystems' \
     if os.path.isfile('${OEROOT}/meta-security/conf/layer.conf') else ''} \
@@ -55,3 +56,11 @@ BBLAYERS += " \
 
 # specific to framework
 BBLAYERS += "${@'${OEROOT}/meta-st/meta-st-openstlinux' if os.path.isfile('${OEROOT}/meta-st/meta-st-openstlinux/conf/layer.conf') else ''}"
+
+# add BSP layer
+BBLAYERS += " \
+    ${OEROOT}/meta-st/meta-st-cannes2 \
+    ${OEROOT}/meta-st/meta-st-stm32mp \
+    "
+
+

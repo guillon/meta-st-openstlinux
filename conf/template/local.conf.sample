@@ -253,6 +253,8 @@ RM_OLD_IMAGE = "1"
 INHERIT += "buildhistory"
 BUILDHISTORY_COMMIT = "1"
 
+INHERIT += "image-buildinfo"
+
 # Clean up working directory after build
 #INHERIT += "rm_work"
 
