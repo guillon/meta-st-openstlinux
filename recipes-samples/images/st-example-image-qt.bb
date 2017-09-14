@@ -38,7 +38,6 @@ IMAGE_QT_MANDATORY_PART = " \
    qtbase-tools            \
    \
    qtdeclarative           \
-   qtdeclarative-plugins   \
    qtdeclarative-qmlplugins\
    qtdeclarative-tools     \
    \
@@ -121,6 +120,8 @@ IMAGE_QT_EXAMPLES_PART = " \
 # INSTALL addons
 #
 CORE_IMAGE_EXTRA_INSTALL += " \
+    systemd-networkd-configuration \
+    \
     packagegroup-framework-tools-core	    \
     packagegroup-framework-tools-kernel	    \
     packagegroup-framework-tools-network    \

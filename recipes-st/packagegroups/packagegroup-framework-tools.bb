@@ -107,7 +107,6 @@ RDEPENDS_packagegroup-framework-tools-network = "\
     ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'dhcp-client st-dhcp-client', '', d)} \
 "
 RDEPENDS_packagegroup-framework-tools-network-extra = "\
-    iperf           \
     iperf3          \
     ethtool         \
     bridge-utils    \
@@ -121,7 +120,7 @@ RDEPENDS_packagegroup-framework-tools-network-extra = "\
 "
 
 RDEPENDS_packagegroup-framework-tools-audio = "\
-    ${@bb.utils.contains('DISTRO_FEATURES', 'alsa', 'alsa-lib', '', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'alsa', 'libasound alsa-conf', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'alsa', 'alsa-utils', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'alsa', 'alsa-plugins', '', d)} \
     pulseaudio \

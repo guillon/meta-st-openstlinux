@@ -11,6 +11,10 @@ IMAGE_LINGUAS = "en-gb"
 
 IMAGE_FEATURES += "splash package-management ssh-server-dropbear hwcodecs"
 
+# make sure we boot to desktop
+# by default and without x11-base in IMAGE_FEATURES we default to multi-user.target
+SYSTEMD_DEFAULT_TARGET = "graphical.target"
+
 #
 # Multimedia part addons
 #
@@ -33,21 +37,36 @@ IMAGE_DISPLAY_PART = " \
 #
 # XFCE part addons
 #
+#
 IMAGE_XFCE_PART = " \
-    lxdm \
-    xfce4-netload-plugin \
-    xfce4-cpugraph-plugin \
-    xfce4-cpufreq-plugin \
-    xclock \
-    xterm \
+    packagegroup-xfce-base \
     \
     gnome-bluetooth \
+    \
+    lxdm \
+    xfce4-netload-plugin \
+    xfce4-wavelan-plugin \
+    xfce4-cpugraph-plugin \
+    xfce4-cpufreq-plugin \
+    xfce4-systemload-plugin \
+    "
+
+IMAGE_X11_PART = " \
+    openbox \
+    openbox-theme-clearlooks \
+    xclock \
+    xterm \
     "
 
 #
 # INSTALL addons
 #
 CORE_IMAGE_EXTRA_INSTALL += " \
+    packagegroup-core-x11 \
+    systemd-networkd-configuration \
+    \
+    packagegroup-core-boot \
+    \
     packagegroup-framework-tools-core	    \
     packagegroup-framework-tools-kernel	    \
     packagegroup-framework-tools-network    \
@@ -59,6 +78,8 @@ CORE_IMAGE_EXTRA_INSTALL += " \
     \
     ${IMAGE_DISPLAY_PART}		    \
     ${IMAGE_MM_PART}			    \
+    ${IMAGE_X11_PART}		    \
+    ${IMAGE_XFCE_PART}		    \
     "
 
 EXTRA_USERS_PARAMS = "\

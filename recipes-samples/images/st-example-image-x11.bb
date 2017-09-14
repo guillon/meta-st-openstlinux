@@ -10,6 +10,10 @@ IMAGE_LINGUAS = "en-gb"
 
 IMAGE_FEATURES += "splash package-management x11-base x11-sato ssh-server-dropbear hwcodecs tools-profile"
 
+# make sure we boot to desktop
+# by default and without x11-base in IMAGE_FEATURES we default to multi-user.target
+SYSTEMD_DEFAULT_TARGET = "graphical.target"
+
 #
 # Multimedia part addons
 #
@@ -59,6 +63,8 @@ IMAGE_X11_DISPLAY_PART = " \
 # INSTALL addons
 #
 CORE_IMAGE_EXTRA_INSTALL += " \
+    systemd-networkd-configuration \
+    \
     ${@bb.utils.contains('DISTRO_FEATURES', 'bluetooth', 'bluez5', '', d)} \
     \
     packagegroup-framework-tools-core    \
