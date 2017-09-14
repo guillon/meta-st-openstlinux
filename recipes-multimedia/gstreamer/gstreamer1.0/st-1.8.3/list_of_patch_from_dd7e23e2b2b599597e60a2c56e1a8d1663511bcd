@@ -1,3 +1,0 @@
-3cba0df STM: identity: add a property to set the size to dump
-d3c0347 STM: tee : forward allocation query downstream
-c1ea8ff STM: bufferpool: add error trace when discarding buffers @ release
