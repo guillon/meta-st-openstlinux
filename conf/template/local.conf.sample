@@ -263,3 +263,6 @@ INHERIT += "image-buildinfo"
 
 # force the usage of debian package
 PACKAGE_CLASSES = "package_deb"
+
+# To enable archiver for recipes that are configured (e.g. atf, u-boot, kernel...)
+#ST_ARCHIVER_ENABLE = "1"
