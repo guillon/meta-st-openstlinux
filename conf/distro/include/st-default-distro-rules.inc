@@ -30,13 +30,17 @@ CONNECTIVITY_CHECK_URIS ?= " \
 # that breaks the format and have been previously discussed on the mailing list
 # with general agreement from the core team.
 #
-OELAYOUT_ABI = "11"
+OELAYOUT_ABI = "12"
 
 #--------------------------
 # Package configuration
 #
 # Force the gpl functionnality usage for libav
 PACKAGECONFIG_pn-gstreamer1.0-libav = " gpl "
+
+#--------------------------
+# Add the manifest and the licenses file on image generated
+COPY_LIC_MANIFEST = "1"
 
 #--------------------------
 # Tune build config display

@@ -34,13 +34,13 @@ TARGET_VENDOR = "-ostl"
 IMAGE_BASENAME_append = "-${DISTRO}"
 
 # Add image name for generated SDK and set default SDK install folder
-SDK_NAME_PREFIX = "${DISTRO}-${IMAGE_LINK_NAME}"
-SDKPATH = "/opt/${DISTRO}/${SDK_VERSION}"
+SDK_NAME = "${IMAGE_LINK_NAME}-${SDK_ARCH}"
+SDKPATH = "/opt/st/${MACHINE}/${SDK_VERSION}"
 # Don't include the DATE variable in the sstate package signatures
 SDKPATH[vardepsexclude] = "DATE"
 
 LOCALCONF_VERSION = "1"
-LAYER_CONF_VERSION ?= "6"
+LAYER_CONF_VERSION ?= "7"
 
 # TODO: is that really want we want?
 IMAGE_LINGUAS = "en-gb"
@@ -80,7 +80,6 @@ DISTRO_FEATURES_append = " systemd "
 # add support of tpm
 #DISTRO_FEATURES_append = " tpm "
 
-
 # Disabling sysvinit
 DISTRO_FEATURES_BACKFILL_CONSIDERED += "sysvinit"
 
@@ -88,10 +87,6 @@ VIRTUAL-RUNTIME_init_manager = "systemd"
 VIRTUAL-RUNTIME_initscripts = "systemd-compat-units"
 
 LICENSE_FLAGS_WHITELIST += " commercial"
-
-#--------------------------
-#Add the manifest and the licenses file on image generated
-COPY_LIC_MANIFEST = "1"
 
 #--------------------------
 # Preferred version
@@ -102,9 +97,8 @@ PREFERRED_VERSION_gst-player ?= "1.8"
 # v4l-utils
 #PREFERRED_VERSION_v4l-utils ?= "1.6.2"
 
-#X11 addons
+# X11 addons
 IMAGE_INSTALL_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'xf86-video-modesetting', '', d)} "
 
 # resize tools
 IMAGE_INSTALL_append = " resize-helper "
-
