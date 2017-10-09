@@ -3,7 +3,7 @@ LICENSE = "MIT"
 
 inherit core-image distro_features_check
 
-# let's make sure we have a good image..
+# let's make sure we have a good image...
 REQUIRED_DISTRO_FEATURES = "wayland"
 
 IMAGE_LINGUAS = "en-gb"
@@ -14,7 +14,7 @@ IMAGE_FEATURES += "\
     ssh-server-dropbear \
     hwcodecs \
     tools-profile \
-    eclipse-debug\
+    eclipse-debug \
     "
 
 #
@@ -79,9 +79,8 @@ IMAGE_TPM_PART = " \
 # INSTALL addons
 #
 CORE_IMAGE_EXTRA_INSTALL += " \
-    systemd-networkd-configuration \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'systemd-networkd-configuration', '', d)} \
     \
-    ${@bb.utils.contains('DISTRO_FEATURES', 'bluetooth', 'bluez5', '', d)} \
     \
     packagegroup-framework-tools-core    \
     packagegroup-framework-tools-kernel  \
