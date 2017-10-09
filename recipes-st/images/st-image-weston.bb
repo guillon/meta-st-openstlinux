@@ -81,19 +81,24 @@ IMAGE_TPM_PART = " \
 CORE_IMAGE_EXTRA_INSTALL += " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'systemd-networkd-configuration', '', d)} \
     \
+    packagegroup-framework-tools-core-base      \
+    packagegroup-framework-tools-kernel-base    \
+    packagegroup-framework-tools-network-base   \
+    packagegroup-framework-tools-audio-base     \
+    packagegroup-framework-tools-ui-base        \
     \
-    packagegroup-framework-tools-core    \
-    packagegroup-framework-tools-kernel  \
-    packagegroup-framework-tools-network \
-    packagegroup-framework-tools-audio   \
-    packagegroup-framework-tools-ui      \
+    packagegroup-framework-tools-core           \
+    packagegroup-framework-tools-kernel         \
+    packagegroup-framework-tools-network        \
+    packagegroup-framework-tools-audio          \
+    packagegroup-framework-tools-ui             \
     \
-    ${IMAGE_DISPLAY_PART}               \
-    ${IMAGE_MM_PART}                    \
+    ${IMAGE_DISPLAY_PART}                       \
+    ${IMAGE_MM_PART}                            \
     \
-    ${IMAGE_X11_DISPLAY_PART}           \
+    ${IMAGE_X11_DISPLAY_PART}                   \
     \
-    ${IMAGE_OPTEE_PART}                 \
+    ${IMAGE_OPTEE_PART}                         \
     \
-    ${IMAGE_TPM_PART}                 \
+    ${IMAGE_TPM_PART}                           \
     "

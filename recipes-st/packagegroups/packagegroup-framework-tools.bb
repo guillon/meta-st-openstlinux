@@ -9,6 +9,12 @@ PACKAGE_ARCH = "${TUNE_PKGARCH}"
 inherit packagegroup
 
 PACKAGES = "\
+    packagegroup-framework-tools-core-base \
+    packagegroup-framework-tools-kernel-base \
+    packagegroup-framework-tools-network-base \
+    packagegroup-framework-tools-audio-base \
+    packagegroup-framework-tools-ui-base \
+    \
     packagegroup-framework-tools-core \
     packagegroup-framework-tools-kernel \
     packagegroup-framework-tools-network \
@@ -24,6 +30,12 @@ PACKAGES = "\
 
 PROVIDES = "${PACKAGES}"
 
+RDEPENDS_packagegroup-framework-tools-core-base = "\
+    ckermit         \
+    coreutils       \
+    libiio-iiod     \
+    libiio-tests    \
+    "
 RDEPENDS_packagegroup-framework-tools-core = "\
     grep            \
     util-linux      \
@@ -32,7 +44,6 @@ RDEPENDS_packagegroup-framework-tools-core = "\
     kbd             \
     file            \
     bc              \
-    coreutils       \
     e2fsprogs       \
     e2fsprogs-resize2fs \
     sysstat         \
@@ -40,9 +51,8 @@ RDEPENDS_packagegroup-framework-tools-core = "\
     ntp             \
     systemtap       \
     gptfdisk        \
-    ckermit         \
     lsb             \
-"
+    "
 RDEPENDS_packagegroup-framework-tools-core-extra = "\
     tslib-calibrate \
     pointercal \
@@ -59,28 +69,31 @@ RDEPENDS_packagegroup-framework-tools-core-extra = "\
     python-pytest \
     python-setuptools \
     python-unittest \
-"
+    "
 
-RDEPENDS_packagegroup-framework-tools-kernel = "\
+RDEPENDS_packagegroup-framework-tools-kernel-base = "\
+    can-utils       \
+    i2c-tools       \
+    strace          \
     usbutils        \
+    \
+    evtest          \
+    memtester       \
+    mtd-utils       \
+    "
+RDEPENDS_packagegroup-framework-tools-kernel = "\
     pciutils        \
     cpufrequtils    \
     sysfsutils      \
-    can-utils       \
-    i2c-tools       \
     dosfstools      \
     mmc-utils       \
     blktool         \
-    \
-    strace          \
-"
+    "
 RDEPENDS_packagegroup-framework-tools-kernel-extra = "\
     latencytop      \
     powertop        \
-    mtd-utils       \
     fio             \
     \
-    memtester       \
     lmbench         \
     nbench-byte     \
     iozone3         \
@@ -90,13 +103,15 @@ RDEPENDS_packagegroup-framework-tools-kernel-extra = "\
     elfutils        \
     formfactor      \
     \
-    evtest          \
     lirc \
-"
+    "
 
+RDEPENDS_packagegroup-framework-tools-network-base = "\
+    ethtool         \
+    iproute2        \
+    "
 RDEPENDS_packagegroup-framework-tools-network = "\
     tcpdump         \
-    iproute2        \
     iptables        \
     ${@bb.utils.contains('DISTRO_FEATURES', 'wifi', 'hostap-utils', '', d)}    \
     ${@bb.utils.contains('DISTRO_FEATURES', 'wifi', 'iw', '', d)}              \
@@ -105,10 +120,9 @@ RDEPENDS_packagegroup-framework-tools-network = "\
     ${@bb.utils.contains('DISTRO_FEATURES', 'wifi', 'hostapd', '', d)}         \
     openssh-sftp    \
     ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'dhcp-client st-dhcp-client', '', d)} \
-"
+    "
 RDEPENDS_packagegroup-framework-tools-network-extra = "\
     iperf3          \
-    ethtool         \
     bridge-utils    \
     vlan            \
     libnl           \
@@ -117,12 +131,14 @@ RDEPENDS_packagegroup-framework-tools-network-extra = "\
     net-snmp        \
     \
     neard           \
-"
+    "
 
-RDEPENDS_packagegroup-framework-tools-audio = "\
+RDEPENDS_packagegroup-framework-tools-audio-base = "\
     ${@bb.utils.contains('DISTRO_FEATURES', 'alsa', 'libasound alsa-conf', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'alsa', 'alsa-utils', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'alsa', 'alsa-plugins', '', d)} \
+    "
+RDEPENDS_packagegroup-framework-tools-audio = "\
     pulseaudio \
     pulseaudio-server \
     pulseaudio-misc \
@@ -131,19 +147,21 @@ RDEPENDS_packagegroup-framework-tools-audio = "\
     ${@bb.utils.contains('DISTRO_FEATURES', 'bluetooth', 'pulseaudio-module-bluetooth-policy', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'bluetooth', 'pulseaudio-module-bluez5-device', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'bluetooth', 'pulseaudio-module-bluez5-discover', '', d)} \
-"
+    "
 RDEPENDS_packagegroup-framework-tools-audio-extra = "\
     ${@bb.utils.contains('DISTRO_FEATURES', 'alsa', 'alsa-utils-aplay', '', d)} \
-"
+    "
 
+RDEPENDS_packagegroup-framework-tools-ui-base = "\
+    "
 RDEPENDS_packagegroup-framework-tools-ui = "\
     ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'xvinfo', '', d)}    \
     ${@bb.utils.contains('DISTRO_FEATURES', 'gplv3', 'glmark2', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'gplv3', 'netdata', '', d)} \
-"
+    "
 RDEPENDS_packagegroup-framework-tools-ui-extra = "\
     ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'xvideo-tests', '', d)}  \
     ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'x11perf', '', d)}   \
     ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'fstests', '', d)}   \
     ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'gtkperf', '', d)}   \
-"
+    "
