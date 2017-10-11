@@ -1,4 +1,4 @@
-# Distribution definition for: st-core
+# Distribution definition for openstlinux
 
 # from dev manual:
 # Your configuration file needs to set the following variables:
@@ -45,6 +45,9 @@ LAYER_CONF_VERSION ?= "7"
 # TODO: is that really want we want?
 IMAGE_LINGUAS = "en-gb"
 
+# =========================================================================
+# DISTRO features
+# =========================================================================
 DISTRO_FEATURES  = "alsa"
 DISTRO_FEATURES += "argp"
 DISTRO_FEATURES += "ext2"
@@ -87,16 +90,19 @@ DISTRO_FEATURES_BACKFILL_CONSIDERED += "sysvinit"
 VIRTUAL-RUNTIME_init_manager = "systemd"
 VIRTUAL-RUNTIME_initscripts = "systemd-compat-units"
 
-LICENSE_FLAGS_WHITELIST += " commercial"
-
-#--------------------------
+# =========================================================================
 # Preferred version
-
+# =========================================================================
 # gstreamer configuration
 PREFERRED_VERSION_gst-player ?= "1.8"
 
 # v4l-utils
 #PREFERRED_VERSION_v4l-utils ?= "1.6.2"
+
+# =========================================================================
+# IMAGE addons
+# =========================================================================
+LICENSE_FLAGS_WHITELIST += " commercial"
 
 # X11 addons
 IMAGE_INSTALL_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'xf86-video-modesetting', '', d)} "
