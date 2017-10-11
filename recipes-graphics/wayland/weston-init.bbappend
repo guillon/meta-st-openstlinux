@@ -3,7 +3,7 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 SRC_URI += " \
             file://weston.ini \
             file://utilities-terminal.png \
-            file://wallpaper_1920x1080_white.png \
+            file://ST_1366x768.png \
             file://weston.sh \
             file://weston_profile.sh \
             "
@@ -23,7 +23,7 @@ do_install_append() {
 
     install -m 0644 ${WORKDIR}/weston.ini ${D}${sysconfdir}/xdg/weston
     install -m 0644 ${WORKDIR}/utilities-terminal.png ${D}${datadir}/weston/icon/utilities-terminal.png
-    install -m 0644 ${WORKDIR}/wallpaper_1920x1080_white.png ${D}${datadir}/weston/backgrounds/wallpaper_1920x1080_white.png
+    install -m 0644 ${WORKDIR}/ST_1366x768.png ${D}${datadir}/weston/backgrounds/ST_1366x768.png
 
     install -d ${D}${systemd_system_unitdir} ${D}${sbindir}
     install -m 0755  ${WORKDIR}/weston.sh ${D}${sbindir}/
