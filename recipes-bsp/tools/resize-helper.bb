@@ -1,4 +1,4 @@
-# Copyright (C) 2016 Christophe Priouzeau <christophe.priouzeau@st.com>
+# Copyright (C) 2016, STMicroelectronics - All Rights Reserved
 # Released under the MIT license (see COPYING.MIT for the terms)
 
 # Tools extracted from 96boards-tools https://github.com/96boards/96boards-tools

@@ -1,4 +1,4 @@
-# Copyright (C) 2014 Christophe Priouzeau <christophe.priouzeau@st.com>
+# Copyright (C) 2014, STMicroelectronics - All Rights Reserved
 # Released under the MIT license (see COPYING.MIT for the terms)
 
 DESCRIPTION = "Basic splash screen which display a picture on DRM/KMS"
