@@ -10,6 +10,9 @@ IMAGE_LINGUAS = "en-gb"
 
 IMAGE_FEATURES += "splash package-management ssh-server-dropbear hwcodecs"
 
+# Define to null ROOTFS_MAXSIZE to avoid partition size restriction
+IMAGE_ROOTFS_MAXSIZE = ""
+
 #
 # Multimedia part addons
 #

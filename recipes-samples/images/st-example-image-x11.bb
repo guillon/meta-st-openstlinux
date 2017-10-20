@@ -10,6 +10,9 @@ IMAGE_LINGUAS = "en-gb"
 
 IMAGE_FEATURES += "splash package-management x11-base x11-sato ssh-server-dropbear hwcodecs tools-profile"
 
+# Define to null ROOTFS_MAXSIZE to avoid partition size restriction
+IMAGE_ROOTFS_MAXSIZE = ""
+
 # make sure we boot to desktop
 # by default and without x11-base in IMAGE_FEATURES we default to multi-user.target
 SYSTEMD_DEFAULT_TARGET = "graphical.target"
