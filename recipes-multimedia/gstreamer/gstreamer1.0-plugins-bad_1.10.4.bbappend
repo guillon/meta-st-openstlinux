@@ -7,7 +7,7 @@ PACKAGECONFIG ?= " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'directfb', 'directfb', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'wayland egl', '', d)} \
     bz2 curl dash hls neon sbc smoothstreaming sndfile uvch264  \
-    faac \
+    faac kms\
 "
 
 ARM_INSTRUCTION_SET = "arm"
