@@ -37,6 +37,7 @@ IMAGE_DISPLAY_PART = " \
 #
 IMAGE_QT_MANDATORY_PART = " \
    qtbase                  \
+   liberation-fonts        \
    qtbase-plugins          \
    qtbase-tools            \
    \
@@ -74,8 +75,12 @@ IMAGE_QT_OPTIONAL_PART = " \
    \
    qtwebkit                \
    \
+   qtquick1                \
+   \
    qtquickcontrols         \
    qtquickcontrols-qmlplugins \
+   qtquickcontrols2         \
+   qtquickcontrols2-qmlplugins\
    qtscript                \
    \
    qtsensors               \
@@ -141,3 +146,6 @@ CORE_IMAGE_EXTRA_INSTALL += " \
     ${IMAGE_QT_OPTIONAL_PART}		    \
     ${IMAGE_QT_EXAMPLES_PART}		    \
     "
+
+# Define to null ROOTFS_MAXSIZE
+IMAGE_ROOTFS_MAXSIZE = ""

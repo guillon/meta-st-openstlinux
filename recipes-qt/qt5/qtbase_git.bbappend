@@ -11,7 +11,7 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 #    examples \
 #"
 PACKAGECONFIG_GL = " ${@base_contains('DISTRO_FEATURES', 'opengl', 'gles2', '', d)} "
-PACKAGECONFIG_append = " eglfs kms gbm examples "
+PACKAGECONFIG_append = " eglfs kms gbm examples fontconfig accessibility "
 QT_CONFIG_FLAGS += " -no-sse2 -no-opengles3 -no-mirclient "
 
 SRC_URI += "file://0001-qtbase-Cast-EGL-type-for-build-issue.patch"
