@@ -8,7 +8,7 @@ LICENSE = "CLOSED"
 
 inherit qmake5
 
-QT_MODULE_BRANCH = "5.6"
+QT_MODULE_BRANCH = "5.8"
 QT_GIT = "git://github.com/qt"
 
 DEPENDS += "qtbase"
