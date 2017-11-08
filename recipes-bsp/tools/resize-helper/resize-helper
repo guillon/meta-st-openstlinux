@@ -33,9 +33,10 @@
 RESIZE2FS=$(which resize2fs) || { echo "E: You must have resize2fs" && exit 1; }
 
 # find root device
-ROOT_DEVICE=$(findmnt --noheadings --output=SOURCE / | cut -d'[' -f1)
+# ROOT_DEVICE=$(findmnt --noheadings --output=SOURCE / | cut -d'[' -f1)
+DEVICES=$(ls /sys/fs/ext4/)
 # prune root device (for example UUID)
-ROOT_DEVICE=$(realpath ${ROOT_DEVICE})
+#ROOT_DEVICE=$(realpath ${ROOT_DEVICE})
 # get the partition number and type
 #PART_ENTRY_NUMBER=$(udevadm info --query=property --name=${ROOT_DEVICE} | grep '^ID_PART_ENTRY_NUMBER=' | cut -d'=' -f2)
 #PART_TABLE_TYPE=$(udevadm info --query=property --name=${ROOT_DEVICE} | grep '^ID_PART_TABLE_TYPE=' | cut -d'=' -f2)
@@ -50,5 +51,9 @@ ROOT_DEVICE=$(realpath ${ROOT_DEVICE})
 
 #${PARTED} ${DEVICE} resizepart ${PART_ENTRY_NUMBER} Yes 100%
 #${PARTPROBE}
-${RESIZE2FS} "${ROOT_DEVICE}"
+for device in ${DEVICES}; do
+    if [ -e /dev/${device} ]; then
+        ${RESIZE2FS} "/dev/${device}"
+    fi
+done
 

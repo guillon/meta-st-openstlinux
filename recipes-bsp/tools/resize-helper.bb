@@ -10,16 +10,13 @@ LICENSE = "GPLv2+"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/GPL-2.0;md5=801f80980d171dd6425610833a22dbe6"
 
 # e2fsprogs for resize2fs
-# gptfdisk for sgdisk
-# parted for parted and partprobe (Gplv3)
-# util-linux for findmnt
-DEPENDS = " e2fsprogs gptfdisk util-linux"
+RDEPENDS_${PN} += " e2fsprogs-resize2fs "
 
-SRC_URI = " file://resize-helper.service file://resize-helper"
+SRC_URI = " file://resize-helper.service file://resize-helper file://resize-helper.sh.in"
 
-S = "${WORKDIR}"
+S = "${WORKDIR}/git"
 
-inherit systemd
+inherit systemd update-rc.d
 
 SYSTEMD_PACKAGES += " resize-helper "
 SYSTEMD_SERVICE_${PN} = "resize-helper.service"
@@ -29,5 +26,13 @@ do_install() {
     install -d ${D}${systemd_unitdir}/system ${D}${base_sbindir}
     install -m 0644 ${WORKDIR}/resize-helper.service ${D}${systemd_unitdir}/system
     install -m 0755 ${WORKDIR}/resize-helper ${D}${base_sbindir}
+
+    install -d ${D}${sysconfdir}/init.d
+    install -m 0755 ${WORKDIR}/resize-helper.sh.in ${D}${sysconfdir}/init.d/resize-helper.sh
+
+    sed -i -e "s:@sbindir@:${base_sbindir}:; s:@sysconfdir@:${sysconfdir}:" \
+${D}${sysconfdir}/init.d/resize-helper.sh
 }
 
+INITSCRIPT_NAME = "resize-helper.sh"
+INITSCRIPT_PARAMS = "start 22 5 3 ."
