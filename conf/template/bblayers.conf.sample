@@ -59,8 +59,6 @@ BBLAYERS += "${@'${OEROOT}/meta-st/meta-st-openstlinux' if os.path.isfile('${OER
 
 # add BSP layer
 BBLAYERS += " \
-    ${OEROOT}/meta-st/meta-st-cannes2 \
-    ${OEROOT}/meta-st/meta-st-stm32mp \
+    ${@'${OEROOT}/meta-st/meta-st-cannes2' if os.path.isfile('${OEROOT}/meta-st/meta-st-cannes2/conf/layer.conf') else ''} \
+    ${@'${OEROOT}/meta-st/meta-st-stm32mp' if os.path.isfile('${OEROOT}/meta-st/meta-st-stm32mp/conf/layer.conf') else ''} \
     "
-
-
