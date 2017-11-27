@@ -32,3 +32,5 @@ then
 else
     cp -f /lib/systemd/network/50-wired.network.all /lib/systemd/network/50-wired.network
 fi
+
+systemctl restart systemd-networkd
