@@ -48,9 +48,11 @@ COPY_LIC_MANIFEST = "1"
 #--------------------------
 # Tune build config display
 #
+BUILDCFG_VARS += "DISTRO_CODENAME"
 BUILDCFG_VARS += "GCCVERSION"
 BUILDCFG_VARS += "PREFERRED_PROVIDER_virtual/kernel"
 BUILDCFG_VARS += "PREFERRED_VERSION_${PREFERRED_PROVIDER_virtual/kernel}"
+
 
 #--------------------------
 # Writes build information to target filesystem on /etc/build
