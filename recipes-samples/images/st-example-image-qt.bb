@@ -1,5 +1,7 @@
 SUMMARY = "ST example of image based on QT framework."
-LICENSE = "MIT"
+LICENSE = "Proprietary"
+
+include recipes-st/images/st-image.inc
 
 inherit core-image distro_features_check
 

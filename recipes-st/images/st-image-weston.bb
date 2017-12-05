@@ -1,5 +1,7 @@
 SUMMARY = "OpenSTLinux weston image with basic Wayland support (if enable in distro)."
-LICENSE = "MIT"
+LICENSE = "Proprietary"
+
+include recipes-st/images/st-image.inc
 
 inherit core-image distro_features_check
 

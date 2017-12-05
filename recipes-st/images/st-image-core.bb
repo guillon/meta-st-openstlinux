@@ -1,5 +1,7 @@
 SUMMARY = "OpenSTLinux core image."
-LICENSE = "MIT"
+LICENSE = "Proprietary"
+
+include recipes-st/images/st-image.inc
 
 inherit core-image
 
