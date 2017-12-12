@@ -6,7 +6,7 @@
 
 # Set list of tasks that need 'depends' flag update
 TASKS_TO_CLEAN  = "do_populate_lic"
-TASKS_TO_CLEAN += "do_unpack"
+TASKS_TO_CLEAN += "do_patch"
 
 python () {
     for do_xxx in d.getVar('TASKS_TO_CLEAN', True).split():
