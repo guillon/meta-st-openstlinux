@@ -102,7 +102,7 @@ PREFERRED_VERSION_gst-player ?= "1.8"
 # =========================================================================
 # IMAGE addons
 # =========================================================================
-LICENSE_FLAGS_WHITELIST += " commercial"
+LICENSE_FLAGS_WHITELIST += " non-commercial commercial"
 
 # X11 addons
 IMAGE_INSTALL_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'xf86-video-modesetting', '', d)} "

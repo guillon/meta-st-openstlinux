@@ -123,6 +123,7 @@ RDEPENDS_packagegroup-framework-tools-network = "\
     "
 RDEPENDS_packagegroup-framework-tools-network-extra = "\
     iperf3          \
+    netperf          \
     bridge-utils    \
     vlan            \
     libnl           \
