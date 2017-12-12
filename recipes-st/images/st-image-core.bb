@@ -32,6 +32,8 @@ IMAGE_OPTEE_PART = " \
 # INSTALL addons
 #
 CORE_IMAGE_EXTRA_INSTALL += " \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'systemd-networkd-configuration', '', d)} \
+    \
     packagegroup-framework-tools-core-base      \
     packagegroup-framework-tools-kernel-base    \
     packagegroup-framework-tools-network-base   \
