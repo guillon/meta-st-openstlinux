@@ -21,32 +21,39 @@ POKY_NON_REMOVABLE += "${OEROOT}/poky/meta-yocto"
 
 #--------------------------
 #
-BBLAYERS ?= " \
-    ${@'${OPENEMBEDDED}' if os.path.isfile('${OEROOT}/openembedded-core/meta/conf/layer.conf') else '${POKY}'} \
+BASELAYERS ?= " \
     ${OEROOT}/meta-openembedded/meta-oe \
-    ${OEROOT}/meta-openembedded/meta-systemd \
-    ${OEROOT}/meta-openembedded/meta-webserver \
+    ${OEROOT}/meta-openembedded/meta-gnome \
+    ${OEROOT}/meta-openembedded/meta-xfce \
+    ${OEROOT}/meta-openembedded/meta-initramfs \
     ${OEROOT}/meta-openembedded/meta-multimedia \
     ${OEROOT}/meta-openembedded/meta-networking \
+    ${OEROOT}/meta-openembedded/meta-webserver \
+    ${OEROOT}/meta-openembedded/meta-filesystems \
+    ${OEROOT}/meta-openembedded/meta-perl \
     ${OEROOT}/meta-openembedded/meta-python \
-    ${OEROOT}/meta-openembedded/meta-xfce \
-    ${OEROOT}/meta-openembedded/meta-gnome \
 "
 
 BBLAYERS_NON_REMOVABLE ?= " \
     ${@'${OPENEMBEDDED_NON_REMOVABLE}' if os.path.isfile('${OEROOT}/openembedded-core/meta/conf/layer.conf') else '${POKY_NON_REMOVABLE}'} \
   "
 
+BSPLAYER ?= " \
+    ${@'${OEROOT}/meta-st/meta-st-cannes2' if os.path.isfile('${OEROOT}/meta-st/meta-st-cannes2/conf/layer.conf') else ''} \
+    ${@'${OEROOT}/meta-st/meta-st-stm32mp' if os.path.isfile('${OEROOT}/meta-st/meta-st-stm32mp/conf/layer.conf') else ''} \
+    "
+
+ADDONSLAYERS = ""
 # linaro
-BBLAYERS += "${@'${OEROOT}/meta-linaro/meta-linaro' if os.path.isfile('${OEROOT}/meta-linaro/meta-linaro/conf/layer.conf') else ''}"
-BBLAYERS += "${@'${OEROOT}/meta-linaro/meta-linaro-toolchain' if os.path.isfile('${OEROOT}/meta-linaro/meta-linaro-toolchain/conf/layer.conf') else ''}"
-BBLAYERS += "${@'${OEROOT}/meta-openembedded/meta-networking' if os.path.isfile('${OEROOT}/meta-linaro/meta-linaro/conf/layer.conf') else ''}"
+ADDONSLAYERS += "${@'${OEROOT}/meta-linaro/meta-linaro' if os.path.isfile('${OEROOT}/meta-linaro/meta-linaro/conf/layer.conf') else ''}"
+ADDONSLAYERS += "${@'${OEROOT}/meta-linaro/meta-linaro-toolchain' if os.path.isfile('${OEROOT}/meta-linaro/meta-linaro-toolchain/conf/layer.conf') else ''}"
+ADDONSLAYERS += "${@'${OEROOT}/meta-openembedded/meta-networking' if os.path.isfile('${OEROOT}/meta-linaro/meta-linaro/conf/layer.conf') else ''}"
 
 # Qt5
-BBLAYERS += "${@'${OEROOT}/meta-qt5' if os.path.isfile('${OEROOT}/meta-qt5/conf/layer.conf') else ''}"
+ADDONSLAYERS += "${@'${OEROOT}/meta-qt5' if os.path.isfile('${OEROOT}/meta-qt5/conf/layer.conf') else ''}"
 
 # Security layer
-BBLAYERS += " \
+ADDONSLAYERS += " \
     ${@'${OEROOT}/meta-security \
     ${OEROOT}/meta-security/meta-tpm \
     ${OEROOT}/meta-openembedded/meta-perl \
@@ -55,10 +62,13 @@ BBLAYERS += " \
     "
 
 # specific to framework
-BBLAYERS += "${@'${OEROOT}/meta-st/meta-st-openstlinux' if os.path.isfile('${OEROOT}/meta-st/meta-st-openstlinux/conf/layer.conf') else ''}"
+FRAMEWORKLAYERS += "${@'${OEROOT}/meta-st/meta-st-openstlinux' if os.path.isfile('${OEROOT}/meta-st/meta-st-openstlinux/conf/layer.conf') else ''}"
 
 # add BSP layer
 BBLAYERS += " \
-    ${@'${OEROOT}/meta-st/meta-st-cannes2' if os.path.isfile('${OEROOT}/meta-st/meta-st-cannes2/conf/layer.conf') else ''} \
-    ${@'${OEROOT}/meta-st/meta-st-stm32mp' if os.path.isfile('${OEROOT}/meta-st/meta-st-stm32mp/conf/layer.conf') else ''} \
+    ${BASELAYERS} \
+    ${BSPLAYER} \
+    ${ADDONSLAYERS} \
+    ${FRAMEWORKLAYERS} \
+    ${@'${OPENEMBEDDED}' if os.path.isfile('${OEROOT}/openembedded-core/meta/conf/layer.conf') else '${POKY}'} \
     "
