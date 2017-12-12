@@ -1,11 +1,15 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 
+# remove egl (glimagesink)
+# PACKAGECONFIG_GL ?= "${@bb.utils.contains('DISTRO_FEATURES', 'opengl', 'gles2 egl', '', d)}"
+PACKAGECONFIG_GL = ""
+
 PACKAGECONFIG ?= " \
     ${GSTREAMER_ORC} \
     ${PACKAGECONFIG_GL} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'bluetooth', 'bluez', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'directfb', 'directfb', '', d)} \
-    ${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'wayland egl', '', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'wayland', '', d)} \
     bz2 curl dash hls neon sbc smoothstreaming sndfile uvch264  \
     faac kms\
 "
