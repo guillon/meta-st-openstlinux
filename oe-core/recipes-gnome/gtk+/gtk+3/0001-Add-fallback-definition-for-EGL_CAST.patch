@@ -1,0 +1,40 @@
+From e54611884c95acaf0fd6ed9fbea90ba98a621dc4 Mon Sep 17 00:00:00 2001
+From: Christophe Priouzeau <christophe.priouzeau@st.com>
+Date: Thu, 14 Dec 2017 14:08:03 +0100
+Subject: [PATCH] Add fallback definition for EGL_CAST
+
+The EGL API update from d11104f introduced a dependency on the
+EGL_CAST() macro, provided by an updated eglplatform.h. Given that we
+don't provide eglplatform.h, add a fallback definition for if we're
+building against Mesa 17.0.x or similar.
+
+https://bugs.gentoo.org/show_bug.cgi?id=623926
+---
+ gdk/wayland/gdkglcontext-wayland.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/gdk/wayland/gdkglcontext-wayland.c b/gdk/wayland/gdkglcontext-wayland.c
+index 254900d..99745cf 100644
+--- a/gdk/wayland/gdkglcontext-wayland.c
++++ b/gdk/wayland/gdkglcontext-wayland.c
+@@ -33,6 +33,17 @@
+ 
+ #include "gdkintl.h"
+ 
++#include "EGL/eglplatform.h"
++// Account for older eglplatform.h, which doesn't define
++// the EGL_CAST macro.
++#ifndef EGL_CAST
++#if defined(__cplusplus)
++#define EGL_CAST(type, value) (static_cast<type>(value))
++#else
++#define EGL_CAST(type, value) ((type) (value))
++#endif
++#endif
++
+ G_DEFINE_TYPE (GdkWaylandGLContext, gdk_wayland_gl_context, GDK_TYPE_GL_CONTEXT)
+ 
+ static void gdk_x11_gl_context_dispose (GObject *gobject);
+-- 
+2.7.4
+
