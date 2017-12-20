@@ -35,6 +35,7 @@ RDEPENDS_packagegroup-framework-tools-core-base = "\
     coreutils       \
     libiio-iiod     \
     libiio-tests    \
+    lrzsz           \
     "
 RDEPENDS_packagegroup-framework-tools-core = "\
     grep            \
