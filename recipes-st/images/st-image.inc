@@ -2,6 +2,8 @@ LICENSE = "Proprietary"
 LIC_FILES_CHKSUM = "file://${EULA_FILE_ST};md5=${EULA_FILE_ST_MD5SUM}"
 
 inherit st-image-license-summary
+inherit st-sdk-license-summary
+
 image_copy_image_license() {
     if [ -f ${EULA_FILE_ST} ]; then
         cp ${EULA_FILE_ST} ${IMGDEPLOYDIR}/${IMAGE_NAME}.license
@@ -11,4 +13,14 @@ image_copy_image_license() {
     fi
 }
 IMAGE_POSTPROCESS_COMMAND_prepend = "image_copy_image_license;"
+
+sdk_copy_image_license() {
+    mkdir -p ${SDKDEPLOYDIR}
+    if [ -f ${EULA_FILE_ST} ]; then
+        cp ${EULA_FILE_ST} ${SDKDEPLOYDIR}/${TOOLCHAIN_OUTPUTNAME}.license
+    else
+        bbwarn "Missing 'EULA_FILE_ST' var : no image license copied..."
+    fi
+}
+SDK_POSTPROCESS_COMMAND_prepend = "sdk_copy_image_license;"
 
