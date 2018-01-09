@@ -9,6 +9,7 @@ python write_license_create_summary() {
     if enable_image_license_summary:
         license_create_summary(d)
 }
+
 def license_create_summary(d):
     import re
     tab =  d.expand("${LICENSE_IMAGE_CONTENT_WITH_TAB}")
@@ -642,10 +643,12 @@ def license_create_summary(d):
     html.closefile()
 
     # create link
+    curcwd = os.getcwd()
     os.chdir(temp_deploy_image_dir)
     if os.path.exists("%s-license_content.html" % ref_image_name):
         os.remove("%s-license_content.html" % ref_image_name)
     os.symlink("%s-license_content.html" % ref_image_name_full, "%s-license_content.html" % ref_image_name)
+    os.chdir(curcwd)
 
 IMAGE_POSTPROCESS_COMMAND_append = "write_license_create_summary;"
 
