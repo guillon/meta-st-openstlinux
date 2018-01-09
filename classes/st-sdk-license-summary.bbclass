@@ -326,8 +326,10 @@ def license_sdk_create_summary(d):
         general_DISTRO_CODENAME = None
         contents = None
 
-        with open(console_latest, "r") as console:
-            contents = console.readlines()
+        if os.path.exists(console_latest):
+            with open(console_latest, "r") as console:
+                contents = console.readlines()
+
         for line in contents:
             r = re.compile("([^=]+)=\s*\"(.*)\"")
             m = r.match(line)
@@ -388,8 +390,9 @@ def license_sdk_create_summary(d):
         html.addNewLine()
 
         license_file_to_read = os.path.join(temp_deploy_sdk_dir, "%s.license" % ref_sdk_name_full)
-        with open(license_file_to_read, "r") as lic:
-            contents = lic.readlines()
+        if os.path.exists(license_file_to_read):
+            with open(license_file_to_read, "r") as lic:
+                contents = lic.readlines()
 
         html.startTable()
         html.startRow()
@@ -431,8 +434,9 @@ def license_sdk_create_summary(d):
             html.addNewLine()
 
             file_to_read = temp_deploy_sdk_dir + "/" + _info_file
-            with open(file_to_read, "r") as file_read:
-                contents = file_read.readlines()
+            if os.path.exists(file_to_read):
+                with open(file_to_read, "r") as file_read:
+                    contents = file_read.readlines()
 
             html.addAnchor("%s_binaries"% _info_type)
             html.startTable()
@@ -454,8 +458,9 @@ def license_sdk_create_summary(d):
                     package_file = pkgdata_host_dir + "/runtime-reverse/" + package_name
                 else:
                     package_file = pkgdata_dir + "/runtime-reverse/" + package_name
-                with open(package_file, "r") as file_read:
-                    package_file_content = file_read.readlines()
+                if os.path.exists(package_file):
+                    with open(package_file, "r") as file_read:
+                        package_file_content = file_read.readlines()
                 r = re.compile("([^:]+):\s*(.*)")
                 for line in package_file_content:
                     m = r.match(line)

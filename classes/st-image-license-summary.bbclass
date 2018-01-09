@@ -1,9 +1,13 @@
 # for having tab on html file generated
 LICENSE_IMAGE_CONTENT_WITH_TAB ?= "1"
-IMAGE_SUMMARY_LIST = "st-image-bootfs:#IMAGE#:st-image-userfs"
+IMAGE_SUMMARY_LIST ?= "st-image-bootfs:#IMAGE#:st-image-userfs"
+
+ENABLE_IMAGE_LICENSE_SUMMARY ?= "1"
 
 python write_license_create_summary() {
-    license_create_summary(d)
+    enable_image_license_summary = d.getVar('ENABLE_IMAGE_LICENSE_SUMMARY')
+    if enable_image_license_summary:
+        license_create_summary(d)
 }
 def license_create_summary(d):
     import re
@@ -341,8 +345,10 @@ def license_create_summary(d):
         general_DISTRO_CODENAME = None
         contents = None
 
-        with open(console_latest, "r") as console:
-            contents = console.readlines()
+        if os.path.exists(console_latest):
+            with open(console_latest, "r") as console:
+                contents = console.readlines()
+
         for line in contents:
             r = re.compile("([^=]+)=\s*\"(.*)\"")
             m = r.match(line)
@@ -403,8 +409,9 @@ def license_create_summary(d):
         html.addNewLine()
 
         license_file_to_read = os.path.join(temp_deploy_image_dir, "%s.license" % ref_image_name_full)
-        with open(license_file_to_read, "r") as lic:
-            contents = lic.readlines()
+        if os.path.exists(license_file_to_read):
+            with open(license_file_to_read, "r") as lic:
+                contents = lic.readlines()
 
         html.startTable()
         html.startRow()
@@ -451,16 +458,19 @@ def license_create_summary(d):
         html.addNewLine()
         html.addNewLine()
 
+        boot_file_to_read = None
         # boot binaries
         for img in image_list_arrray:
             _image_prefix = img[0]
             _image_date = img[1]
-            if findWholeWord("bootfs")(_image_prefix):
+
+            if img[2].startswith("#IMAGE#"):
                 _image_package = "image_license.manifest"
                 boot_file_to_read = license_deploy_dir + "/" + _image_prefix + "-" + _image_date + "/" + _image_package
 
-        with open(boot_file_to_read, "r") as file_read:
-            contents = file_read.readlines()
+        if boot_file_to_read and os.path.exists(boot_file_to_read):
+            with open(boot_file_to_read, "r") as file_read:
+                contents = file_read.readlines()
 
         html.addContent("List of packages used during the different boot phases:")
         html.addAnchor("boot_binaries")
@@ -532,8 +542,9 @@ def license_create_summary(d):
             _image_package="package.manifest"
             file_to_read = license_deploy_dir + "/" + _image_prefix + "-" + _image_date + "/" + _image_package
             #print("Process for %s" % _image_prefix)
-            with open(file_to_read, "r") as file_read:
-                contents = file_read.readlines()
+            if os.path.exists(file_to_read):
+                with open(file_to_read, "r") as file_read:
+                    contents = file_read.readlines()
 
             html.startTable()
             html.startRow()
@@ -551,8 +562,9 @@ def license_create_summary(d):
                 package_description = None
                 package_summary = None
                 package_file = pkgdata_dir + "/runtime-reverse/" + package_name
-                with open(package_file, "r") as file_read:
-                    package_file_content = file_read.readlines()
+                if os.path.exists(package_file):
+                    with open(package_file, "r") as file_read:
+                        package_file_content = file_read.readlines()
                 r = re.compile("([^:]+):\s*(.*)")
                 for line in package_file_content:
                     m = r.match(line)
