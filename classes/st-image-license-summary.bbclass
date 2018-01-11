@@ -5,8 +5,7 @@ IMAGE_SUMMARY_LIST ?= "st-image-bootfs:#IMAGE#:st-image-userfs"
 ENABLE_IMAGE_LICENSE_SUMMARY ?= "1"
 
 python write_license_create_summary() {
-    enable_image_license_summary = d.getVar('ENABLE_IMAGE_LICENSE_SUMMARY')
-    if enable_image_license_summary:
+    if d.getVar('ENABLE_IMAGE_LICENSE_SUMMARY') == "1":
         license_create_summary(d)
 }
 
