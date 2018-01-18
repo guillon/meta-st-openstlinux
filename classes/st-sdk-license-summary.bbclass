@@ -22,6 +22,24 @@ def license_sdk_create_summary(d):
     else:
         with_tab = None
 
+    def private_open(filename):
+        result = None
+        if os.path.exists(filename):
+            try:
+                with open(filename, "r") as lic:
+                    result = lic.readlines()
+            except IOError:
+                bb.warn("SDK LIC SUM: Cannot open file %s" % (filename))
+                result = ""
+            except:
+                bb.warn("SDK LIC SUM: Error with file %s" % (filename))
+                result = ""
+        else:
+            bb.warn("SDK LIC SUM: File does not exist with open file %s" % (filename))
+
+            result = ""
+        return result
+
     class HTMLSummaryfile():
         ''' format definition '''
         bold = "font-weight: bold; background-color: #cccccc;"
@@ -326,9 +344,7 @@ def license_sdk_create_summary(d):
         general_DISTRO_CODENAME = None
         contents = None
 
-        if os.path.exists(console_latest):
-            with open(console_latest, "r") as console:
-                contents = console.readlines()
+        contents = private_open(console_latest)
 
         for line in contents:
             r = re.compile("([^=]+)=\s*\"(.*)\"")
@@ -390,9 +406,7 @@ def license_sdk_create_summary(d):
         html.addNewLine()
 
         license_file_to_read = os.path.join(temp_deploy_sdk_dir, "%s.license" % ref_sdk_name_full)
-        if os.path.exists(license_file_to_read):
-            with open(license_file_to_read, "r") as lic:
-                contents = lic.readlines()
+        contents = private_open(license_file_to_read)
 
         html.startTable()
         html.startRow()
@@ -434,9 +448,7 @@ def license_sdk_create_summary(d):
             html.addNewLine()
 
             file_to_read = temp_deploy_sdk_dir + "/" + _info_file
-            if os.path.exists(file_to_read):
-                with open(file_to_read, "r") as file_read:
-                    contents = file_read.readlines()
+            contents = private_open(file_to_read)
 
             html.addAnchor("%s_binaries"% _info_type)
             html.startTable()
@@ -458,9 +470,7 @@ def license_sdk_create_summary(d):
                     package_file = pkgdata_host_dir + "/runtime-reverse/" + package_name
                 else:
                     package_file = pkgdata_dir + "/runtime-reverse/" + package_name
-                if os.path.exists(package_file):
-                    with open(package_file, "r") as file_read:
-                        package_file_content = file_read.readlines()
+                package_file_content = private_open(package_file)
                 r = re.compile("([^:]+):\s*(.*)")
                 for line in package_file_content:
                     m = r.match(line)
