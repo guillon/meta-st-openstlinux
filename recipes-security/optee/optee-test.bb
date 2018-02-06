@@ -27,6 +27,7 @@ EXTRA_OEMAKE += 'CROSS_COMPILE_TA=${TARGET_PREFIX}'
 # refer to optee-os for TA devkit installation path
 EXTRA_OEMAKE += 'TA_DEV_KIT_DIR=${STAGING_INCDIR}/optee/export-ta_arm32'
 EXTRA_OEMAKE += 'OPTEE_CLIENT_EXPORT=${STAGING_EXECPREFIXDIR}'
+EXTRA_OEMAKE += 'TA_DIR=${libdir}/optee_armtz'
 
 CFLAGS_append = " --sysroot=${STAGING_DIR_TARGET} "
 

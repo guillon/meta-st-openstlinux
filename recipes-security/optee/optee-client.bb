@@ -18,6 +18,7 @@ S = "${WORKDIR}/git"
 
 EXTRA_OEMAKE = 'CROSS_COMPILE=${TARGET_PREFIX}'
 EXTRA_OEMAKE += 'CC="${TARGET_PREFIX}gcc --sysroot=${STAGING_DIR_TARGET}"'
+EXTRA_OEMAKE += 'CFG_TEE_CLIENT_LOAD_PATH="${libdir}"'
 
 do_compile() {
     mkdir -p ${D}${exec_prefix}
