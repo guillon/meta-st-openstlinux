@@ -4,7 +4,7 @@ LCONF_VERSION = "7"
 
 BBPATH = "${TOPDIR}"
 BBFILES ?= ""
-OEROOT := "${@os.path.abspath(os.path.dirname(d.getVar('FILE', True)) + '/../..')}"
+OEROOT := "${@os.path.abspath(os.path.dirname(d.getVar('FILE')) + '/../..')}"
 
 #--------------------------
 # Layers var definition for buildsystem

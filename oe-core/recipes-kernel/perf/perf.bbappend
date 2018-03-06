@@ -9,7 +9,7 @@ TASKS_TO_CLEAN  = "do_populate_lic"
 TASKS_TO_CLEAN += "do_patch"
 
 python () {
-    for do_xxx in d.getVar('TASKS_TO_CLEAN', True).split():
+    for do_xxx in d.getVar('TASKS_TO_CLEAN').split():
         # Get depends for do_xxx task
         taskdepends = (d.getVarFlag(do_xxx, 'depends', False) or '').split()
         # Reset depends for do_xxx task
