@@ -160,6 +160,7 @@ RDEPENDS_packagegroup-framework-tools-ui = "\
     ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'xvinfo', '', d)}    \
     ${@bb.utils.contains('DISTRO_FEATURES', 'gplv3', 'glmark2', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'gplv3', 'netdata', '', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'gplv3', 'lmsensors libsensors', '', d)} \
     "
 RDEPENDS_packagegroup-framework-tools-ui-extra = "\
     ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'xvideo-tests', '', d)}  \
