@@ -93,8 +93,6 @@ VIRTUAL-RUNTIME_initscripts = "systemd-compat-units"
 # =========================================================================
 # Preferred version
 # =========================================================================
-# gstreamer configuration
-PREFERRED_VERSION_gst-player ?= "1.8"
 
 # v4l-utils
 #PREFERRED_VERSION_v4l-utils ?= "1.6.2"
