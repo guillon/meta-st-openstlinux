@@ -43,6 +43,7 @@ IMAGE_DISPLAY_PART = " \
 # Display part addons: X11 via Xwayland
 #
 IMAGE_X11_XWAYLAND_DISPLAY_PART = " \
+    weston-xwayland \
     xserver-xorg-xwayland \
     xkbcomp \
     libxcb \
