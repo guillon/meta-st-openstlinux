@@ -1,4 +1,4 @@
-SPLASH_IMG ?=  LOGO_cobranded_OpenSDK.png
+SPLASH_IMG ?= stmicroelectronics_uboot_logo_8bit_png_rotation.png
 
 all: modeset
 

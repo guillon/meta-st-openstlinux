@@ -647,7 +647,7 @@ main (int argc, char **argv)
     /* draw some colors for 5seconds */
     modeset_draw_bgcolor (0xFF, 0xFF, 0xFF);
     splash_draw_image_center (SPLASH_IMG_WIDTH,
-            SPLASH_IMG_WIDTH,
+            SPLASH_IMG_HEIGHT,
             SPLASH_IMG_BYTES_PER_PIXEL,
             SPLASH_IMG_RLE_PIXEL_DATA);
 
