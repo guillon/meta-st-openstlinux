@@ -1,0 +1,30 @@
+From 71be5faf94f9c8cccd76d0d6db7eaa52f8ad261e Mon Sep 17 00:00:00 2001
+From: Nicolas Dufresne <nicolas.dufresne@collabora.com>
+Date: Tue, 21 Nov 2017 23:12:12 -0500
+Subject: [PATCH 04/10] waylandsink: Allocate only what's needed when copying
+
+There was this regression that we'd be using the updated video
+info size instead of default size when initializing the pool.
+
+https://bugzilla.gnome.org/show_bug.cgi?id=790057
+---
+ ext/wayland/gstwaylandsink.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/ext/wayland/gstwaylandsink.c b/ext/wayland/gstwaylandsink.c
+index 97576e0..30f15af 100644
+--- a/ext/wayland/gstwaylandsink.c
++++ b/ext/wayland/gstwaylandsink.c
+@@ -727,6 +727,9 @@ gst_wayland_sink_show_frame (GstVideoSink * vsink, GstBuffer * buffer)
+ 
+         config = gst_buffer_pool_get_config (sink->pool);
+         gst_buffer_pool_config_get_params (config, &caps, NULL, NULL, NULL);
++
++        /* revert back to default strides and offsets */
++        gst_video_info_from_caps (&sink->video_info, caps);
+         gst_buffer_pool_config_set_params (config, caps, sink->video_info.size,
+             2, 0);
+ 
+-- 
+1.9.1
+

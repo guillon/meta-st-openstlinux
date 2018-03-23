@@ -1,0 +1,93 @@
+From 4a85548d06d92195e94928bf766465a3fa81b028 Mon Sep 17 00:00:00 2001
+From: Shinya Saito <ssaito@igel.co.jp>
+Date: Wed, 1 Nov 2017 18:05:26 +0900
+Subject: [PATCH 09/10] waylandsink: Fix memory leak of shm allocator.
+
+gst_allocator_find() needs gst_object_unref() after usage.
+
+https://bugzilla.gnome.org/show_bug.cgi?id=790042
+---
+ ext/wayland/gstwaylandsink.c | 9 +++++++--
+ ext/wayland/wlwindow.c       | 6 +++++-
+ 2 files changed, 12 insertions(+), 3 deletions(-)
+
+diff --git a/ext/wayland/gstwaylandsink.c b/ext/wayland/gstwaylandsink.c
+index b075bf8..d11a1a8 100644
+--- a/ext/wayland/gstwaylandsink.c
++++ b/ext/wayland/gstwaylandsink.c
+@@ -494,18 +494,20 @@ gst_wayland_create_pool (GstWaylandSink * sink, GstCaps * caps)
+   GstBufferPool *pool = NULL;
+   GstStructure *structure;
+   gsize size = sink->video_info.size;
++  GstAllocator *alloc;
+ 
+   pool = g_object_new (gst_wayland_pool_get_type (), NULL);
+ 
+   structure = gst_buffer_pool_get_config (pool);
+   gst_buffer_pool_config_set_params (structure, caps, size, 2, 0);
+-  gst_buffer_pool_config_set_allocator (structure, gst_wl_shm_allocator_get (),
+-      NULL);
+ 
++  alloc = gst_wl_shm_allocator_get ();
++  gst_buffer_pool_config_set_allocator (structure, alloc, NULL);
+   if (!gst_buffer_pool_set_config (pool, structure)) {
+     g_object_unref (pool);
+     pool = NULL;
+   }
++  g_object_unref (alloc);
+ 
+   return pool;
+ }
+@@ -569,6 +571,7 @@ gst_wayland_sink_propose_allocation (GstBaseSink * bsink, GstQuery * query)
+   GstCaps *caps;
+   GstBufferPool *pool = NULL;
+   gboolean need_pool;
++  GstAllocator *alloc;
+ 
+   gst_query_parse_allocation (query, &caps, &need_pool);
+ 
+@@ -580,8 +583,10 @@ gst_wayland_sink_propose_allocation (GstBaseSink * bsink, GstQuery * query)
+     g_object_unref (pool);
+   }
+ 
++  alloc = gst_wl_shm_allocator_get ();
+   gst_query_add_allocation_param (query, gst_wl_shm_allocator_get (), NULL);
+   gst_query_add_allocation_meta (query, GST_VIDEO_META_API_TYPE, NULL);
++  g_object_unref (alloc);
+ 
+   return TRUE;
+ }
+diff --git a/ext/wayland/wlwindow.c b/ext/wayland/wlwindow.c
+index d08ed87..c64c77a 100644
+--- a/ext/wayland/wlwindow.c
++++ b/ext/wayland/wlwindow.c
+@@ -332,6 +332,7 @@ gst_wl_window_update_borders (GstWlWindow * window)
+   GstBuffer *buf;
+   struct wl_buffer *wlbuf;
+   GstWlBuffer *gwlbuf;
++  GstAllocator *alloc;
+ 
+   if (window->no_border_update)
+     return;
+@@ -354,7 +355,9 @@ gst_wl_window_update_borders (GstWlWindow * window)
+   /* draw the area_subsurface */
+   gst_video_info_set_format (&info, format, width, height);
+ 
+-  buf = gst_buffer_new_allocate (gst_wl_shm_allocator_get (), info.size, NULL);
++  alloc = gst_wl_shm_allocator_get ();
++
++  buf = gst_buffer_new_allocate (alloc, info.size, NULL);
+   gst_buffer_memset (buf, 0, 0, info.size);
+   wlbuf =
+       gst_wl_shm_memory_construct_wl_buffer (gst_buffer_peek_memory (buf, 0),
+@@ -365,6 +368,7 @@ gst_wl_window_update_borders (GstWlWindow * window)
+   /* at this point, the GstWlBuffer keeps the buffer
+    * alive and will free it on wl_buffer::release */
+   gst_buffer_unref (buf);
++  g_object_unref (alloc);
+ }
+ 
+ void
+-- 
+1.9.1
+

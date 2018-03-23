@@ -1,0 +1,30 @@
+From 0c97ed71054850eb6aad860c79f5e9071c1e77f4 Mon Sep 17 00:00:00 2001
+From: Nicolas Dufresne <nicolas.dufresne@collabora.com>
+Date: Wed, 6 Dec 2017 20:50:31 -0500
+Subject: [PATCH 10/10] waylandsink: Fix memory leak of shm allocator
+
+This fixes conflict resolution error introduced in commit:
+
+  816d115317c522c87297109de781c63b16146493
+
+http://bugzilla.gnome.org/show_bug.cgi?id=790042
+---
+ ext/wayland/gstwaylandsink.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/ext/wayland/gstwaylandsink.c b/ext/wayland/gstwaylandsink.c
+index d11a1a8..14c0e2f 100644
+--- a/ext/wayland/gstwaylandsink.c
++++ b/ext/wayland/gstwaylandsink.c
+@@ -584,7 +584,7 @@ gst_wayland_sink_propose_allocation (GstBaseSink * bsink, GstQuery * query)
+   }
+ 
+   alloc = gst_wl_shm_allocator_get ();
+-  gst_query_add_allocation_param (query, gst_wl_shm_allocator_get (), NULL);
++  gst_query_add_allocation_param (query, alloc, NULL);
+   gst_query_add_allocation_meta (query, GST_VIDEO_META_API_TYPE, NULL);
+   g_object_unref (alloc);
+ 
+-- 
+1.9.1
+

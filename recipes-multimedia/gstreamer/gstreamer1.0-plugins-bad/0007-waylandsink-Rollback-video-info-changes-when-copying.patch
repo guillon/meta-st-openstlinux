@@ -1,0 +1,47 @@
+From 9a82d7e7af94f575b77cf8eb55ebffe448c9e606 Mon Sep 17 00:00:00 2001
+From: Nicolas Dufresne <nicolas.dufresne@collabora.com>
+Date: Wed, 22 Nov 2017 22:27:04 -0500
+Subject: [PATCH 07/10] waylandsink: Rollback video info changes when copying
+
+We change the video info base on the received buffer. We need to
+rollback these changes whenever we want to copy into our internal
+pool of buffers.
+
+https://bugzilla.gnome.org/show_bug.cgi?id=790057
+---
+ ext/wayland/gstwaylandsink.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/ext/wayland/gstwaylandsink.c b/ext/wayland/gstwaylandsink.c
+index 118391a..e1ff375 100644
+--- a/ext/wayland/gstwaylandsink.c
++++ b/ext/wayland/gstwaylandsink.c
+@@ -632,6 +632,7 @@ gst_wayland_sink_show_frame (GstVideoSink * vsink, GstBuffer * buffer)
+   GstWlBuffer *wlbuffer;
+   GstVideoMeta *vmeta;
+   GstVideoFormat format;
++  GstVideoInfo old_vinfo;
+   GstMemory *mem;
+   struct wl_buffer *wbuf = NULL;
+ 
+@@ -677,6 +678,7 @@ gst_wayland_sink_show_frame (GstVideoSink * vsink, GstBuffer * buffer)
+   /* update video info from video meta */
+   mem = gst_buffer_peek_memory (buffer, 0);
+ 
++  old_vinfo = sink->video_info;
+   vmeta = gst_buffer_get_video_meta (buffer);
+   if (vmeta) {
+     gint i;
+@@ -714,6 +716,9 @@ gst_wayland_sink_show_frame (GstVideoSink * vsink, GstBuffer * buffer)
+       GstVideoFrame src, dst;
+       GstVideoInfo src_info = sink->video_info;
+ 
++      /* rollback video info changes */
++      sink->video_info = old_vinfo;
++
+       /* we don't know how to create a wl_buffer directly from the provided
+        * memory, so we have to copy the data to shm memory that we know how
+        * to handle... */
+-- 
+1.9.1
+

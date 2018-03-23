@@ -1,5 +1,15 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 
+SRC_URI_append = " file://0002-waylandsink-Disable-video-alignment-from-the-pool.patch "
+SRC_URI_append = " file://0003-waylandsink-Only-try-SHM-for-single-memory-buffer.patch "
+SRC_URI_append = " file://0004-waylandsink-Allocate-only-what-s-needed-when-copying.patch "
+SRC_URI_append = " file://0005-waylandsink-Update-video-info-size-to-buffer-size.patch "
+SRC_URI_append = " file://0006-waylandsink-Validate-strides-and-offset-when-using-F.patch "
+SRC_URI_append = " file://0007-waylandsink-Rollback-video-info-changes-when-copying.patch "
+SRC_URI_append = " file://0008-waylandsink-Add-prototype-for-gst_wayand_pool_get_ty.patch "
+SRC_URI_append = " file://0009-waylandsink-Fix-memory-leak-of-shm-allocator.patch "
+SRC_URI_append = " file://0010-waylandsink-Fix-memory-leak-of-shm-allocator.patch "
+
 # remove egl (glimagesink)
 # PACKAGECONFIG_GL ?= "${@bb.utils.contains('DISTRO_FEATURES', 'opengl', 'gles2 egl', '', d)}"
 PACKAGECONFIG_GL = ""
