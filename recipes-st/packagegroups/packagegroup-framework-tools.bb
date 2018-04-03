@@ -81,6 +81,7 @@ RDEPENDS_packagegroup-framework-tools-kernel-base = "\
     evtest          \
     memtester       \
     mtd-utils       \
+    v4l-utils       \
     "
 RDEPENDS_packagegroup-framework-tools-kernel = "\
     pciutils        \
