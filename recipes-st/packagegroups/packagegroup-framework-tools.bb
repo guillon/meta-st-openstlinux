@@ -36,6 +36,7 @@ RDEPENDS_packagegroup-framework-tools-core-base = "\
     libiio-iiod     \
     libiio-tests    \
     lrzsz           \
+    lsb             \
     "
 RDEPENDS_packagegroup-framework-tools-core = "\
     grep            \
@@ -52,7 +53,6 @@ RDEPENDS_packagegroup-framework-tools-core = "\
     ntp             \
     systemtap       \
     gptfdisk        \
-    lsb             \
     "
 RDEPENDS_packagegroup-framework-tools-core-extra = "\
     tslib-calibrate \
