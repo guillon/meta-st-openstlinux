@@ -144,14 +144,14 @@ RDEPENDS_packagegroup-framework-tools-audio-base = "\
     ${@bb.utils.contains('DISTRO_FEATURES', 'alsa', 'alsa-plugins', '', d)} \
     "
 RDEPENDS_packagegroup-framework-tools-audio = "\
-    pulseaudio \
-    pulseaudio-server \
-    pulseaudio-misc \
-    pulseaudio-module-combine-sink \
-    ${@bb.utils.contains('DISTRO_FEATURES', 'bluetooth', 'pulseaudio-module-bluetooth-discover', '', d)} \
-    ${@bb.utils.contains('DISTRO_FEATURES', 'bluetooth', 'pulseaudio-module-bluetooth-policy', '', d)} \
-    ${@bb.utils.contains('DISTRO_FEATURES', 'bluetooth', 'pulseaudio-module-bluez5-device', '', d)} \
-    ${@bb.utils.contains('DISTRO_FEATURES', 'bluetooth', 'pulseaudio-module-bluez5-discover', '', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'pulseaudio', 'pulseaudio', '', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'pulseaudio', 'pulseaudio-server', '', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'pulseaudio', 'pulseaudio-misc', '', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'pulseaudio', 'pulseaudio-module-combine-sink', '', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'pulseaudio bluetooth', 'pulseaudio-module-bluetooth-discover', '', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'pulseaudio bluetooth', 'pulseaudio-module-bluetooth-policy', '', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'pulseaudio bluetooth', 'pulseaudio-module-bluez5-device', '', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'pulseaudio bluetooth', 'pulseaudio-module-bluez5-discover', '', d)} \
     "
 RDEPENDS_packagegroup-framework-tools-audio-extra = "\
     ${@bb.utils.contains('DISTRO_FEATURES', 'alsa', 'alsa-utils-aplay', '', d)} \
