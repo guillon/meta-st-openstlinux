@@ -90,6 +90,8 @@ RDEPENDS_packagegroup-framework-tools-kernel = "\
     dosfstools      \
     mmc-utils       \
     blktool         \
+    \
+    minicoredumper  \
     "
 RDEPENDS_packagegroup-framework-tools-kernel-extra = "\
     latencytop      \
