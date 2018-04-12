@@ -56,6 +56,7 @@ IMAGE_X11_XWAYLAND_DISPLAY_PART = " \
     xeyes \
     xclock \
     xorg-minimal-fonts \
+    libx11 libx11-locale \
     "
 
 IMAGE_X11_DISPLAY_PART = " \
