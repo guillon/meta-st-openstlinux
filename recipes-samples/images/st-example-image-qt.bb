@@ -132,19 +132,25 @@ IMAGE_QT_EXAMPLES_PART = " \
 CORE_IMAGE_EXTRA_INSTALL += " \
     systemd-networkd-configuration \
     \
-    packagegroup-framework-tools-core	    \
-    packagegroup-framework-tools-kernel	    \
+    packagegroup-framework-tools-core-base      \
+    packagegroup-framework-tools-kernel-base    \
+    packagegroup-framework-tools-network-base   \
+    packagegroup-framework-tools-audio-base     \
+    packagegroup-framework-tools-ui-base        \
+    \
+    packagegroup-framework-tools-core       \
+    packagegroup-framework-tools-kernel     \
     packagegroup-framework-tools-network    \
-    packagegroup-framework-tools-audio	    \
-    packagegroup-framework-tools-ui	    \
+    packagegroup-framework-tools-audio      \
+    packagegroup-framework-tools-ui         \
     \
-    packagegroup-core-eclipse-debug	    \
+    packagegroup-core-eclipse-debug         \
     \
     \
-    ${IMAGE_DISPLAY_PART}		    \
-    ${IMAGE_MM_PART}			    \
+    ${IMAGE_DISPLAY_PART}       \
+    ${IMAGE_MM_PART}            \
     \
-    ${IMAGE_QT_MANDATORY_PART}		    \
-    ${IMAGE_QT_OPTIONAL_PART}		    \
-    ${IMAGE_QT_EXAMPLES_PART}		    \
+    ${IMAGE_QT_MANDATORY_PART}  \
+    ${IMAGE_QT_OPTIONAL_PART}   \
+    ${IMAGE_QT_EXAMPLES_PART}   \
     "

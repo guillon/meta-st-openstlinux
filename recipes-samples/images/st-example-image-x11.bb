@@ -72,6 +72,12 @@ CORE_IMAGE_EXTRA_INSTALL += " \
     \
     ${@bb.utils.contains('DISTRO_FEATURES', 'bluetooth', 'bluez5', '', d)} \
     \
+    packagegroup-framework-tools-core-base      \
+    packagegroup-framework-tools-kernel-base    \
+    packagegroup-framework-tools-network-base   \
+    packagegroup-framework-tools-audio-base     \
+    packagegroup-framework-tools-ui-base        \
+    \
     packagegroup-framework-tools-core    \
     packagegroup-framework-tools-kernel  \
     packagegroup-framework-tools-network \

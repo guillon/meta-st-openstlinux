@@ -67,27 +67,32 @@ IMAGE_X11_PART = " \
 # INSTALL addons
 #
 CORE_IMAGE_EXTRA_INSTALL += " \
-    packagegroup-core-x11 \
-    systemd-networkd-configuration \
+    packagegroup-core-x11           \
+    systemd-networkd-configuration  \
     \
-    packagegroup-core-boot \
+    packagegroup-core-boot          \
     \
-    packagegroup-framework-tools-core	    \
-    packagegroup-framework-tools-kernel	    \
+    packagegroup-framework-tools-core-base      \
+    packagegroup-framework-tools-kernel-base    \
+    packagegroup-framework-tools-network-base   \
+    packagegroup-framework-tools-audio-base     \
+    packagegroup-framework-tools-ui-base        \
+    \
+    packagegroup-framework-tools-core       \
+    packagegroup-framework-tools-kernel     \
     packagegroup-framework-tools-network    \
-    packagegroup-framework-tools-audio	    \
-    packagegroup-framework-tools-ui	    \
+    packagegroup-framework-tools-audio      \
+    packagegroup-framework-tools-ui         \
     \
-    packagegroup-core-eclipse-debug	    \
+    packagegroup-core-eclipse-debug         \
     \
     \
-    ${IMAGE_DISPLAY_PART}		    \
-    ${IMAGE_MM_PART}			    \
-    ${IMAGE_X11_PART}		    \
-    ${IMAGE_XFCE_PART}		    \
+    ${IMAGE_DISPLAY_PART}   \
+    ${IMAGE_MM_PART}        \
+    ${IMAGE_X11_PART}       \
+    ${IMAGE_XFCE_PART}      \
     "
 
 EXTRA_USERS_PARAMS = "\
 useradd -p '' st; \
 "
-
