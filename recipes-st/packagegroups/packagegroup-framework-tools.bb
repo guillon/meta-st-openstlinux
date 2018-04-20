@@ -53,6 +53,7 @@ RDEPENDS_packagegroup-framework-tools-core = "\
     ntp             \
     systemtap       \
     gptfdisk        \
+    lsb-openstlinux \
     "
 RDEPENDS_packagegroup-framework-tools-core-extra = "\
     tslib-calibrate \
