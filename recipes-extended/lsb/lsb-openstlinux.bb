@@ -16,3 +16,5 @@ do_install() {
 		printf "LIBGLES1=${PREFERRED_PROVIDER_virtual/libgles1}\n" > ${D}${sysconfdir}/lsb-release.d/graphics-${PV}
 	fi
 }
+
+ALLOW_EMPTY_${PN} = "1"
