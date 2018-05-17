@@ -9,9 +9,9 @@ COMPATIBLE_MACHINE = "(stm32mpcommon)"
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 SRC_URI = "git://github.com/OP-TEE/optee_client.git"
-SRCREV = "09b69afa5e9e74aac39e383d74f14b4d61c90476"
+SRCREV = "3f16662284a69fdec97b1712064be94d1fed7ae7"
 
-PV = "3.0.0"
+PV = "3.1.0"
 PR = "git${SRCPV}.r0"
 
 S = "${WORKDIR}/git"

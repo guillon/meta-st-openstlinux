@@ -5,9 +5,9 @@ LICENSE = "BSD"
 LIC_FILES_CHKSUM = "file://Notice.md;md5=445126761b17c6ff8957f3a3dbf7fa54"
 
 SRC_URI = "git://github.com/OP-TEE/optee_test.git"
-SRCREV = "692efd172e46768d31700b8e4add274454ce8273"
+SRCREV = "45218eb59b006ad20cc7610904f291dd85157a43"
 
-PV = "3.0.0"
+PV = "3.1.0"
 PR = "git${SRCPV}.r0"
 
 S = "${WORKDIR}/git"
