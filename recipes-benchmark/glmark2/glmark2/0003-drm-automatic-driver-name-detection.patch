@@ -1,12 +1,15 @@
-From 69f3a2186233c2b3b34d39f52d511fd98476b06f Mon Sep 17 00:00:00 2001
+From 351f516d7742646f7f3d3647e0b58ac1c04702e3 Mon Sep 17 00:00:00 2001
 From: Christophe Priouzeau <christophe.priouzeau@st.com>
-Date: Tue, 25 Oct 2016 09:37:26 +0200
-Subject: [PATCH] drm: automatic driver name detection
+Date: Fri, 18 May 2018 17:08:52 +0200
+Subject: [PATCH 3/3] drm: automatic driver name detection
 
 Look for the drm driver using udev services.
 
 Signed-off-by: Vincent Abriou <vincent.abriou@st.com>
 ---
+ src/wscript_build | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
 diff --git a/src/wscript_build b/src/wscript_build
 index bc7e04e..e976f8d 100644
 --- a/src/wscript_build
@@ -21,5 +24,7 @@ index bc7e04e..e976f8d 100644
 +  'drm-glesv2' : ['drm', 'gbm', 'udev', 'egl', 'glesv2', 'matrix-glesv2', 'common-glesv2', 'udev'],
    'mir-gl' : ['mirclient', 'egl', 'gl', 'matrix-gl', 'common-gl'],
    'mir-glesv2' : ['mirclient', 'egl', 'glesv2', 'matrix-glesv2', 'common-glesv2'],
-   'wayland-gl' : ['wayland-client', 'wayland-egl', 'egl', 'gl', 'matrix-gl', 'common-gl'],1.9.1
+   'wayland-gl' : ['wayland-client', 'wayland-egl', 'egl', 'gl', 'matrix-gl', 'common-gl'],
+-- 
+2.7.4
 
