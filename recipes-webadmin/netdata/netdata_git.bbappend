@@ -12,6 +12,6 @@ do_install_append() {
 
     install -m 0644 ${WORKDIR}/stm32.html ${D}${datadir}/netdata/web/
     install -m 0644 ${WORKDIR}/python.d.conf ${D}${sysconfdir}/netdata/
-    install -m 0755 ${WORKDIR}/kill_netdata ${D}${bindir}/netdata/
+    install -m 0755 ${WORKDIR}/kill_netdata ${D}${bindir}/
 
 }
