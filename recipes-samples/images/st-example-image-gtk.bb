@@ -83,35 +83,6 @@ IMAGE_GTK_EXAMPLES_PART = " \
     sensors-iks01a2 \
 "
 
-#
-# Python part examples
-IMAGE_PYTHON_PART = " \
-    python3-argparse \
-    python3-datetime \
-    python3-dateutil \
-    python3-distutils \
-    python3-email \
-    python3-enum \
-    python3-fcntl \
-    python3-importlib \
-    python3-io \
-    python3-logging \
-    python3-misc \
-    python3-numbers \
-    python3-pycairo \
-    python3-pygobject \
-    python3-pyparsing \
-    python3-re \
-    python3-readline \
-    python3-shell \
-    python3-signal \
-    python3-stringold \
-    python3-subprocess \
-    python3-textutils \
-    python3-threading \
-    python3-unittest \
-"
-
 # INSTALL addons
 #
 CORE_IMAGE_EXTRA_INSTALL += " \
@@ -128,8 +99,9 @@ CORE_IMAGE_EXTRA_INSTALL += " \
     packagegroup-framework-tools-network        \
     packagegroup-framework-tools-audio          \
     packagegroup-framework-tools-ui             \
+    packagegroup-framework-tools-python         \
     \
-    packagegroup-core-eclipse-debug	            \
+    packagegroup-core-eclipse-debug             \
     \
     \
     ${IMAGE_DISPLAY_PART}                       \

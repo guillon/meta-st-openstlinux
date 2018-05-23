@@ -96,6 +96,7 @@ CORE_IMAGE_EXTRA_INSTALL += " \
     packagegroup-framework-tools-network        \
     packagegroup-framework-tools-audio          \
     packagegroup-framework-tools-ui             \
+    packagegroup-framework-tools-python         \
     \
     ${IMAGE_DISPLAY_PART}                       \
     ${IMAGE_MM_PART}                            \
