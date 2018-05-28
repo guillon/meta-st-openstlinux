@@ -14,8 +14,6 @@ SRC_URI_stm32mp1 = " \
 
 inherit systemd
 
-COMPATIBLE_MACHINE = "(stm32mpcommon)"
-
 do_install_stm32mp1() {
     if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
         install -d ${D}${systemd_unitdir}/system-generators/
