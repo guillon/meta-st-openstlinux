@@ -8,13 +8,22 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/MIT;md5=0835ad
 PV = "1.0"
 PR = "r0"
 
-SRC_URI_stm32mp1 = " \
+SRC_URI = " \
+        file://README-CHECK-GPU \
+    "
+
+SRC_URI_append_stm32mp1 = " \
         file://system-generator-check-gpu \
     "
 
 inherit systemd
 
-do_install_stm32mp1() {
+do_install() {
+    install -d ${D}/home/root/
+    install -m 644 ${WORKDIR}/README-CHECK-GPU ${D}/home/root/
+}
+
+do_install_append_stm32mp1() {
     if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
         install -d ${D}${systemd_unitdir}/system-generators/
 
@@ -22,4 +31,4 @@ do_install_stm32mp1() {
     fi
 }
 
-FILES_${PN} += " ${systemd_unitdir}/system-generators"
+FILES_${PN} += " /home/root ${systemd_unitdir}/system-generators"
