@@ -1,0 +1,11 @@
+[Unit]
+Description=Check GPU presence or not
+Before=weston.service
+After=systemd-remount-fs.service
+
+[Service]
+Type=oneshot
+ExecStart=-/sbin/check-gpu
+
+[Install]
+WantedBy=multi-user.target

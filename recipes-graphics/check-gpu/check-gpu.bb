@@ -13,10 +13,14 @@ SRC_URI = " \
     "
 
 SRC_URI_append_stm32mp1 = " \
-        file://system-generator-check-gpu \
+        file://check-gpu \
+        file://check-gpu.service \
     "
 
 inherit systemd
+SYSTEMD_PACKAGES += "${PN}"
+SYSTEMD_SERVICE_${PN} = "check-gpu.service"
+SYSTEMD_AUTO_ENABLE_${PN} = "enable"
 
 do_install() {
     install -d ${D}/home/root/
@@ -25,9 +29,10 @@ do_install() {
 
 do_install_append_stm32mp1() {
     if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
-        install -d ${D}${systemd_unitdir}/system-generators/
-
-        install -m 755 ${WORKDIR}/system-generator-check-gpu ${D}${systemd_unitdir}/system-generators/
+        install -d ${D}${systemd_unitdir}/system ${D}${base_sbindir}
+        
+        install -m 0644 ${WORKDIR}/check-gpu.service ${D}${systemd_unitdir}/system
+        install -m 755 ${WORKDIR}/check-gpu ${D}${base_sbindir}
     fi
 }
 
