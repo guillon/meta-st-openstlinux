@@ -3,7 +3,7 @@
 #
 #          FILE: system-generator-check-gpu
 #
-#   DESCRIPTION: The goal are to detect if the gpu are present/loaded or not 
+#   DESCRIPTION: The goal are to detect if the gpu are present/loaded or not
 #  ORGANIZATION: STMicroelectronics
 #     COPYRIGHT: Copyright (C) 2018, STMicroelectronics - All Rights Reserved
 #===============================================================================
