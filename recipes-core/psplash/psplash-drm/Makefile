@@ -8,7 +8,7 @@ generate_header: $(SPLASH_IMG)
 	@(sed -e "s/MY_PIXBUF/SPLASH_IMG/g" -e "s/guint8/uint8_t/g" image_header.tmp > image_header.h && rm image_header.tmp)
 
 psplash:
-	$(CC) $(CFLAGS) $(LDFLAGS) -o psplash-drm basic_splash_drm.c -I. `pkg-config --cflags --libs libdrm` -Wall -O0 -g
+	$(CC) $(CFLAGS) $(LDFLAGS) -o psplash-drm basic_splash_drm.c -I. `pkg-config --cflags --libs libdrm` -Wall -Os
 
 clean:
 	rm -rf psplash-drm
