@@ -12,5 +12,5 @@ PREFERRED_PROVIDER_console-tools = "kbd"
 #--------------------------
 # Preferred provider
 # splash
-SPLASH = "psplash-drm"
-PREFERRED_PROVIDER_virtual/psplash = "psplash-drm"
+SPLASH = "${@bb.utils.contains('COMBINED_FEATURES', 'splashscreen', 'psplash-drm', '', d)}"
+PREFERRED_PROVIDER_virtual/psplash = "${@bb.utils.contains('COMBINED_FEATURES', 'splashscreen', 'psplash-drm', '', d)}"

@@ -72,6 +72,9 @@ DISTRO_FEATURES_append = " gstreamer "
 # add support of optee
 DISTRO_FEATURES_append = " optee "
 
+# add support of splashscreen
+DISTRO_FEATURES_append = " splashscreen "
+
 # add support of wayland
 DISTRO_FEATURES_append = " wayland pam "
 
