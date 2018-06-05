@@ -50,9 +50,7 @@ static int modeset_prepare (int fd);
 static void modeset_draw_bgcolor (uint8_t r_p, uint8_t g_p, uint8_t b_p);
 static void modeset_cleanup (int fd);
 
-static void splash_draw_image_center (int img_witdh, int img_height,
-        int img_bytes_per_pixel,
-        uint8_t * rle_data);
+static void splash_draw_image_center (void);
 
 
 //-------------------------------
@@ -458,15 +456,28 @@ splash_draw_image_for_modeset (struct modeset_dev *iter,
 
 
 static void
-splash_draw_image_center (int img_width,
-        int img_height,
-        int img_bytes_per_pixel,
-        uint8_t * rle_data)
+splash_draw_image_center (void)
 {
     struct modeset_dev *iter;
+    int img_width, img_height, img_bytes_per_pixel;
+    uint8_t *rle_data;
     int x, y;
 
     for (iter = modeset_list; iter; iter = iter->next) {
+        if (iter->width >= iter->height) {
+            /* Default mode is landscape, ie. use image with no rotation */
+            img_width = SPLASH_IMG_WIDTH;
+            img_height = SPLASH_IMG_HEIGHT;
+            img_bytes_per_pixel = SPLASH_IMG_BYTES_PER_PIXEL;
+            rle_data = SPLASH_IMG_RLE_PIXEL_DATA;
+        } else {
+            /* Else portrait, ie. use image with 90 degree rotation */
+            img_width = SPLASH_IMG_ROT_WIDTH;
+            img_height = SPLASH_IMG_ROT_HEIGHT;
+            img_bytes_per_pixel = SPLASH_IMG_ROT_BYTES_PER_PIXEL;
+            rle_data = SPLASH_IMG_ROT_RLE_PIXEL_DATA;
+        }
+
         x = (iter->width - img_width) / 2;
         y = (iter->height - img_height) / 2;
         splash_draw_image_for_modeset (iter, x, y, img_width, img_height,
@@ -646,10 +657,7 @@ main (int argc, char **argv)
 
     /* draw some colors for 5seconds */
     modeset_draw_bgcolor (0xFF, 0xFF, 0xFF);
-    splash_draw_image_center (SPLASH_IMG_WIDTH,
-            SPLASH_IMG_HEIGHT,
-            SPLASH_IMG_BYTES_PER_PIXEL,
-            SPLASH_IMG_RLE_PIXEL_DATA);
+    splash_draw_image_center ();
 
     splash_processing ();
 
