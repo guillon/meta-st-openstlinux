@@ -5,9 +5,9 @@ LICENSE = "BSD"
 LIC_FILES_CHKSUM = "file://Notice.md;md5=445126761b17c6ff8957f3a3dbf7fa54"
 
 SRC_URI = "git://github.com/OP-TEE/optee_test.git"
-SRCREV = "45218eb59b006ad20cc7610904f291dd85157a43"
+SRCREV = "3ff36f5d06984b121d9857a552993864ea56ad0c"
 
-PV = "3.1.0"
+PV = "3.1.0+"
 PR = "git${SRCPV}.r0"
 
 S = "${WORKDIR}/git"
@@ -26,6 +26,7 @@ EXTRA_OEMAKE = 'CROSS_COMPILE_HOST=${TARGET_PREFIX}'
 EXTRA_OEMAKE += 'CROSS_COMPILE_TA=${TARGET_PREFIX}'
 # refer to optee-os for TA devkit installation path
 EXTRA_OEMAKE += 'TA_DEV_KIT_DIR=${STAGING_INCDIR}/optee/export-ta_arm32'
+EXTRA_OEMAKE += 'COMPILE_NS_USER=32'
 EXTRA_OEMAKE += 'OPTEE_CLIENT_EXPORT=${STAGING_EXECPREFIXDIR}'
 EXTRA_OEMAKE += 'TA_DIR=${libdir}/optee_armtz'
 
