@@ -88,7 +88,8 @@ DISTRO_FEATURES_append = " systemd "
 #DISTRO_FEATURES_append = " tpm "
 
 # Disabling pulseaudio
-DISTRO_FEATURES_BACKFILL_CONSIDERED += "pulseaudio"
+#DISTRO_FEATURES_BACKFILL_CONSIDERED += "pulseaudio"
+DISTRO_FEATURES_append = "pulseaudio"
 
 # Disabling sysvinit
 DISTRO_FEATURES_BACKFILL_CONSIDERED += "sysvinit"
