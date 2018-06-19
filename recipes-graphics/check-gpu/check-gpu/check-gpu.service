@@ -1,7 +1,7 @@
 [Unit]
 Description=Check GPU presence or not
 Before=weston.service
-After=systemd-remount-fs.service
+After=systemd-remount-fs.service  nss-user-lookup.target
 
 [Service]
 Type=oneshot
