@@ -4,6 +4,8 @@ SRC_URI_append = " file://stm32.html "
 SRC_URI_append = " file://python.d.conf "
 SRC_URI_append = " file://kill_netdata "
 
+# force to not start netdata service
+SYSTEMD_AUTO_ENABLE_${PN} = "disable"
 
 do_install_append() {
     install -d ${D}${sysconfdir}/netdata
