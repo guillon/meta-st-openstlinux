@@ -1,17 +1,19 @@
 #!/bin/sh -
 #===============================================================================
 #
-#          FILE: mount-bootfs-userfs.sh
+#          FILE: mount-partitions.sh
 #
-#         USAGE: ./mount-bootfs-userfs.sh [start|stop]
+#         USAGE: ./mount-partitions.sh [start|stop]
 #
-#   DESCRIPTION: mount hte bootfs and userfs partition
+#   DESCRIPTION: mount partitions
 
 #  ORGANIZATION: STMicroelectronics
 #     COPYRIGHT: Copyright (C) 2018, STMicroelectronics - All Rights Reserved
 #       CREATED: 01/09/2018 13:36
 #      REVISION:  ---
 #===============================================================================
+
+MOUNT_PARTITIONS_LIST=""
 
 get_type() {
     local  __resultvar=$1
@@ -99,31 +101,28 @@ found_devices() {
 }
 
 case "$1" in
-  start)
-    # mount bootfs and userfs
-    get_type TYPE
-    echo "TYPE of support detected: $TYPE"
-    found_devices DEVICE_BOOT DEVICE_OPTION $TYPE boot
-    found_devices DEVICE_USERFS DEVICE_OPTION $TYPE userfs
-    echo "Boot device:   $DEVICE_BOOT"
-    echo "Userfs device: $DEVICE_USERFS"
-
-    if [ -e $DEVICE_BOOT ];
-    then
-        mount $DEVICE_OPTION $DEVICE_BOOT /boot
-    fi
-    if [ -e $DEVICE_USERFS ];
-    then
-        mount $DEVICE_OPTION $DEVICE_USERFS /usr/local
-    fi
-    ;;
-  stop)
-    # umount bootfs and userfs
-    umount /boot
-    umount /usr/local/
-    ;;
-   *)
-       echo "Usage: $0 [start|stop]"
-    ;;
+    start)
+        # mount partitions
+        get_type TYPE
+        echo "TYPE of support detected: $TYPE"
+        for part in $MOUNT_PARTITIONS_LIST
+        do
+            part_label=$(echo $part | cut -d';' -f1)
+            mountpoint=$(echo $part | cut -d';' -f2)
+            found_devices DEVICE DEVICE_OPTION $TYPE $part_label
+            echo "$part_label device: $DEVICE"
+            [ -e $DEVICE ] && mount $DEVICE_OPTION $DEVICE $mountpoint
+        done
+        ;;
+    stop)
+        # umount partitions
+        for part in $MOUNT_PARTITIONS_LIST
+        do
+            mountpoint=$(echo $part | cut -d';' -f2)
+            umount $mountpoint
+        done
+        ;;
+    *)
+        echo "Usage: $0 [start|stop]"
+        ;;
 esac
-
