@@ -107,8 +107,8 @@ case "$1" in
         echo "TYPE of support detected: $TYPE"
         for part in $MOUNT_PARTITIONS_LIST
         do
-            part_label=$(echo $part | cut -d';' -f1)
-            mountpoint=$(echo $part | cut -d';' -f2)
+            part_label=$(echo $part | cut -d',' -f1)
+            mountpoint=$(echo $part | cut -d',' -f2)
             found_devices DEVICE DEVICE_OPTION $TYPE $part_label
             echo "$part_label device: $DEVICE"
             [ -e $DEVICE ] && mount $DEVICE_OPTION $DEVICE $mountpoint
@@ -118,7 +118,7 @@ case "$1" in
         # umount partitions
         for part in $MOUNT_PARTITIONS_LIST
         do
-            mountpoint=$(echo $part | cut -d';' -f2)
+            mountpoint=$(echo $part | cut -d',' -f2)
             umount $mountpoint
         done
         ;;
