@@ -27,6 +27,7 @@ IMAGE_MM_PART = " \
     tiff \
     libv4l \
     rc-keymaps \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'opengl', 'kmscube', '', d)} \
     "
 
 #
