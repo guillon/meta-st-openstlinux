@@ -15,7 +15,7 @@ index df42fc3..6981fb2 100644
  [Unit]
  Description=Sound Service
 +Requires=dbus.service
-+After=dbus.service
++After=dbus.service weston.service
  
  [Service]
  # Note that notify will only work if --daemonize=no
