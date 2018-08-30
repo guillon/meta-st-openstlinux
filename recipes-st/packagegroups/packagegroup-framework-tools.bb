@@ -117,7 +117,7 @@ RDEPENDS_packagegroup-framework-tools-network-base = "\
     "
 RDEPENDS_packagegroup-framework-tools-network = "\
     tcpdump         \
-    iptables        \
+    packagegroup-core-full-cmdline-extended \
     ${@bb.utils.contains('DISTRO_FEATURES', 'wifi', 'hostap-utils', '', d)}    \
     ${@bb.utils.contains('DISTRO_FEATURES', 'wifi', 'iw', '', d)}              \
     ${@bb.utils.contains('DISTRO_FEATURES', 'wifi', 'wireless-tools', '', d)}  \
