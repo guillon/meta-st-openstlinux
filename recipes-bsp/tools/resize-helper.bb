@@ -4,7 +4,6 @@
 # Tools extracted from 96boards-tools https://github.com/96boards/96boards-tools
 DESCRIPTION = "Tools for resizing the file system"
 SECTION = "devel"
-PR = "r0"
 
 LICENSE = "GPLv2+"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/GPL-2.0;md5=801f80980d171dd6425610833a22dbe6"

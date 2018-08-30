@@ -7,8 +7,7 @@ LIC_FILES_CHKSUM = "file://Notice.md;md5=445126761b17c6ff8957f3a3dbf7fa54"
 SRC_URI = "git://github.com/OP-TEE/optee_test.git"
 SRCREV = "3ff36f5d06984b121d9857a552993864ea56ad0c"
 
-PV = "3.1.0+"
-PR = "git${SRCPV}.r0"
+PV = "3.1.0+git${SRCPV}"
 
 S = "${WORKDIR}/git"
 

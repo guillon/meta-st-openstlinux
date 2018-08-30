@@ -7,8 +7,6 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/MIT;md5=0835ad
 
 RDEPENDS_${PN} += " util-linux "
 
-PR = "r0"
-
 MOUNT_BASENAME = "mount-partitions"
 
 SRC_URI = " \

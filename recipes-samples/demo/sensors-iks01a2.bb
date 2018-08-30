@@ -4,8 +4,6 @@ DESCRIPTION = "Python script which monitor temperature from sensor on Nucleo ext
 LICENSE = "Proprietary"
 LIC_FILES_CHKSUM = "file://${OPENSTLINUX_BASE}/files/licenses/ST-Proprietary;md5=7cb1e55a9556c7dd1a3cae09db9cc85f"
 
-PR = "r0"
-
 SRC_URI = " \
     file://sensors_temperature.py \
     \

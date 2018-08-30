@@ -4,7 +4,6 @@ HOMEPAGE = "www.st.com"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384361b4de20420"
 DEPENDS = ""
-PR = "r0"
 
 SRC_URI = " \
     file://qt-eglfs.sh \
