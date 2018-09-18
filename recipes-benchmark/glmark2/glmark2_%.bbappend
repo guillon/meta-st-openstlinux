@@ -1,9 +1,10 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 
 DEPENDS += " udev "
-SRC_URI_append = " file://0003-drm-automatic-driver-name-detection.patch \
-		   file://0001-NativeStateDRM-add-stm-driver-in-module-list.patch \
-		   file://0001-NativeStateDRM-Set-a-default-encoder-for-not-connect.patch "
+
+SRC_URI_remove = "file://0001-Fix-clang-warnings.patch"
+
+SRCREV = "5e0e448ca2c3a37c0b2c7794bcd73a700f79aa4f"
 
 PACKAGECONFIG = "${@bb.utils.contains('DISTRO_FEATURES', 'x11 opengl', 'x11-gl x11-gles2', '', d)} \
                  ${@bb.utils.contains('DISTRO_FEATURES', 'wayland opengl', 'wayland-gles2', '', d)} \
