@@ -23,9 +23,7 @@ SOURCE_MIRROR_URL ??= "${YOCTOPROJECT_MIRROR_URL}"
 # using the same syntax as for SRC_URI. If the variable is not set
 # the check is skipped
 #
-CONNECTIVITY_CHECK_URIS ?= " \
-    https://eula-downloads.yoctoproject.org/index.php \
-    http://bugzilla.yoctoproject.org/report.cgi"
+CONNECTIVITY_CHECK_URIS ?= "https://www.example.com/"
 
 #--------------------------
 # OELAYOUT_ABI allows us to notify users when the format of TMPDIR changes in
