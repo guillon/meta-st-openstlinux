@@ -6,7 +6,9 @@ SRC_URI += " \
             file://ST_1366x768.png \
             file://weston.sh \
             file://weston_profile.sh \
+            file://README-CHECK-GPU \
             "
+SRC_URI_append_stm32mp1 = " file://check-gpu "
 
 FILES_${PN} += " ${datadir}/weston \
          ${systemd_system_unitdir}/weston.service \
@@ -38,4 +40,21 @@ do_install_append() {
         # uncomment modules line for support of xwayland
         sed -i -e 's,#modules=xwayland.so,modules=xwayland.so,g' ${D}${sysconfdir}/xdg/weston/weston.ini
     fi
+
+    # check GPU
+    install -d ${D}/home/root/
+    install -m 644 ${WORKDIR}/README-CHECK-GPU ${D}/home/root/
+    if ! test -f ${D}${base_sbindir}/check-gpu; then
+        install -d ${D}${base_sbindir}
+        echo "" > ${WORKDIR}/check-gpu.empty
+        install -m 755 ${WORKDIR}/check-gpu.empty ${D}${base_sbindir}/check-gpu
+    fi
 }
+
+do_install_append_stm32mp1() {
+    if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
+        install -d ${D}${base_sbindir}
+        install -m 755 ${WORKDIR}/check-gpu ${D}${base_sbindir}
+    fi
+}
+
