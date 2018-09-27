@@ -12,19 +12,24 @@ PACKAGES = "\
     packagegroup-framework-tools-network-base \
     packagegroup-framework-tools-audio-base \
     packagegroup-framework-tools-ui-base \
+    packagegroup-framework-tools-python2-base \
+    packagegroup-framework-tools-python3-base \
     \
     packagegroup-framework-tools-core \
     packagegroup-framework-tools-kernel \
     packagegroup-framework-tools-network \
     packagegroup-framework-tools-audio \
     packagegroup-framework-tools-ui \
-    packagegroup-framework-tools-python \
+    packagegroup-framework-tools-python2 \
+    packagegroup-framework-tools-python3 \
     \
     packagegroup-framework-tools-core-extra \
     packagegroup-framework-tools-kernel-extra \
     packagegroup-framework-tools-network-extra \
     packagegroup-framework-tools-audio-extra \
     packagegroup-framework-tools-ui-extra \
+    packagegroup-framework-tools-python2-extra \
+    packagegroup-framework-tools-python3-extra \
     "
 
 PROVIDES = "${PACKAGES}"
@@ -58,20 +63,12 @@ RDEPENDS_packagegroup-framework-tools-core = "\
     "
 RDEPENDS_packagegroup-framework-tools-core-extra = "\
     tslib-calibrate \
-    pointercal \
+    pointercal      \
     \
-    acl \
-    bzip2 \
-    cronie \
-    rng-tools \
-    \
-    python-lxml \
-    python-modules \
-    python-nose \
-    python-pkgutil \
-    python-pytest \
-    python-setuptools \
-    python-unittest \
+    acl             \
+    bzip2           \
+    cronie          \
+    rng-tools       \
     "
 
 RDEPENDS_packagegroup-framework-tools-kernel-base = "\
@@ -129,7 +126,7 @@ RDEPENDS_packagegroup-framework-tools-network = "\
     "
 RDEPENDS_packagegroup-framework-tools-network-extra = "\
     iperf3          \
-    netperf          \
+    netperf         \
     bridge-utils    \
     vlan            \
     libnl           \
@@ -174,7 +171,24 @@ RDEPENDS_packagegroup-framework-tools-ui-extra = "\
     ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'gtkperf', '', d)}   \
     "
 
-RDEPENDS_packagegroup-framework-tools-python = "\
+RDEPENDS_packagegroup-framework-tools-python2-base = "\
+    "
+RDEPENDS_packagegroup-framework-tools-python2 = "\
+      \
+    "
+RDEPENDS_packagegroup-framework-tools-python2-extra = "\
+    python-lxml         \
+    python-modules      \
+    python-nose         \
+    python-pkgutil      \
+    python-pytest       \
+    python-setuptools   \
+    python-unittest     \
+    "
+
+RDEPENDS_packagegroup-framework-tools-python3-base = "\
+    "
+RDEPENDS_packagegroup-framework-tools-python3 = "\
     python3-argparse    \
     python3-datetime    \
     python3-dateutil    \
@@ -200,5 +214,8 @@ RDEPENDS_packagegroup-framework-tools-python = "\
     python3-threading   \
     python3-unittest    \
     python3-pyyaml      \
+    "
+RDEPENDS_packagegroup-framework-tools-python3-extra = "\
+    python3-pytest    \
     "
 

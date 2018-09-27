@@ -39,6 +39,8 @@ CORE_IMAGE_EXTRA_INSTALL += " \
     packagegroup-framework-tools-network-base   \
     packagegroup-framework-tools-audio-base     \
     packagegroup-framework-tools-ui-base        \
+    packagegroup-framework-tools-python2-base   \
+    packagegroup-framework-tools-python3-base   \
     \
     ${IMAGE_DISPLAY_PART}                       \
     ${IMAGE_OPTEE_PART}                         \
