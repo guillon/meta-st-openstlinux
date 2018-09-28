@@ -180,6 +180,7 @@ RDEPENDS_packagegroup-framework-tools-python2-extra = "\
     python-lxml         \
     python-modules      \
     python-nose         \
+    python-pip          \
     python-pkgutil      \
     python-pytest       \
     python-setuptools   \
@@ -216,6 +217,7 @@ RDEPENDS_packagegroup-framework-tools-python3 = "\
     python3-pyyaml      \
     "
 RDEPENDS_packagegroup-framework-tools-python3-extra = "\
-    python3-pytest    \
+    python3-pip         \
+    python3-pytest      \
     "
 
