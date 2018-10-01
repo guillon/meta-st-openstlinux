@@ -16,6 +16,9 @@ func_ms=mass_storage.0
 VENDOR_ID="0x1d6b"
 PRODUCT_ID="0x0104"
 
+IP="192.168.7.2"
+NETMASK="255.255.255.0"
+
 do_start() {
   if [ ! -d ${configfs} ]; then
     modprobe libcomposite
@@ -91,11 +94,20 @@ do_start() {
 
   sleep 0.2
 
-  ifup usb0
+  if [ -e /etc/network/interfaces ]; then
+    ifup usb0
+  else
+	ifconfig usb0 $IP $NETMASK
+	ifconfig usb0 up
+  fi
 }
 
 do_stop() {
-  ifdown usb0
+  if [ -e /etc/network/interfaces ]; then
+    ifdown usb0
+  else
+    ifconfig usb0 down
+  fi
 
   sleep 0.2
 
