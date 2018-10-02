@@ -15,7 +15,9 @@ FILES_${PN} += " ${datadir}/weston \
          ${sbindir}/weston.sh \
          ${sysconfdir}/etc/profile.d \
          ${sysconfdir}/xdg/weston/weston.ini \
+         /home/root \
          "
+
 CONFFILES_${PN} += "${sysconfdir}/xdg/weston/weston.ini"
 
 do_install_append() {
