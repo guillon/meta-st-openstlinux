@@ -94,20 +94,12 @@ do_start() {
 
   sleep 0.2
 
-  if [ -e /etc/network/interfaces ]; then
-    ifup usb0
-  else
-	ifconfig usb0 $IP $NETMASK
-	ifconfig usb0 up
-  fi
+  ifconfig usb0 $IP $NETMASK
+  ifconfig usb0 up
 }
 
 do_stop() {
-  if [ -e /etc/network/interfaces ]; then
-    ifdown usb0
-  else
-    ifconfig usb0 down
-  fi
+  ifconfig usb0 down
 
   sleep 0.2
 
