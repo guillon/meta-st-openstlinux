@@ -2,9 +2,8 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}/:"
 
 PACKAGECONFIG ?= " \
     ${GSTREAMER_ORC} \
-    ${@bb.utils.contains('DISTRO_FEATURES', 'pulseaudio', 'pulseaudio', '', d)} \
-    ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'x11', '', d)} \
-    cairo flac gdk-pixbuf gudev jpeg libpng soup speex taglib v4l2 \
+    ${@bb.utils.filter('DISTRO_FEATURES', 'pulseaudio x11', d)} \
+    bz2 cairo flac gdk-pixbuf gudev jpeg lame libpng mpg123 soup speex taglib v4l2 zlib \
     libv4l2 \
 "
 
