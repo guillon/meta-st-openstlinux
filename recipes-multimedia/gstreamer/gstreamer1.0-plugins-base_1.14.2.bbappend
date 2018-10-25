@@ -2,9 +2,10 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}/:"
 
 PACKAGECONFIG ?= " \
     ${GSTREAMER_ORC} \
-    ${@bb.utils.contains('DISTRO_FEATURES', 'alsa', 'alsa', '', d)} \
-    ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'x11', '', d)} \
-    ivorbis ogg pango theora vorbis \
+    ${PACKAGECONFIG_GL} \
+    ${@bb.utils.filter('DISTRO_FEATURES', 'alsa x11', d)} \
+    gio-unix-2.0 jpeg ogg pango png theora vorbis zlib \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'wayland egl', '', d)} \
     encoding \
 "
 
