@@ -1,7 +1,7 @@
-From 3e4388dda4b141d8b45e76551728d03212024896 Mon Sep 17 00:00:00 2001
-From: Nicolas Dufresne <nicolas.dufresne@collabora.com>
-Date: Tue, 21 Nov 2017 23:11:02 -0500
-Subject: [PATCH 03/10] waylandsink: Only try SHM for single memory buffer
+From ec238da5087aafd8f4067f24687d162ab8b756ee Mon Sep 17 00:00:00 2001
+From: Christophe Priouzeau <christophe.priouzeau@st.com>
+Date: Fri, 18 May 2018 17:20:12 +0200
+Subject: [PATCH 2/7] waylandsink: Only try SHM for single memory buffer
 
 https://bugzilla.gnome.org/show_bug.cgi?id=790057
 ---
@@ -9,10 +9,10 @@ https://bugzilla.gnome.org/show_bug.cgi?id=790057
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/ext/wayland/gstwaylandsink.c b/ext/wayland/gstwaylandsink.c
-index 237deac..97576e0 100644
+index 466eadd..a22ef9b 100644
 --- a/ext/wayland/gstwaylandsink.c
 +++ b/ext/wayland/gstwaylandsink.c
-@@ -705,7 +705,7 @@ gst_wayland_sink_show_frame (GstVideoSink * vsink, GstBuffer * buffer)
+@@ -709,7 +709,7 @@ gst_wayland_sink_show_frame (GstVideoSink * vsink, GstBuffer * buffer)
    }
  
    if (!wbuf && gst_wl_display_check_format_for_shm (sink->display, format)) {
@@ -22,5 +22,5 @@ index 237deac..97576e0 100644
            &sink->video_info);
      } else {
 -- 
-1.9.1
+2.7.4
 

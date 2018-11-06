@@ -1,15 +1,14 @@
-From caca052580f83b87b705466fbb576ca09a2eb528 Mon Sep 17 00:00:00 2001
-From: Nicolas Dufresne <nicolas.dufresne@collabora.com>
-Date: Sat, 25 Nov 2017 20:06:57 -0500
-Subject: [PATCH 08/10] waylandsink: Add prototype for
- gst_wayand_pool_get_type()
+From bf2f91f22c0146ed27560b71dd6ba25b6e8b3243 Mon Sep 17 00:00:00 2001
+From: Christophe Priouzeau <christophe.priouzeau@st.com>
+Date: Fri, 18 May 2018 17:28:11 +0200
+Subject: [PATCH 7/7] waylandsink: Add prototype for gst_wayand_pool_get_type()
 
 ---
  ext/wayland/gstwaylandsink.c | 3 +++
  1 file changed, 3 insertions(+)
 
 diff --git a/ext/wayland/gstwaylandsink.c b/ext/wayland/gstwaylandsink.c
-index e1ff375..b075bf8 100644
+index b70e74e..84f67e9 100644
 --- a/ext/wayland/gstwaylandsink.c
 +++ b/ext/wayland/gstwaylandsink.c
 @@ -126,6 +126,9 @@ G_DEFINE_TYPE_WITH_CODE (GstWaylandSink, gst_wayland_sink, GST_TYPE_VIDEO_SINK,
@@ -23,5 +22,5 @@ index e1ff375..b075bf8 100644
  {
    GstVideoBufferPool parent;
 -- 
-1.9.1
+2.7.4
 

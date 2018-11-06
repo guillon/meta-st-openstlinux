@@ -1,7 +1,7 @@
-From 6b3fe845f90032dca0f0fa752da9d0199c0a0066 Mon Sep 17 00:00:00 2001
-From: Nicolas Dufresne <nicolas.dufresne@collabora.com>
-Date: Tue, 21 Nov 2017 23:17:14 -0500
-Subject: [PATCH 05/10] waylandsink: Update video info size to buffer size
+From 3c5fd8fb3d36f171ce8615e9d96cead746b1b6c6 Mon Sep 17 00:00:00 2001
+From: Christophe Priouzeau <christophe.priouzeau@st.com>
+Date: Fri, 18 May 2018 17:22:39 +0200
+Subject: [PATCH 4/7] waylandsink: Update video info size to buffer size
 
 We where setting the size to the first memory size, this may be
 too small in case we received a buffer with multiple memory.
@@ -12,10 +12,10 @@ https://bugzilla.gnome.org/show_bug.cgi?id=790057
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/ext/wayland/gstwaylandsink.c b/ext/wayland/gstwaylandsink.c
-index 30f15af..ed5acfa 100644
+index 7597521..25c1041 100644
 --- a/ext/wayland/gstwaylandsink.c
 +++ b/ext/wayland/gstwaylandsink.c
-@@ -685,7 +685,7 @@ gst_wayland_sink_show_frame (GstVideoSink * vsink, GstBuffer * buffer)
+@@ -689,7 +689,7 @@ gst_wayland_sink_show_frame (GstVideoSink * vsink, GstBuffer * buffer)
        sink->video_info.offset[i] = vmeta->offset[i];
        sink->video_info.stride[i] = vmeta->stride[i];
      }
@@ -25,5 +25,5 @@ index 30f15af..ed5acfa 100644
  
    GST_LOG_OBJECT (sink, "buffer %p does not have a wl_buffer from our "
 -- 
-1.9.1
+2.7.4
 

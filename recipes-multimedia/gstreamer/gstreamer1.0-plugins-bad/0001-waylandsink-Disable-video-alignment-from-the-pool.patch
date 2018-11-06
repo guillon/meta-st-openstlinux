@@ -1,7 +1,7 @@
-From 9d80d12eecd591b644a1837604d9c53617a66619 Mon Sep 17 00:00:00 2001
-From: Nicolas Dufresne <nicolas.dufresne@collabora.com>
-Date: Mon, 20 Nov 2017 21:09:28 -0500
-Subject: [PATCH 02/10] waylandsink: Disable video-alignment from the pool
+From e490886d42ea9821582805049311fbe2d3653052 Mon Sep 17 00:00:00 2001
+From: Christophe Priouzeau <christophe.priouzeau@st.com>
+Date: Fri, 18 May 2018 17:19:13 +0200
+Subject: [PATCH 1/7] waylandsink: Disable video-alignment from the pool
 
 The SHM interface does not allow passing arbitrary strides and offsets,
 for this reason, we simply disable this feature from the proposed pool.
@@ -15,7 +15,7 @@ https://bugzilla.gnome.org/show_bug.cgi?id=790057
  1 file changed, 37 insertions(+), 1 deletion(-)
 
 diff --git a/ext/wayland/gstwaylandsink.c b/ext/wayland/gstwaylandsink.c
-index 46a710f..237deac 100644
+index dc5a064..466eadd 100644
 --- a/ext/wayland/gstwaylandsink.c
 +++ b/ext/wayland/gstwaylandsink.c
 @@ -121,6 +121,42 @@ G_DEFINE_TYPE_WITH_CODE (GstWaylandSink, gst_wayland_sink, GST_TYPE_VIDEO_SINK,
@@ -61,9 +61,9 @@ index 46a710f..237deac 100644
  static void
  gst_wayland_sink_class_init (GstWaylandSinkClass * klass)
  {
-@@ -456,7 +492,7 @@ gst_wayland_create_pool (GstWaylandSink * sink, GstCaps * caps)
-   GstStructure *structure;
+@@ -457,7 +493,7 @@ gst_wayland_create_pool (GstWaylandSink * sink, GstCaps * caps)
    gsize size = sink->video_info.size;
+   GstAllocator *alloc;
  
 -  pool = gst_video_buffer_pool_new ();
 +  pool = g_object_new (gst_wayland_pool_get_type (), NULL);
@@ -71,5 +71,5 @@ index 46a710f..237deac 100644
    structure = gst_buffer_pool_get_config (pool);
    gst_buffer_pool_config_set_params (structure, caps, size, 2, 0);
 -- 
-1.9.1
+2.7.4
 

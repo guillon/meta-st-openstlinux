@@ -1,8 +1,8 @@
-From e65694cd79350c774bf175a8480c0bc0c61ad5c0 Mon Sep 17 00:00:00 2001
-From: Nicolas Dufresne <nicolas.dufresne@collabora.com>
-Date: Tue, 21 Nov 2017 23:18:24 -0500
-Subject: [PATCH 06/10] waylandsink: Validate strides and offset when using FD
- as SHM
+From ad6a5093a9bf63b44d51f22775155981de44176d Mon Sep 17 00:00:00 2001
+From: Christophe Priouzeau <christophe.priouzeau@st.com>
+Date: Fri, 18 May 2018 17:25:40 +0200
+Subject: [PATCH 5/7] waylandsink: Validate strides and offset when using FD as
+ SHM
 
 As SHM interface only support 1 stride, and 1 offset, we need to
 make sure that there is no padding between planes for planar formats.
@@ -14,10 +14,10 @@ https://bugzilla.gnome.org/show_bug.cgi?id=790057
  2 files changed, 69 insertions(+), 2 deletions(-)
 
 diff --git a/ext/wayland/gstwaylandsink.c b/ext/wayland/gstwaylandsink.c
-index ed5acfa..118391a 100644
+index 25c1041..8091bee 100644
 --- a/ext/wayland/gstwaylandsink.c
 +++ b/ext/wayland/gstwaylandsink.c
-@@ -705,10 +705,12 @@ gst_wayland_sink_show_frame (GstVideoSink * vsink, GstBuffer * buffer)
+@@ -709,10 +709,12 @@ gst_wayland_sink_show_frame (GstVideoSink * vsink, GstBuffer * buffer)
    }
  
    if (!wbuf && gst_wl_display_check_format_for_shm (sink->display, format)) {
@@ -123,5 +123,5 @@ index e1b691b..3593b80 100644
    g_return_val_if_fail (gst_is_fd_memory (mem), NULL);
    g_return_val_if_fail (size <= memsize, NULL);
 -- 
-1.9.1
+2.7.4
 
