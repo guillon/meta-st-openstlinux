@@ -9,7 +9,7 @@
 #===============================================================================
 
 check_dt_status() {
-gcnano_dir=$(ls /proc/device-tree/soc/ | grep gcnano)
+gcnano_dir=$(ls /proc/device-tree/soc/ | grep gpu)
 if [ ! -d /proc/device-tree/soc/$gcnano_dir ];
 then
     echo "Gcnano in /proc/device-tree/soc/ is not available" > /dev/kmsg
