@@ -263,5 +263,5 @@ INHERIT += "rm_work"
 # force the usage of debian package
 PACKAGE_CLASSES = "package_deb"
 
-# To enable archiver for recipes that are configured (e.g. atf, u-boot, kernel...)
+# To enable archiver for recipes that are configured
 #ST_ARCHIVER_ENABLE = "1"
