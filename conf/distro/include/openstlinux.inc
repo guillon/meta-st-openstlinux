@@ -43,7 +43,8 @@ LOCALCONF_VERSION = "1"
 LAYER_CONF_VERSION ?= "7"
 
 # TODO: is that really want we want?
-IMAGE_LINGUAS = "en-gb"
+#IMAGE_LINGUAS = "en-us en-gb"
+IMAGE_LINGUAS = "en-us en-gb"
 
 # =========================================================================
 # DISTRO features
