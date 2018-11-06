@@ -8,7 +8,7 @@ inherit core-image distro_features_check
 # let's make sure we have a good image...
 REQUIRED_DISTRO_FEATURES = "wayland"
 
-IMAGE_LINGUAS = "en-gb"
+IMAGE_LINGUAS = "en-us"
 
 IMAGE_FEATURES += " \
     splash \

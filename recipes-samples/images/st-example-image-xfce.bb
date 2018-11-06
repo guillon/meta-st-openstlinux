@@ -9,7 +9,7 @@ inherit core-image distro_features_check extrausers
 CONFLICT_DISTRO_FEATURES = "wayland"
 REQUIRED_DISTRO_FEATURES = "x11"
 
-IMAGE_LINGUAS = "en-gb"
+IMAGE_LINGUAS = "en-us"
 
 IMAGE_FEATURES += "splash package-management ssh-server-dropbear hwcodecs"
 

@@ -8,7 +8,7 @@ inherit core-image distro_features_check
 # let's make sure we have a good image..
 REQUIRED_DISTRO_FEATURES = "x11"
 
-IMAGE_LINGUAS = "en-gb"
+IMAGE_LINGUAS = "en-us"
 
 IMAGE_FEATURES += "splash package-management x11-base x11-sato ssh-server-dropbear hwcodecs tools-profile"
 

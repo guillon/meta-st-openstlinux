@@ -5,7 +5,7 @@ include recipes-st/images/st-image.inc
 
 inherit core-image
 
-IMAGE_LINGUAS = "en-gb"
+IMAGE_LINGUAS = "en-us"
 
 IMAGE_FEATURES += "\
     package-management \
