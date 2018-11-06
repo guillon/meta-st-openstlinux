@@ -93,7 +93,6 @@ RDEPENDS_packagegroup-framework-tools-kernel = "\
     minicoredumper  \
     "
 RDEPENDS_packagegroup-framework-tools-kernel-extra = "\
-    latencytop      \
     powertop        \
     fio             \
     \
@@ -116,9 +115,7 @@ RDEPENDS_packagegroup-framework-tools-network-base = "\
 RDEPENDS_packagegroup-framework-tools-network = "\
     tcpdump         \
     packagegroup-core-full-cmdline-extended \
-    ${@bb.utils.contains('DISTRO_FEATURES', 'wifi', 'hostap-utils', '', d)}    \
     ${@bb.utils.contains('DISTRO_FEATURES', 'wifi', 'iw', '', d)}              \
-    ${@bb.utils.contains('DISTRO_FEATURES', 'wifi', 'wireless-tools', '', d)}  \
     ${@bb.utils.contains('DISTRO_FEATURES', 'wifi', 'wpa-supplicant', '', d)}  \
     ${@bb.utils.contains('DISTRO_FEATURES', 'wifi', 'hostapd', '', d)}         \
     openssh-sftp    \
@@ -167,7 +164,6 @@ RDEPENDS_packagegroup-framework-tools-ui = "\
 RDEPENDS_packagegroup-framework-tools-ui-extra = "\
     ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'xvideo-tests', '', d)}  \
     ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'x11perf', '', d)}   \
-    ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'fstests', '', d)}   \
     ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'gtkperf', '', d)}   \
     "
 
@@ -190,14 +186,11 @@ RDEPENDS_packagegroup-framework-tools-python2-extra = "\
 RDEPENDS_packagegroup-framework-tools-python3-base = "\
     "
 RDEPENDS_packagegroup-framework-tools-python3 = "\
-    python3-argparse    \
     python3-datetime    \
     python3-dateutil    \
     python3-distutils   \
     python3-email       \
-    python3-enum        \
     python3-fcntl       \
-    python3-importlib   \
     python3-io          \
     python3-logging     \
     python3-misc        \
@@ -205,13 +198,8 @@ RDEPENDS_packagegroup-framework-tools-python3 = "\
     python3-pycairo     \
     python3-pygobject   \
     python3-pyparsing   \
-    python3-re          \
-    python3-readline    \
     python3-shell       \
-    python3-signal      \
     python3-stringold   \
-    python3-subprocess  \
-    python3-textutils   \
     python3-threading   \
     python3-unittest    \
     python3-pyyaml      \
