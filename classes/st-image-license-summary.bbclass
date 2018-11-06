@@ -4,8 +4,12 @@ IMAGE_SUMMARY_LIST ?= "st-image-bootfs:#IMAGE#:st-image-userfs"
 
 ENABLE_IMAGE_LICENSE_SUMMARY ?= "1"
 
-python write_license_create_summary() {
+inherit license_image
+
+python do_st_write_license_create_summary() {
+
     if d.getVar('ENABLE_IMAGE_LICENSE_SUMMARY') == "1":
+        license_deployed_manifest(d)
         license_create_summary(d)
 }
 
@@ -16,7 +20,7 @@ def license_create_summary(d):
     ref_image_name_full = d.expand("${IMAGE_NAME}")
     console_latest = d.expand("${LOG_DIR}/cooker/${MACHINE}/console-latest.log")
     deploy_image_dir = d.expand("${DEPLOY_DIR_IMAGE}")
-    temp_deploy_image_dir = d.expand("${IMGDEPLOYDIR}")
+    temp_deploy_image_dir = deploy_image_dir #d.expand("${IMGDEPLOYDIR}")
     license_deploy_dir = d.expand("${DEPLOY_DIR}/licenses")
     pkgdata_dir = d.expand("${TMPDIR}/pkgdata/${MACHINE}")
 
@@ -424,7 +428,7 @@ def license_create_summary(d):
         html.addNewLine()
         html.addNewLine()
 
-        license_file_to_read = os.path.join(temp_deploy_image_dir, "%s.license" % ref_image_name_full)
+        license_file_to_read = os.path.join(temp_deploy_image_dir, "%s.license" % ref_image_name)
         contents = private_open(license_file_to_read)
 
         html.startTable()
@@ -634,7 +638,7 @@ def license_create_summary(d):
 
 
 
-    summary_file = os.path.join(temp_deploy_image_dir, "%s-license_content.html" % ref_image_name_full)
+    summary_file = os.path.join(deploy_image_dir, "%s-license_content.html" % ref_image_name_full)
     # bb.warn("file generated %s" % (summary_file))
     html = HTMLSummaryfile()
     html.openfile(summary_file)
@@ -654,11 +658,11 @@ def license_create_summary(d):
 
     # create link
     curcwd = os.getcwd()
-    os.chdir(temp_deploy_image_dir)
+    os.chdir(deploy_image_dir)
     if os.path.exists("%s-license_content.html" % ref_image_name):
         os.remove("%s-license_content.html" % ref_image_name)
     os.symlink("%s-license_content.html" % ref_image_name_full, "%s-license_content.html" % ref_image_name)
     os.chdir(curcwd)
 
-IMAGE_POSTPROCESS_COMMAND_append = "write_license_create_summary;"
+addtask st_write_license_create_summary before do_build after do_image_complete
 

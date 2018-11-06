@@ -1,4 +1,4 @@
-python write_sdk_license_create_summary() {
+python do_write_sdk_license_create_summary() {
     license_sdk_create_summary(d)
 }
 def license_sdk_create_summary(d):
@@ -549,5 +549,5 @@ def license_sdk_create_summary(d):
     html.endHtml()
     html.closefile()
 
-SDK_POSTPROCESS_COMMAND_append = "write_sdk_license_create_summary;"
+SDK_POSTPROCESS_COMMAND_append = "do_write_sdk_license_create_summary;"
 
