@@ -1,44 +1,37 @@
 SUMMARY = "OPTEE Client"
-DESCRIPTION = "OPTEE Linux Userspace Client component: libteec and tee-supplicant"
+HOMEPAGE = "https://github.com/OP-TEE/optee_client"
 
-LIC_FILES_CHKSUM = "file://LICENSE;md5=69663ab153298557a59c67a60a743e5b"
 LICENSE = "BSD"
+LIC_FILES_CHKSUM = "file://${S}/LICENSE;md5=69663ab153298557a59c67a60a743e5b"
 
-COMPATIBLE_MACHINE = "(stm32mpcommon)"
+PV = "3.3.0+git${SRCPV}"
 
-PACKAGE_ARCH = "${MACHINE_ARCH}"
+inherit pythonnative systemd
 
-SRC_URI = "git://github.com/OP-TEE/optee_client.git"
-SRCREV = "c48bc3be9f23529952c7dd80ddd775bf580315b8"
-
-PV = "3.3.0"
-PR = "git${SRCPV}.r0"
-
+SRC_URI = "git://github.com/OP-TEE/optee_client.git \
+           file://tee-supplicant.service"
 S = "${WORKDIR}/git"
 
-EXTRA_OEMAKE = 'CROSS_COMPILE=${TARGET_PREFIX}'
-EXTRA_OEMAKE += 'CC="${TARGET_PREFIX}gcc --sysroot=${STAGING_DIR_TARGET}"'
-EXTRA_OEMAKE += 'CFG_TEE_CLIENT_LOAD_PATH="${libdir}"'
+SRCREV = "c48bc3be9f23529952c7dd80ddd775bf580315b8"
 
-do_compile() {
-    mkdir -p ${D}${exec_prefix}
-    oe_runmake -C ${S} EXPORT_DIR=${D}${exec_prefix}
-}
-
-FILES_${PN} = "${libdir}/libteec.so*"
-FILES_${PN} += "${bindir}/tee-supplicant"
+SYSTEMD_SERVICE_${PN} = "tee-supplicant.service"
 
 do_install() {
-    install -d ${D}${exec_prefix}
-    oe_runmake -C ${S} install EXPORT_DIR=${D}${exec_prefix}
+    oe_runmake install
 
-    cd ${D}/${libdir}
-    rm libteec.so libteec.so.1
-    ln -s libteec.so.1.0 libteec.so.1
-    ln -s libteec.so.1.0 libteec.so
-    cd -
-}
+    install -D -p -m0755 ${S}/out/export/bin/tee-supplicant ${D}${bindir}/tee-supplicant
 
-do_clean() {
-    oe_runmake -C ${S} EXPORT_DIR=${D}${exec_prefix} clean
+    install -D -p -m0644 ${S}/out/export/lib/libteec.so.1.0 ${D}${libdir}/libteec.so.1.0
+    ln -sf libteec.so.1.0 ${D}${libdir}/libteec.so
+    ln -sf libteec.so.1.0 ${D}${libdir}/libteec.so.1
+
+    cp -a ${S}/out/export/include ${D}/usr/
+
+    if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
+        sed -i -e s:/etc:${sysconfdir}:g \
+           -e s:/usr/bin:${bindir}:g \
+              ${WORKDIR}/tee-supplicant.service
+
+        install -D -p -m0644 ${WORKDIR}/tee-supplicant.service ${D}${systemd_system_unitdir}/tee-supplicant.service
+    fi
 }
