@@ -9,7 +9,10 @@ inherit license_image
 python do_st_write_license_create_summary() {
 
     if d.getVar('ENABLE_IMAGE_LICENSE_SUMMARY') == "1":
-        license_deployed_manifest(d)
+        try:
+            license_deployed_manifest(d)
+        except:
+            bb.warn("Deploy of image license not ready")
         license_create_summary(d)
 }
 
