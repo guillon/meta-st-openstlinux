@@ -38,6 +38,9 @@ IMAGE_DISPLAY_PART = " \
     fb-test         \
     libdrm          \
     libdrm-tests    \
+    \
+    gtk+3 \
+    gtk+3-demo \
     "
 
 #
