@@ -668,4 +668,4 @@ def license_create_summary(d):
     os.chdir(curcwd)
 
 addtask st_write_license_create_summary before do_build after do_image_complete
-
+do_populate_lic_deploy[noexec] = "1"
