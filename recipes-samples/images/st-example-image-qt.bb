@@ -80,8 +80,6 @@ IMAGE_QT_OPTIONAL_PART = " \
    \
    qtwebkit                \
    \
-   qtquick1                \
-   \
    qtquickcontrols         \
    qtquickcontrols-qmlplugins \
    qtquickcontrols2         \
