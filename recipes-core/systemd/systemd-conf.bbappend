@@ -6,9 +6,6 @@ SRC_URI_append = " \
     "
 
 do_install_append() {
-    #Remove this service useless for our needs
-    rm -f ${D}/${rootlibexecdir}/systemd/system-generators/systemd-gpt-auto-generator
-
     install -d ${D}${sysconfdir}/systemd/coredump.conf.d/
     install -m 644 ${WORKDIR}/coredump-custom.conf ${D}${sysconfdir}/systemd/coredump.conf.d/
 }

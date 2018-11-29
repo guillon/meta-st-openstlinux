@@ -9,7 +9,9 @@ PV = "3.3.0+git${SRCPV}"
 inherit pythonnative systemd
 
 SRC_URI = "git://github.com/OP-TEE/optee_client.git \
-           file://tee-supplicant.service"
+           file://tee-supplicant.service \
+	"
+
 S = "${WORKDIR}/git"
 
 SRCREV = "c48bc3be9f23529952c7dd80ddd775bf580315b8"
