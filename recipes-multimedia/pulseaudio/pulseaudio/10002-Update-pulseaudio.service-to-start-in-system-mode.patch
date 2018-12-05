@@ -4,20 +4,21 @@ Date: Thu, 25 Oct 2018 17:50:36 +0200
 Subject: [PATCH 2/3] Update pulseaudio.service to start in system mode
 
 ---
- src/daemon/systemd/user/pulseaudio.service.in | 12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
+ src/daemon/systemd/user/pulseaudio.service.in | 14 ++++++++++----
+ 1 file changed, 10 insertions(+), 4 deletions(-)
 
 diff --git a/src/daemon/systemd/user/pulseaudio.service.in b/src/daemon/systemd/user/pulseaudio.service.in
-index 46897bf..9aceb2e 100644
+index 46897bf..9f175e4 100644
 --- a/src/daemon/systemd/user/pulseaudio.service.in
 +++ b/src/daemon/systemd/user/pulseaudio.service.in
 @@ -14,14 +14,20 @@ Description=Sound Service
  # After=pulseaudio.socket is not needed, as it is already implicit in the
  # socket-service relationship, see systemd.socket(5).
  Requires=pulseaudio.socket
+-ConditionUser=!root
 +Requires=dbus.service
 +After=dbus.service weston.service
- ConditionUser=!root
++#ConditionUser=!root
  
  [Service]
  # Note that notify will only work if --daemonize=no
