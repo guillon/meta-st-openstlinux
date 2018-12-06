@@ -1,6 +1,13 @@
+# Configure on BSP side this var if you expect the summary to be generated
+ENABLE_IMAGE_LICENSE_SUMMARY ?= "0"
+
 python do_write_sdk_license_create_summary() {
-    license_sdk_create_summary(d)
+    if d.getVar('ENABLE_IMAGE_LICENSE_SUMMARY') == "1":
+        license_sdk_create_summary(d)
+    else:
+        bb.warn("IMG LIC SUM: Please set ENABLE_IMAGE_LICENSE_SUMMARY to '1' to enable licence summary")
 }
+
 def license_sdk_create_summary(d):
     import re
     tab =  d.expand("${LICENSE_IMAGE_CONTENT_WITH_TAB}")
@@ -529,8 +536,6 @@ def license_sdk_create_summary(d):
 
         html.stopDiv()
 
-
-
     summary_file = os.path.join(temp_deploy_sdk_dir, "%s-license_content.html" % ref_sdk_name_full)
     # bb.warn("file generated %s" % (summary_file))
     html = HTMLSummaryfile()
@@ -550,4 +555,3 @@ def license_sdk_create_summary(d):
     html.closefile()
 
 SDK_POSTPROCESS_COMMAND_append = "do_write_sdk_license_create_summary;"
-

@@ -1,19 +1,25 @@
 # for having tab on html file generated
 LICENSE_IMAGE_CONTENT_WITH_TAB ?= "1"
-IMAGE_SUMMARY_LIST ?= "st-image-bootfs:#IMAGE#:st-image-userfs"
 
-ENABLE_IMAGE_LICENSE_SUMMARY ?= "1"
+# We can define one or more additional images built as additional partitions
+# to the default rootfs one (#IMAGE#) thought IMAGE_SUMMARY_LIST var with format
+#   IMAGE_SUMMARY_LIST = "<image_name_1>:<image_name_2>:#IMAGE#"
+IMAGE_SUMMARY_LIST ?= "#IMAGE#"
+
+# Configure on BSP side this var if you expect the summary to be generated
+ENABLE_IMAGE_LICENSE_SUMMARY ?= "0"
 
 inherit license_image
 
 python do_st_write_license_create_summary() {
-
     if d.getVar('ENABLE_IMAGE_LICENSE_SUMMARY') == "1":
         try:
             license_deployed_manifest(d)
         except:
             bb.warn("Deploy of image license not ready")
         license_create_summary(d)
+    else:
+        bb.warn("IMG LIC SUM: Please set ENABLE_IMAGE_LICENSE_SUMMARY to '1' to enable licence summary")
 }
 
 def license_create_summary(d):
