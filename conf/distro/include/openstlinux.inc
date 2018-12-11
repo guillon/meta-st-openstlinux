@@ -82,6 +82,9 @@ DISTRO_FEATURES_append = " wayland pam "
 # add support of X11
 DISTRO_FEATURES_append = " x11"
 
+# add support of KDE (since OE thud version)
+DISTRO_FEATURES_append = " kde "
+
 # add support of systemd
 DISTRO_FEATURES_append = " systemd "
 
