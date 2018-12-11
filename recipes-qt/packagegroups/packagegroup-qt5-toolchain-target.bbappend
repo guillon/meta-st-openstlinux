@@ -1,8 +1,3 @@
-RDEPENDS_${PN}_append += "\
-   qtcharts-dev \
-   qtcharts-mkspecs \
-   "
-
 RDEPENDS_${PN}_remove += "\
    qtenginio-dev \
    qtenginio-mkspecs \
