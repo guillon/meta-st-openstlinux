@@ -60,6 +60,7 @@ RDEPENDS_packagegroup-framework-tools-core = "\
     systemtap       \
     gptfdisk        \
     lsb-openstlinux \
+    rng-tools       \
     "
 RDEPENDS_packagegroup-framework-tools-core-extra = "\
     tslib-calibrate \
@@ -68,7 +69,6 @@ RDEPENDS_packagegroup-framework-tools-core-extra = "\
     acl             \
     bzip2           \
     cronie          \
-    rng-tools       \
     "
 
 RDEPENDS_packagegroup-framework-tools-kernel-base = "\
