@@ -1,6 +1,14 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 
 SRC_URI_append = " file://0010-waylandsink-Uprank-to-secondary.patch "
+SRC_URI_append = " file://0001-waylandsink-add-I420-to-dmabuf-supported-formats.patch "
+SRC_URI_append = " file://0002-waylandsink-add-dmabuf-bufferpool.patch "
+SRC_URI_append = " file://0003-waylandsink-fix-error-when-mmapping-dmabuf-buffers.patch "
+SRC_URI_append = " file://0004-waylandsink-fix-wrong-width-when-creating-dmabuf-dum.patch "
+SRC_URI_append = " file://0005-waylandsink-do-not-hardcode-dmabuf-bufferpool-info-s.patch "
+SRC_URI_append = " file://0006-waylandsink-increase-max-buffers-to-32-to-enable-dma.patch "
+SRC_URI_append = " file://0007-waylandsink-always-select-dmabuf-buffer-pool.patch "
+SRC_URI_append = " file://0008-waylandsink-do-not-destroy-pool-twice.patch "
 
 PACKAGECONFIG_GL ?= "${@bb.utils.contains('DISTRO_FEATURES', 'opengl', 'gles2 egl', '', d)}"
 
