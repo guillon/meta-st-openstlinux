@@ -56,9 +56,6 @@ IMAGE_QT_MANDATORY_PART = " \
    \
    qtscript                \
    \
-   ${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'qtwayland', '', d)} \
-   ${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'qtwayland-plugins', '', d)} \
-   \
    openstlinux-qt-eglfs \
    "
 
@@ -106,8 +103,6 @@ IMAGE_QT_EXAMPLES_PART = " \
    qtdeclarative-examples  \
    \
    qtmultimedia-examples   \
-   \
-   ${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'qtwayland-examples', '', d)} \
    \
    qtwebkit-examples       \
    \
