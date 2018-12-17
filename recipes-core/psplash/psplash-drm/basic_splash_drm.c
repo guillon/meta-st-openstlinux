@@ -29,6 +29,8 @@
 
 
 #define SPLASH_FIFO "/tmp/splash_fifo"
+
+#define MAX_HEIGHT_THRESHOLD 720
 //-----------------------
 // Static variable
 static int drm_fd;
@@ -161,7 +163,7 @@ modeset_setup_dev (int fd,
         drmModeRes * res,
         drmModeConnector * conn, struct modeset_dev *dev)
 {
-    int ret;
+    int mode, ret;
 
     /* check if a monitor is connected */
     if (conn->connection != DRM_MODE_CONNECTED) {
@@ -176,10 +178,23 @@ modeset_setup_dev (int fd,
         return -EFAULT;
     }
 
+    mode = 0;
+    if (conn->count_modes > 1) {
+        /*  Kick out any resolution above 720p */
+        for (mode = 0; mode < conn->count_modes; mode++) {
+            if (conn->modes[mode].vdisplay <= MAX_HEIGHT_THRESHOLD) {
+                fprintf (stderr, "Defaulting to 720p - id:%d\n", mode);
+                break;
+            }
+        }
+        if (mode >= conn->count_modes)
+            mode = 0;
+    }
+
     /* copy the mode information into our device structure */
-    memcpy (&dev->mode, &conn->modes[0], sizeof (dev->mode));
-    dev->width = conn->modes[0].hdisplay;
-    dev->height = conn->modes[0].vdisplay;
+    memcpy (&dev->mode, &conn->modes[mode], sizeof (dev->mode));
+    dev->width = conn->modes[mode].hdisplay;
+    dev->height = conn->modes[mode].vdisplay;
     fprintf (stderr, "mode for connector %u is %ux%u\n",
             conn->connector_id, dev->width, dev->height);
 
