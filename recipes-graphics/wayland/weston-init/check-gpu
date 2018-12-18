@@ -22,10 +22,30 @@ fi
 }
 
 check_load_module() {
+local _timeout=0
+while [ -n $(cat /proc/modules | grep galcore) ]; do
+    sleep 1
+    echo "Sleep load" > /dev/kmsg
+    _timeout=$(($_timeout+1))
+    if [ "$_timeout" -eq "10" ]; then
+        echo "Time out check load galcore module expired" > /dev/kmsg
+        break
+    fi
+done
 galcore_module=$(cat /proc/modules | grep  galcore)
 }
 
 check_devices() {
+local _timeout=0
+while [ -n $(ls -l /dev/ | grep galcore) ]; do
+    sleep 1
+    echo "Sleep devices" > /dev/kmsg
+    _timeout=$(($_timeout+1))
+    if [ "$_timeout" -eq "10" ]; then
+        echo "Time out check galcore device expired" > /dev/kmsg
+        break
+    fi
+done
 galcore_device=$(ls -l /dev/ | grep galcore)
 }
 
