@@ -1,5 +1,6 @@
 LICENSE = "Proprietary"
 LIC_FILES_CHKSUM = "file://${EULA_FILE_ST};md5=${EULA_FILE_ST_MD5SUM}"
+LIC_FILES_CHKSUM[vardepsexclude] += "EULA_FILE_ST"
 
 inherit st-image-license-summary
 inherit st-sdk-license-summary
