@@ -69,6 +69,7 @@ RDEPENDS_packagegroup-framework-tools-core-extra = "\
     acl             \
     bzip2           \
     cronie          \
+    ltrace          \
     "
 
 RDEPENDS_packagegroup-framework-tools-kernel-base = "\
