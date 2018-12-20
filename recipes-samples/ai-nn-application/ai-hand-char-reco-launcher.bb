@@ -46,5 +46,6 @@ do_install() {
 }
 
 FILES_${PN} += "${prefix}/local/demo/bin/"
-FILES_${PN} += "${prefix}/local/demo/ai_char_reco_launcher/media/"
+FILES_${PN} += "${prefix}/local/demo/media/"
+FILES_${PN} += "${prefix}/local/demo/lib/"
 RDEPENDS_${PN} += "gtk+3 gstreamer1.0-plugins-base"
