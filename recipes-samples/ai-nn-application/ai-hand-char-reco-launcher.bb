@@ -28,8 +28,8 @@ do_configure[noexec] = "1"
 #Temporary store the firmware until officialy supported in the stm32cube_mp1
 #EXTRA_OEMAKE  = 'FIRMWARE_PATH_DK2="${STM32MP_USERFS_MOUNTPOINT_IMAGE}/Cube-M4-examples/demonstrations/STM32MP157C-DK2/AI_Character_Recognition/lib/firmware"'
 #EXTRA_OEMAKE += 'FIRMWARE_PATH_EV1="${STM32MP_USERFS_MOUNTPOINT_IMAGE}/Cube-M4-examples/demonstrations/STM32MP157C-EV1/AI_Character_Recognition/lib/firmware"'
-EXTRA_OEMAKE  = 'FIRMWARE_PATH_DK2="${STM32MP_USERFS_MOUNTPOINT_IMAGE}/demo/lib/firmware/"'
-EXTRA_OEMAKE += 'FIRMWARE_PATH_EV1="${STM32MP_USERFS_MOUNTPOINT_IMAGE}/demo/lib/firmware/"'
+EXTRA_OEMAKE  = 'FIRMWARE_PATH_DK2="${STM32MP_USERFS_MOUNTPOINT_IMAGE}/demo/lib/firmware/STM32MP157C-DK2"'
+EXTRA_OEMAKE += 'FIRMWARE_PATH_EV1="${STM32MP_USERFS_MOUNTPOINT_IMAGE}/demo/lib/firmware/STM32MP157C-EV1"'
 
 #Provides the firmware name
 EXTRA_OEMAKE += 'FIRMWARE_NAME="AI_Character_Recognition.elf"'
@@ -37,12 +37,14 @@ EXTRA_OEMAKE += 'FIRMWARE_NAME="AI_Character_Recognition.elf"'
 do_install() {
     install -d ${D}${prefix}/local/demo/bin/
     install -d ${D}${prefix}/local/demo/media/
-    install -d ${D}${prefix}/local/demo/lib/firmware
+    install -d ${D}${prefix}/local/demo/lib/firmware/STM32MP157C-DK2
+    install -d ${D}${prefix}/local/demo/lib/firmware/STM32MP157C-EV1
 
-    install -m 0755 ${B}/ai_char_reco_launcher    ${D}${STM32MP_USERFS_MOUNTPOINT_IMAGE}/demo/bin/
-    install -m 0755 ${B}/apps_launcher_example.sh ${D}${STM32MP_USERFS_MOUNTPOINT_IMAGE}/demo/bin/
-    install -m 0644 ${B}/media/*                  ${D}${STM32MP_USERFS_MOUNTPOINT_IMAGE}/demo/media/
-    install -m 0644 ${B}/firmware/*               ${D}${STM32MP_USERFS_MOUNTPOINT_IMAGE}/demo/lib/firmware/
+    install -m 0755 ${B}/ai_char_reco_launcher      ${D}${STM32MP_USERFS_MOUNTPOINT_IMAGE}/demo/bin/
+    install -m 0755 ${B}/apps_launcher_example.sh   ${D}${STM32MP_USERFS_MOUNTPOINT_IMAGE}/demo/bin/
+    install -m 0644 ${B}/media/*                    ${D}${STM32MP_USERFS_MOUNTPOINT_IMAGE}/demo/media/
+    install -m 0644 ${B}/firmware/STM32MP157C-DK2/* ${D}${STM32MP_USERFS_MOUNTPOINT_IMAGE}/demo/lib/firmware/STM32MP157C-DK2/
+    install -m 0644 ${B}/firmware/STM32MP157C-EV1/* ${D}${STM32MP_USERFS_MOUNTPOINT_IMAGE}/demo/lib/firmware/STM32MP157C-EV1/
 }
 
 FILES_${PN} += "${prefix}/local/demo/bin/"
