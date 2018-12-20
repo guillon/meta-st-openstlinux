@@ -4,6 +4,7 @@ SRC_URI += " \
             file://weston.ini \
             file://utilities-terminal.png \
             file://ST_1366x768.png \
+            file://ST13028_Linux_picto_11_1366x768.png \
             file://weston.sh \
             file://weston_profile.sh \
             file://README-CHECK-GPU \
@@ -28,6 +29,7 @@ do_install_append() {
     install -m 0644 ${WORKDIR}/weston.ini ${D}${sysconfdir}/xdg/weston
     install -m 0644 ${WORKDIR}/utilities-terminal.png ${D}${datadir}/weston/icon/utilities-terminal.png
     install -m 0644 ${WORKDIR}/ST_1366x768.png ${D}${datadir}/weston/backgrounds/ST_1366x768.png
+    install -m 0644 ${WORKDIR}/ST13028_Linux_picto_11_1366x768.png ${D}${datadir}/weston/backgrounds/ST13028_Linux_picto_11_1366x768.png
 
     install -d ${D}${systemd_system_unitdir} ${D}${sbindir}
     install -m 0755  ${WORKDIR}/weston.sh ${D}${sbindir}/
