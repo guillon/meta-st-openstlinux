@@ -21,8 +21,6 @@ PACKAGECONFIG ?= " \
     faac kms \
 "
 
-ARM_INSTRUCTION_SET = "arm"
-
 #do_configure_prepend() {
 #    ${S}/autogen.sh --noconfigure
 #}
