@@ -90,6 +90,7 @@ RDEPENDS_packagegroup-framework-tools-kernel = "\
     dosfstools      \
     mmc-utils       \
     blktool         \
+    mtd-utils-ubifs \
     "
 RDEPENDS_packagegroup-framework-tools-kernel-extra = "\
     powertop        \
