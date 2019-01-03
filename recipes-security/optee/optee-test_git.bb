@@ -12,8 +12,9 @@ PV = "3.3.0+git${SRCPV}"
 
 SRC_URI = "git://github.com/OP-TEE/optee_test.git \
            file://fix-build-failure-with-GCC6.patch \
-           file://0001-Correct-GCC6-issue.patch \
            file://0002-Correct-support-of-32bits.patch \
+           file://0003-xtest-prevent-unexpected-build-warning-with-strncpy.patch \
+           file://0004-regression-4011-correct-potential-overflow.patch \
           "
 S = "${WORKDIR}/git"
 
