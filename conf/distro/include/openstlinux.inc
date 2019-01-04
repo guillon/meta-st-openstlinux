@@ -88,8 +88,8 @@ DISTRO_FEATURES_append = " kde "
 # add support of systemd
 DISTRO_FEATURES_append = " systemd "
 
-# add support of tpm
-#DISTRO_FEATURES_append = " tpm "
+# add support of tpm2
+#DISTRO_FEATURES_append = " tpm2 "
 
 # Disabling pulseaudio
 #DISTRO_FEATURES_BACKFILL_CONSIDERED += "pulseaudio"
