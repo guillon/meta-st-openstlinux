@@ -29,8 +29,6 @@ quit() {
     kill_all
     killall ai_char_reco_launcher
     echo stop > /sys/class/remoteproc/remoteproc0/state
-    sleep 1
-    rm /lib/firmware/AI_Character_Recognition.elf
 }
 
 case "$1" in
