@@ -42,7 +42,7 @@ RDEPENDS_packagegroup-framework-tools-core-base = "\
     lrzsz           \
     lsb             \
     libgpiod        \
-    ${@bb.utils.contains('DISTRO_FEATURES', 'usbgadget', 'usbotg-msc-eth-config', '', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'usbgadget', 'usbotg-gadget-config', '', d)} \
     "
 RDEPENDS_packagegroup-framework-tools-core = "\
     grep            \

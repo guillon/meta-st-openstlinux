@@ -1,10 +1,8 @@
 #!/bin/sh
 
-#add stm32_msc_eth_config script to enable USB Ethernet & MSC gadget This script configures USB Gadget
+#add stm32_eth_config script to enable USB Ethernet & MSC gadget This script configures USB Gadget
 #configfs to use USB OTG as a USB Ethernet Gadget with Remote NDIS (RNDIS), well supported by Microsoft
-#Windows and Linux, and also as a USB Mass-Storage Gadget. Mass-Storage may be only relevant on Linux if #exported partitions are in EXT4 format, but could also be used on Microsoft Windows if exported
-#partitions are in FAT or NTFS. Take care of Microsoft Windows "You need to format the disk..." popup,
-#choose Cancel, otherwise you risk to erase your µSD content.
+#Windows and Linux.
 
 configfs="/sys/kernel/config/usb_gadget"
 g=g1
@@ -58,21 +56,6 @@ do_start() {
     echo 250 > "${d}/configs/${c}/MaxPower"
     echo 0xC0 > "${d}/configs/${c}/bmAttributes" # self powered device
 
-#    mkdir -p "${d}/functions/${func_ms}"
-#    # Mass-Storage function
-#    echo 0 > "${d}/functions/${func_ms}/stall"
-#    echo 0 > "${d}/functions/${func_ms}/lun.0/cdrom"
-#    echo 0 > "${d}/functions/${func_ms}/lun.0/ro"
-#    echo 0 > "${d}/functions/${func_ms}/lun.0/nofua"
-#    echo 1 > "${d}/functions/${func_ms}/lun.0/removable"
-#    if [ -z "$1" ]; then
-#        echo "Using /dev/mmcblk0"
-#        echo "/dev/mmcblk0" > "${d}/functions/${func_ms}/lun.0/file"
-#    else
-#        echo "Using $1"
-#        echo "$1" > "${d}/functions/${func_ms}/lun.0/file"
-#    fi
-
     mkdir -p "${d}/functions/${func_eth}"
     # Windows extension to force RNDIS config
     mkdir -p "${d}/os_desc"
@@ -86,7 +69,6 @@ do_start() {
 
     # Set up the rndis device only first
     ln -s "${d}/functions/${func_eth}" "${d}/configs/${c}"
-#    ln -s "${d}/functions/${func_ms}" "${d}/configs/${c}"
     ln -s "${d}/configs/${c}" "${d}/os_desc"
 
     echo "${udc}" > "${d}/UDC"
@@ -106,12 +88,10 @@ do_stop() {
 
     rm -f "${d}/os_desc/${c}"
     [ -d "${d}/configs/${c}/${func_eth}" ] &&rm -f "${d}/configs/${c}/${func_eth}"
-    [ -d "${d}/configs/${c}/${func_ms}" ] && rm -f "${d}/configs/${c}/${func_ms}"
 
     [ -d "${d}/strings/0x409/" ] && rmdir "${d}/strings/0x409/"
     [ -d "${d}/configs/${c}/strings/0x409" ] && rmdir "${d}/configs/${c}/strings/0x409"
     [ -d "${d}/configs/${c}" ] && rmdir "${d}/configs/${c}"
-    [ -d "${d}/functions/${func_ms}" ] && rmdir "${d}/functions/${func_ms}"
     [ -d "${d}/functions/${func_eth}" ] && rmdir "${d}/functions/${func_eth}"
     [ -d "${d}" ] && rmdir "${d}"
 }
@@ -124,6 +104,6 @@ case $1 in
         do_stop
         ;;
     *)
-        echo "Usage: $0 (stop | start) [/dev/xxx (if not specified /dev/mmcblk0 will be used by default)]"
+        echo "Usage: $0 (stop | start)"
         ;;
 esac

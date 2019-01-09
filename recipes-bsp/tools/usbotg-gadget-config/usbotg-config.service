@@ -1,10 +1,10 @@
 [Unit]
-Description=Enable USB Ethernet & MSC gadget
+Description=Enable USB Ethernet gadget
 After=systemd-remount-fs.service
 
 [Service]
 Type=oneshot
-ExecStart=-/sbin/stm32_usbotg_msc_eth_config.sh start
+ExecStart=-/sbin/stm32_usbotg_eth_config.sh start
 
 [Install]
 WantedBy=multi-user.target
