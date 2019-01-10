@@ -30,7 +30,7 @@ SIMULATE = 0
 
 
 if SIMULATE > 0:
-    DEMO_PATH = "/home/frq08471/temp/launcher/"
+    DEMO_PATH = os.environ['HOME']+"/Desktop/launcher"
 else:
     DEMO_PATH = "/usr/local/demo"
 
@@ -41,92 +41,13 @@ else:
 SIMULATE_SCREEN_SIZE_WIDTH  = 800
 SIMULATE_SCREEN_SIZE_HEIGHT = 480
 
+ICON_SIZE_BIG = 180
+ICON_SIZE_SMALL = 128
+
 WIFI_HOTSPOT_IP="192.168.72.1"
 
 WIFI_DEFAULT_SSID="STDemoNetwork"
 WIFI_DEFAULT_PASSWD="stm32mp1"
-
-# -------------------------------------------------------------------
-# -------------------------------------------------------------------
-# SPLASH SCREEN class
-#    the splash screen display a logo and the different step of boot
-#
-class SplashScreen():
-    def __init__(self, picture_filename, timeout):
-        #DONT connect 'destroy' event here!
-        self.window = Gtk.Window()
-        self.window.set_title('ST Launcher')
-        self.window.set_position(Gtk.WindowPosition.CENTER)
-        self.window.set_decorated(False)
-        if SIMULATE > 0:
-            screen_width = SIMULATE_SCREEN_SIZE_WIDTH
-            screen_height = SIMULATE_SCREEN_SIZE_HEIGHT
-        else:
-            self.window.fullscreen()
-            #self.maximize()
-            screen_width = self.window.get_screen().get_width()
-            screen_height = self.window.get_screen().get_height()
-
-        self.window.set_default_size(screen_width, screen_height)
-        self.window.set_border_width(1)
-
-        # Add Vbox with image and label
-        main_vbox = Gtk.VBox(False, 1)
-        self.window.add(main_vbox)
-        # load picture
-        print("[DEBUG] Splash screen with picture: %s" % picture_filename)
-        if os.path.exists(picture_filename):
-            pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(
-                filename=picture_filename,
-                width=400, # TODO: change size
-                height=600, # TODO: change size
-                preserve_aspect_ratio=True)
-            image = Gtk.Image.new_from_pixbuf(pixbuf)
-            main_vbox.pack_start(image, True, True, 0)
-
-        #self.lbl = Gtk.Label("Init: splash screen")
-        #self.lbl.set_alignment(0, 0.5)
-        #main_vbox.pack_start(self.lbl, True, True, 0)
-
-        self.window.set_auto_startup_notification(False)
-        self.window.show_all()
-        self.window.set_auto_startup_notification(True)
-
-        # Ensure the splash is completely drawn before moving on
-        GLib.timeout_add(1000, self.loop)
-        self.loops = 0
-        self.loops_timeout = timeout
-        self.loops_break = 0
-
-    def update_text(self, text):
-        self.lbl.set_text(text)
-
-    def loop_stop(self):
-        self.loops_break = 1
-
-    def loop(self):
-        global var
-        var = time ()
-        print ("[DEBUG] ",  var)
-        self.loops += 1
-        if self.loops_break or self.loops == self.loops_timeout:
-            Gtk.main_quit()
-            self.window.destroy()
-            return False
-        return True
-
-
-class DialogError(Gtk.Dialog):
-
-    def __init__(self, parent):
-        Gtk.Dialog.__init__(self, "Error", parent, 0,
-            (Gtk.STOCK_OK, Gtk.ResponseType.OK))
-
-        self.set_default_size(200, 100)
-        label = Gtk.Label("Webcam is not connected :\n/dev/video0 doesn't exist")
-        box = self.get_content_area()
-        box.add(label)
-        self.show_all()
 
 # -------------------------------------------------------------------
 # -------------------------------------------------------------------
@@ -261,7 +182,8 @@ class GstVideoWindow(Gtk.Dialog):
         #self.fullscreen()
         self.maximize()
         self.set_decorated(False)
-        self.override_background_color(Gtk.StateType.NORMAL, Gdk.RGBA(.5,.5,.5,.5))
+        rgba = Gdk.RGBA(0.31, 0.32, 0.31, 0.8)
+        self.override_background_color(Gtk.StateType.NORMAL, rgba)
 
         self.previous_click_time=0
         self.stream_is_paused=0
@@ -311,7 +233,13 @@ class WifiWindow(Gtk.Dialog):
     def __init__(self, parent, pipeline):
         Gtk.Dialog.__init__(self, "Wifi", parent, 0)
 
-        self.fullscreen()
+        #width, height = self.get_size()
+        #self.set_default_size(width, height)
+        self.maximize()
+        self.set_decorated(False)
+        rgba = Gdk.RGBA(0.31, 0.32, 0.31, 0.8)
+        self.override_background_color(0,rgba)
+
         mainvbox = self.get_content_area()
 
         self.page_ip = Gtk.VBox()
@@ -319,14 +247,20 @@ class WifiWindow(Gtk.Dialog):
         self.set_border_width(10)
 
         self.title = Gtk.Label()
-        self.title.set_markup('<span font_desc="LiberationSans 40" face="sans"><b>Wifi Hotspot informations</b></span>')
+        self.title.set_markup("<span font='30' color='#FFFFFFFF'><b>Wifi Hotspot informations</b></span>")
         self.page_ip.add(self.title)
-        self.label_hotspot = Gtk.Label()
-        self.label_hotspot.set_xalign (0.0)
-        self.label_ip_wlan0 = Gtk.Label()
-        self.label_ip_wlan0.set_xalign (0.0)
+        self.label_eth = Gtk.Label()
+        self.label_eth.set_markup("<span font='20' color='#FFFFFFFF'>\nNetData over Ethernet:</span>")
+        self.label_eth.set_xalign (0.0)
         self.label_ip_eth0 = Gtk.Label()
         self.label_ip_eth0.set_xalign (0.0)
+        self.label_wifi = Gtk.Label()
+        self.label_wifi.set_markup("<span font='20' color='#FFFFFFFF'>\nNetData over Wifi:</span>")
+        self.label_wifi.set_xalign (0.0)
+        self.label_ip_wlan0 = Gtk.Label()
+        self.label_ip_wlan0.set_xalign (0.0)
+        self.label_hotspot = Gtk.Label()
+        self.label_hotspot.set_xalign (0.0)
         self.label_ip_wlan_ssid = Gtk.Label()
         self.label_ip_wlan_ssid.set_xalign (0.0)
         self.label_ip_wlan_passwd = Gtk.Label()
@@ -339,6 +273,10 @@ class WifiWindow(Gtk.Dialog):
         self.info_grid = Gtk.Grid()
         self.info_grid.set_column_spacing(2)
         self.info_grid.set_row_spacing(2)
+
+        self.info_grid.attach(self.label_eth, 0, 1, 2, 1)
+        self.info_grid.attach(self.label_ip_eth0, 0, 2, 2, 1)
+        self.info_grid.attach(self.label_wifi, 0, 4, 1, 1)
 
         if self.is_wifi_available():
             print ("wlan0 is available")
@@ -353,16 +291,15 @@ class WifiWindow(Gtk.Dialog):
                 self.hostspot_switch.set_active(False)
             self.hostspot_switch.connect("notify::active", self.on_switch_activated)
 
-            self.info_grid.attach(self.hostspot_switch, 0, 2, 1, 1)
-            self.info_grid.attach(self.label_hotspot, 1, 2, 1, 1)
-            self.info_grid.attach(self.label_ip_wlan0, 0, 0, 2, 1)
-            self.info_grid.attach(self.label_ip_wlan_ssid, 0, 3, 2, 1)
-            self.info_grid.attach(self.label_ip_wlan_passwd, 0, 4, 2, 1)
+            self.info_grid.attach(self.hostspot_switch, 0, 5, 1, 1)
+            self.info_grid.attach(self.label_hotspot, 1, 5, 1, 1)
+            self.info_grid.attach(self.label_ip_wlan0, 0, 6, 2, 1)
+            self.info_grid.attach(self.label_ip_wlan_ssid, 0, 7, 2, 1)
+            self.info_grid.attach(self.label_ip_wlan_passwd, 0, 8, 2, 1)
         else:
             print ("wlan0 interface not available")
-            self.info_grid.attach(self.label_hotspot, 0, 0, 2, 1)
+            self.info_grid.attach(self.label_hotspot, 0, 5, 2, 1)
 
-        self.info_grid.attach(self.label_ip_eth0, 0, 1, 2, 1)
         self.page_ip.add(self.info_grid)
         self.refresh_network_page()
         self.connect("button-release-event", self.on_page_press_event)
@@ -404,35 +341,34 @@ class WifiWindow(Gtk.Dialog):
             print ("wlan0 is available")
             ip_wlan0 = get_ip_address('wlan0')
             if ip_wlan0 == "NA":
-                hotspot_status = '<span foreground="#FF0000" font_desc="LiberationSans 25" face="sans">Wifi not started</span>'
+                hotspot_status = "<span font='15' color='#FF0000FF'>  Wifi not started</span>"
                 wlan0_status = ''
                 self.label_ip_wlan_ssid.set_markup('')
                 self.label_ip_wlan_passwd.set_markup('')
             elif ip_wlan0 == WIFI_HOTSPOT_IP:
-                hotspot_status = '<span foreground="#00AA00" font_desc="LiberationSans 25" face="sans">Wifi hotspot started</span>'
-                wlan0_status =  '<span font_desc="LiberationSans 25" face="sans">NetData over Wifi: http://<b>%s</b>:19999</span>' % ip_wlan0
-                self.label_ip_wlan_ssid.set_markup('<span font_desc="LiberationSans 25" face="sans">Wifi SSID : %s</span>' % self.wifi_ssid)
-                self.label_ip_wlan_passwd.set_markup('<span font_desc="LiberationSans 25" face="sans">Wifi password : %s</span>' % self.wifi_passwd)
+                hotspot_status = "<span font='15' color='#00AA00FF'>  Wifi hotspot started</span>"
+                wlan0_status =  "<span font='15' color='#FFFFFFFF'>  http://%s:19999</span>" % ip_wlan0
+                self.label_ip_wlan_ssid.set_markup("<span font='15' color='#FFFFFFFF'>  Wifi SSID : %s</span>" % self.wifi_ssid)
+                self.label_ip_wlan_passwd.set_markup("<span font='15' color='#FFFFFFFF'>  Wifi password : %s</span>" % self.wifi_passwd)
             else:
-                hotspot_status = '<span foreground="#FF0000" font_desc="LiberationSans 25" face="sans">Wifi started but not configured as hotspot</span>'
-                wlan0_status = '<span font_desc="LiberationSans 25" face="sans">NetData over Wifi: http://<b>%s</b>:19999</span>' % ip_wlan0
+                hotspot_status = "<span font='15' color='#FF0000FF'>Wifi started but not configured as hotspot</span>"
+                wlan0_status = "<span font='15' color='#FFFFFFFF'>NetData over Wifi: http://%s:19999</span>" % ip_wlan0
                 self.label_ip_wlan_ssid.set_markup('')
                 self.label_ip_wlan_passwd.set_markup('')
 
             self.label_ip_wlan0.set_markup(wlan0_status)
         else:
             print ("wlan0 interface not available")
-            hotspot_status = '<span foreground="#FF0000" font_desc="LiberationSans 25" face="sans">Wifi not available on board</span>'
+            hotspot_status = "<span font='15' color='#FF0000FF'>  Wifi not available on board</span>"
 
         ip_eth0 = get_ip_address('eth0')
         if ip_eth0 != "NA":
-            eth0_status = "<span font_desc='LiberationSans 25'>NetData over Ethernet: http://<b>%s</b>:19999</span>" % ip_eth0
+            eth0_status = "<span font='15' color='#FFFFFFFF'>  http://%s:19999</span>" % ip_eth0
         else:
-            eth0_status = ''
+            eth0_status = "<span font='15' color='#FF0000FF'>  No Ethernet connection</span>"
 
         self.label_hotspot.set_markup(hotspot_status)
         self.label_ip_eth0.set_markup(eth0_status)
-
 
     def on_page_press_event(self, widget, event):
         self.click_time = time()
@@ -474,10 +410,77 @@ def get_ip_address(ifname):
 
 # -------------------------------------------------------------------
 # -------------------------------------------------------------------
+def _load_image_eventBox(parent, filename, label_text1, label_text2, scale_w, scale_h):
+    # Create box for xpm and label
+    box = Gtk.VBox(False, 0)
+    # Create an eventBox
+    eventBox = Gtk.EventBox()
+    # Now on to the image stuff
+    pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(
+            filename=filename,
+            width=scale_w,
+            height=scale_h,
+            preserve_aspect_ratio=True)
+    image = Gtk.Image.new_from_pixbuf(pixbuf)
+
+    label = Gtk.Label()
+    label.set_markup("<span font='15' color='#39A9DCFF'>%s\n</span>"
+                     "<span font='15' color='#002052FF'>%s</span>" % (label_text1, label_text2))
+    label.set_justify(Gtk.Justification.CENTER)
+    label.set_line_wrap(True)
+
+    # Pack the pixmap and label into the box
+    box.pack_start(image, True, False, 0)
+    box.pack_start(label, True, False, 0)
+
+    # Add the image to the eventBox
+    eventBox.add(box)
+
+    return eventBox
+
+def _load_image_Box(parent, filename, label_text, scale_w, scale_h):
+    # Create box for xpm and label
+    box = Gtk.VBox(False, 0)
+    # print("[DEBUG] image: %s " % filename)
+    # Now on to the image stuff
+    pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(
+            filename=filename,
+            width=scale_w,
+            height=scale_h,
+            preserve_aspect_ratio=True)
+    image = Gtk.Image.new_from_pixbuf(pixbuf)
+
+    # Create a label for the button
+    label0 = Gtk.Label() #for padding
+
+    label1 = Gtk.Label()
+    label1.set_markup("<span font='14' color='#FFFFFFFF'><b>%s</b></span>\n"
+                      "<span font='10' color='#FFFFFFFF'>Dual Arm&#174; Cortex&#174;-A7</span>\n"
+                      "<span font='10' color='#FFFFFFFF'>+</span>\n"
+                      "<span font='10' color='#FFFFFFFF'>Copro Arm&#174; Cortex&#174;-M4</span>\n" % label_text)
+    label1.set_justify(Gtk.Justification.CENTER)
+    label1.set_line_wrap(True)
+
+    label2 = Gtk.Label() #for padding
+
+    label3 = Gtk.Label()
+    label3.set_markup("<span font='10' color='#FFFFFFFF'><b>Python GTK launcher</b></span>\n")
+    label3.set_justify(Gtk.Justification.CENTER)
+    label3.set_line_wrap(True)
+
+    # Pack the pixmap and label into the box
+    box.pack_start(label0, True, False, 0)
+    box.pack_start(image, True, False, 0)
+    box.pack_start(label1, True, False, 0)
+    box.pack_start(label2, True, False, 0)
+    box.pack_start(label3, True, False, 0)
+
+    return box
+
 def _load_image_on_button(parent, filename, label_text, scale_w, scale_h):
     # Create box for xpm and label
-    box1 = Gtk.HBox(False, 0)
-    box1.set_border_width(2)
+    box = Gtk.HBox(False, 0)
+    box.set_border_width(2)
     # print("[DEBUG] image: %s " % filename)
     # Now on to the image stuff
     pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(
@@ -491,11 +494,11 @@ def _load_image_on_button(parent, filename, label_text, scale_w, scale_h):
     label = Gtk.Label(label_text)
 
     # Pack the pixmap and label into the box
-    box1.pack_start(image, True, False, 3)
+    box.pack_start(image, True, False, 3)
 
     image.show()
     label.show()
-    return box1
+    return box
 
 def wifi_hotspot_start():
     cmd = ["%s/bin/st-hotspot-wifi-service.sh" % DEMO_PATH, "start"]
@@ -526,13 +529,23 @@ def demo_AI_start():
 class MainUIWindow(Gtk.Window):
     def __init__(self):
         Gtk.Window.__init__(self, title="Demo Launcher")
+        self.set_decorated(False)
+        self.modify_bg(Gtk.StateType.NORMAL, Gdk.Color(65535, 65535, 65535))
         if SIMULATE > 0:
             self.screen_width = SIMULATE_SCREEN_SIZE_WIDTH
             self.screen_height = SIMULATE_SCREEN_SIZE_HEIGHT
         else:
-            self.fullscreen()
+            #self.fullscreen()
+            self.maximize()
             self.screen_width = self.get_screen().get_width()
             self.screen_height = self.get_screen().get_height()
+
+        if self.screen_width == 720:
+            self.icon_size = ICON_SIZE_BIG
+            self.board_name = "Evaluation board"
+        else:
+            self.icon_size = ICON_SIZE_SMALL
+            self.board_name = "Discovery kit"
 
         self.set_default_size(self.screen_width, self.screen_height)
         print("[DEBUG] screen size: %dx%d" % (self.screen_width, self.screen_height))
@@ -544,8 +557,50 @@ class MainUIWindow(Gtk.Window):
         # page for basic information
         self.create_page_icon()
 
+    def no_camera(self):
+        dialog = Gtk.Dialog("Error", self, 0, (Gtk.STOCK_OK, Gtk.ResponseType.OK))
+        dialog.set_decorated(False)
+        width, height = self.get_size()
+        dialog.set_default_size(width, height)
+        rgba = Gdk.RGBA(0.31, 0.32, 0.31, 0.8)
+        dialog.override_background_color(0,rgba)
+
+        label0 = Gtk.Label() #for padding
+
+        label1 = Gtk.Label("Webcam is not connected :\n/dev/video0 doesn't exist")
+        label1.set_markup("<span font='15' color='#FFFFFFFF'>Webcam is not connected:\n</span>"
+                          "<span font='15' color='#FFFFFFFF'>/dev/video0 doesn't exist\n</span>")
+        label1.set_justify(Gtk.Justification.CENTER)
+        label1.set_line_wrap(True)
+
+        label2 = Gtk.Label() #for padding
+
+        # Create a centering alignment object
+        align = Gtk.Alignment()
+        align.set(0.5, 0, 0, 0)
+
+        dialog.vbox.pack_start(label0, True, False, 0)
+        dialog.vbox.pack_start(label1, True, True,  0)
+        dialog.vbox.pack_start(align,  True, True,  0)
+        dialog.vbox.pack_start(label2, True, False, 0)
+
+        dialog.action_area.reparent(align)
+        dialog.show_all()
+
+        dialog.run()
+        print("INFO dialog closed")
+
+        dialog.destroy()
+
     # Button event of main screen
-    def wifi_hotspot_event(self, button):
+    def highlight_eventBox(self, widget, event):
+        ''' highlight the eventBox widget '''
+        print("[highlight_eventBox start]\n")
+        rgba = Gdk.RGBA(0.0, 0.0, 0.0, 0.1)
+        widget.override_background_color(0,rgba)
+        print("[highlight_eventBox stop]\n")
+
+    def wifi_hotspot_event(self, widget, event):
         ''' start hotspot wifi on board '''
         print("[wifi_hotspot_event start]\n")
         wifi_window = WifiWindow(self, "Wifi hotspot")
@@ -554,22 +609,26 @@ class MainUIWindow(Gtk.Window):
         #self.hide()
         wifi_window.show_all()
         response = wifi_window.run()
-        self.show_all()
         wifi_window.destroy()
+        print("[wifi_hotspot_event stop]\n")
+        rgba = Gdk.RGBA(0.0, 0.0, 0.0, 0.0)
+        widget.override_background_color(0,rgba)
 
-    def videoplay_event(self, button):
-        print("[videoplay_event]\n");
+    def videoplay_event(self, widget, event):
+        print("[videoplay_event start]\n");
         video_window = GstVideoWindow(self, "playback")
 
         #put it at diaglog http://python-gtk-3-tutorial.readthedocs.io/en/latest/dialogs.html#example
         # self.hide()
         video_window.show_all()
         response = video_window.run()
-        self.show_all()
         video_window.destroy()
+        print("[videoplay_event stop]\n");
+        rgba = Gdk.RGBA(0.0, 0.0, 0.0, 0.0)
+        widget.override_background_color(0,rgba)
 
-    def camera_event(self, button):
-        print("[camera_event]\n")
+    def camera_event(self, widget, event):
+        print("[camera_event start]\n")
 
         if os.path.exists("/dev/video0"):
             video_window = GstVideoWindow(self, "camera")
@@ -578,74 +637,89 @@ class MainUIWindow(Gtk.Window):
             # ????? self.hide()
             video_window.show_all()
             response = video_window.run()
-            self.show_all()
             video_window.destroy()
         else:
             print("[ERROR] camera not detected\n")
-            #TODO : put error message as parameter
-            dialog = DialogError(self)
-            dialog.run()
-            dialog.destroy()
+            self.no_camera()
 
-    def ai_event(self, button):
-        print("[ai_event]\n")
+        print("[camera_event stop]\n")
+        rgba = Gdk.RGBA(0.0, 0.0, 0.0, 0.0)
+        widget.override_background_color(0,rgba)
+
+    def ai_event(self, widget, event):
+        print("[ai_event start]\n")
         demo_AI_start()
+        print("[ai_event stop]\n")
+        rgba = Gdk.RGBA(0.0, 0.0, 0.0, 0.0)
+        widget.override_background_color(0,rgba)
 
-    def gpu3d_event(self, button):
-        print("[gpu3d_event]\n")
+    def gpu3d_event(self, widget, event):
+        print("[gpu3d_event start]\n")
         cube_3D_start()
+        print("[gpu3d_event stop]\n")
+        rgba = Gdk.RGBA(0.0, 0.0, 0.0, 0.0)
+        widget.override_background_color(0,rgba)
 
-    def bluetooth_event(self, button):
-        print("[bluetooth_event]\n")
+    def bluetooth_event(self, widget, event):
+        print("[bluetooth_event start]\n")
         print("[WARNING] bluetooth demo not yet supported\n")
         #subprocess.call(["python", "%s/bin/bluetooth_panel.py" % DEMO_PATH])
+        print("[bluetooth_event stop]\n")
+        rgba = Gdk.RGBA(0.0, 0.0, 0.0, 0.0)
+        widget.override_background_color(0,rgba)
 
     def create_page_icon(self):
         page_main = Gtk.HBox(False, 0)
-        page_main.set_border_width(10)
+        page_main.set_border_width(0)
 
         # create a grid of icon
         icon_grid = Gtk.Grid(column_homogeneous=True, row_homogeneous=True)
-        icon_grid.set_column_spacing(5)
-        icon_grid.set_row_spacing(5)
+        icon_grid.set_column_spacing(20)
+        icon_grid.set_row_spacing(20)
+
+        # STM32MP1 Logo and info area
+        logo_info_area = _load_image_Box(self, "%s/pictures/ST11249_Module_STM32MP1_alpha.png" % DEMO_PATH, self.board_name, -1, 160)
+        rgba = Gdk.RGBA(0.31, 0.32, 0.31, 1.0)
+        logo_info_area.override_background_color(0,rgba)
+
         # Button: Wifi web server icon
-        button_webserv = Gtk.Button()
-        button_webserv.connect("clicked", self.wifi_hotspot_event)
-        button_webserv_image = _load_image_on_button(self, "%s/pictures/ST12556_Gateway.png" % DEMO_PATH, "Wifi web server", -1, 128)
-        button_webserv.add(button_webserv_image)
-        # Button: video icon
-        button_videoplay = Gtk.Button()
-        button_videoplay.connect("clicked", self.videoplay_event)
-        button_videoplay_image = _load_image_on_button(self, "%s/pictures/ST10261_play_button_dark_blue.png" % DEMO_PATH, "Video playback", -1, 128)
-        button_videoplay.add(button_videoplay_image)
+        eventBox_webserv = _load_image_eventBox(self, "%s/pictures/ST12556_Gateway.png" % DEMO_PATH, "Wifi", "Hotspot", -1, self.icon_size)
+        eventBox_webserv.connect("button_release_event", self.wifi_hotspot_event)
+        eventBox_webserv.connect("button_press_event", self.highlight_eventBox)
+
         # Button: camera icon
-        button_camera = Gtk.Button()
-        button_camera.connect("clicked", self.camera_event)
-        button_camera_image = _load_image_on_button(self, "%s/pictures/ST1077_webcam_dark_blue.png" % DEMO_PATH, "Camera", -1, 128)
-        button_camera.add(button_camera_image)
+        eventBox_camera = _load_image_eventBox(self, "%s/pictures/ST1077_webcam_dark_blue.png" % DEMO_PATH, "Camera",  "preview", -1, self.icon_size)
+        eventBox_camera.connect("button_release_event", self.camera_event)
+        eventBox_camera.connect("button_press_event", self.highlight_eventBox)
+
+        # Button: video icon
+        eventBox_videoplay = _load_image_eventBox(self, "%s/pictures/Video_playback_logo.png" % DEMO_PATH, "Video", "playback", -1, self.icon_size)
+        eventBox_videoplay.connect("button_release_event", self.videoplay_event)
+        eventBox_videoplay.connect("button_press_event", self.highlight_eventBox)
+
         # Button: ai icon
-        button_ai = Gtk.Button()
-        button_ai.connect("clicked", self.ai_event)
-        button_ai_image = _load_image_on_button(self, "%s/pictures/ST7079_AI_neural_dark_blue.png" % DEMO_PATH, "Artificial Intelligence", -1, 128)
-        button_ai.add(button_ai_image)
+        eventBox_ai = _load_image_eventBox(self, "%s/pictures/ST7079_AI_neural_pink.png" % DEMO_PATH, "Artificial", "Intelligence", -1, self.icon_size)
+        eventBox_ai.connect("button_release_event", self.ai_event)
+        eventBox_ai.connect("button_press_event", self.highlight_eventBox)
+
         # Button: gpu3d icon
-        button_gpu3d = Gtk.Button()
-        button_gpu3d.connect("clicked", self.gpu3d_event)
-        button_gpu3d_image = _load_image_on_button(self, "%s/pictures/ST153_cube_dark_blue.png" % DEMO_PATH, "3D GPU", -1, 128)
-        button_gpu3d.add(button_gpu3d_image)
+        eventBox_gpu3d = _load_image_eventBox(self, "%s/pictures/ST153_cube_purple.png" % DEMO_PATH, "3D", "GPU", -1, self.icon_size)
+        eventBox_gpu3d.connect("button_release_event", self.gpu3d_event)
+        eventBox_gpu3d.connect("button_press_event", self.highlight_eventBox)
+
         # Button: BT icon
-        button_bluetooth = Gtk.Button()
-        button_bluetooth.connect("clicked", self.bluetooth_event)
-        button_bluetooth_image = _load_image_on_button(self, "%s/pictures/ST11012_bluetooth_speaker_light_blue.png" % DEMO_PATH, "Bluetooth demo", -1, 128)
-        button_bluetooth.add(button_bluetooth_image)
+        eventBox_bluetooth = _load_image_eventBox(self, "%s/pictures/Bluetooth_speaker_logo.png" % DEMO_PATH, "Bluetooth", "speaker", -1, self.icon_size)
+        eventBox_bluetooth.connect("button_release_event", self.bluetooth_event)
+        eventBox_bluetooth.connect("button_press_event", self.highlight_eventBox)
 
-        icon_grid.attach(button_webserv, 0, 0, 1, 1)
-        icon_grid.attach(button_videoplay, 1, 0, 1, 1)
-        icon_grid.attach(button_camera, 2, 0, 1, 1)
+        icon_grid.attach(logo_info_area, 3, 0, 1, 2)
+        icon_grid.attach(eventBox_webserv, 0, 0, 1, 1)
+        icon_grid.attach(eventBox_camera, 1, 0, 1, 1)
+        icon_grid.attach(eventBox_videoplay, 2, 0, 1, 1)
 
-        icon_grid.attach(button_ai, 0, 1, 1, 1)
-        icon_grid.attach(button_gpu3d, 1, 1, 1, 1)
-        icon_grid.attach(button_bluetooth, 2, 1, 1, 1)
+        icon_grid.attach(eventBox_ai, 0, 1, 1, 1)
+        icon_grid.attach(eventBox_gpu3d, 1, 1, 1, 1)
+        icon_grid.attach(eventBox_bluetooth, 2, 1, 1, 1)
 
         page_main.add(icon_grid)
 
@@ -653,10 +727,11 @@ class MainUIWindow(Gtk.Window):
         overlay.add(page_main)
         button_exit = Gtk.Button()
         button_exit.connect("clicked", Gtk.main_quit)
-        button_exit_image = _load_image_on_button(self, "%s/pictures/close_50x50.png" % DEMO_PATH, "Exit", -1, 50)
+        button_exit_image = _load_image_on_button(self, "%s/pictures/close_70x70_white.png" % DEMO_PATH, "Exit", -1, 50)
         button_exit.set_halign(Gtk.Align.END)
         button_exit.set_valign(Gtk.Align.START)
         button_exit.add(button_exit_image)
+        button_exit.set_relief(Gtk.ReliefStyle.NONE)
         overlay.add_overlay(button_exit)
         self.add(overlay)
 
@@ -670,12 +745,6 @@ if __name__ == "__main__":
     import signal
     signal.signal(signal.SIGINT, signal.SIG_DFL)
     try:
-        if SIMULATE:
-            splScr = SplashScreen("%s/pictures/RS70_ST_Logo_Qi.png" % "./files", 2)
-        else:
-            splScr = SplashScreen("%s/pictures/RS70_ST_Logo_Qi.png" % DEMO_PATH, 2)
-        Gtk.main()
-
         win = MainUIWindow()
         win.connect("delete-event", Gtk.main_quit)
         win.show_all()
