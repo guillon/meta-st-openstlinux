@@ -197,8 +197,8 @@ class GstVideoWindow(Gtk.Dialog):
             self.filename = "camera"
         else:
             self.video_widget = GstVideoWidget()
-            self.filename = "%s/media/Teaser-STM32MP1.webm" % DEMO_PATH
-            self.set_video_filename("%s/media/Teaser-STM32MP1.webm" % DEMO_PATH)
+            self.filename = "%s/media/ST2297_visionv3.webm" % DEMO_PATH
+            self.set_video_filename("%s/media/ST2297_visionv3.webm" % DEMO_PATH)
 
         self.video_widget.set_halign(Gtk.Align.CENTER)
         self.video_widget.set_valign(Gtk.Align.CENTER)
