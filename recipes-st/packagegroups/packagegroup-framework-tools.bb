@@ -205,6 +205,7 @@ RDEPENDS_packagegroup-framework-tools-python3 = "\
     python3-unittest    \
     python3-pyyaml      \
     python3-pexpect     \
+    python3-evdev       \
     "
 RDEPENDS_packagegroup-framework-tools-python3-extra = "\
     python3-pip         \

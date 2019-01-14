@@ -10,6 +10,7 @@ from gi.repository import Gdk
 from gi.repository import GLib
 from gi.repository import GdkPixbuf
 
+import evdev
 import subprocess
 import random
 import math
@@ -567,9 +568,44 @@ class MainUIWindow(Gtk.Window):
 
         label0 = Gtk.Label() #for padding
 
-        label1 = Gtk.Label("Webcam is not connected :\n/dev/video0 doesn't exist")
+        label1 = Gtk.Label()
         label1.set_markup("<span font='15' color='#FFFFFFFF'>Webcam is not connected:\n</span>"
                           "<span font='15' color='#FFFFFFFF'>/dev/video0 doesn't exist\n</span>")
+        label1.set_justify(Gtk.Justification.CENTER)
+        label1.set_line_wrap(True)
+
+        label2 = Gtk.Label() #for padding
+
+        # Create a centering alignment object
+        align = Gtk.Alignment()
+        align.set(0.5, 0, 0, 0)
+
+        dialog.vbox.pack_start(label0, True, False, 0)
+        dialog.vbox.pack_start(label1, True, True,  0)
+        dialog.vbox.pack_start(align,  True, True,  0)
+        dialog.vbox.pack_start(label2, True, False, 0)
+
+        dialog.action_area.reparent(align)
+        dialog.show_all()
+
+        dialog.run()
+        print("INFO dialog closed")
+
+        dialog.destroy()
+
+    def no_touchscreen(self):
+        dialog = Gtk.Dialog("Error", self, 0, (Gtk.STOCK_OK, Gtk.ResponseType.OK))
+        dialog.set_decorated(False)
+        width, height = self.get_size()
+        dialog.set_default_size(width, height)
+        rgba = Gdk.RGBA(0.31, 0.32, 0.31, 0.8)
+        dialog.override_background_color(0,rgba)
+
+        label0 = Gtk.Label() #for padding
+
+        label1 = Gtk.Label()
+        label1.set_markup("<span font='15' color='#FFFFFFFF'>No touch screen device connected.\n</span>"
+                          "<span font='15' color='#FFFFFFFF'>The AI application could not be launch\n</span>")
         label1.set_justify(Gtk.Justification.CENTER)
         label1.set_line_wrap(True)
 
@@ -604,9 +640,6 @@ class MainUIWindow(Gtk.Window):
         ''' start hotspot wifi on board '''
         print("[wifi_hotspot_event start]\n")
         wifi_window = WifiWindow(self, "Wifi hotspot")
-
-        #put it at diaglog http://python-gtk-3-tutorial.readthedocs.io/en/latest/dialogs.html#example
-        #self.hide()
         wifi_window.show_all()
         response = wifi_window.run()
         wifi_window.destroy()
@@ -617,9 +650,6 @@ class MainUIWindow(Gtk.Window):
     def videoplay_event(self, widget, event):
         print("[videoplay_event start]\n");
         video_window = GstVideoWindow(self, "playback")
-
-        #put it at diaglog http://python-gtk-3-tutorial.readthedocs.io/en/latest/dialogs.html#example
-        # self.hide()
         video_window.show_all()
         response = video_window.run()
         video_window.destroy()
@@ -632,14 +662,11 @@ class MainUIWindow(Gtk.Window):
 
         if os.path.exists("/dev/video0"):
             video_window = GstVideoWindow(self, "camera")
-
-            #put it at diaglog http://python-gtk-3-tutorial.readthedocs.io/en/latest/dialogs.html#example
-            # ????? self.hide()
             video_window.show_all()
             response = video_window.run()
             video_window.destroy()
         else:
-            print("[ERROR] camera not detected\n")
+            print("[WARNING] camera not detected\n")
             self.no_camera()
 
         print("[camera_event stop]\n")
@@ -648,7 +675,25 @@ class MainUIWindow(Gtk.Window):
 
     def ai_event(self, widget, event):
         print("[ai_event start]\n")
-        demo_AI_start()
+        devices = [evdev.InputDevice(path) for path in evdev.list_devices()]
+        for device in devices:
+            touchscreen = False
+            if device.name == "EP0110M09":
+                touchscreen = True
+                break
+            if device.name == "generic ft5x06 (11)":
+                touchscreen = True
+                break
+            if device.name == "Goodix Capacitive TouchScreen":
+                touchscreen = True
+                break
+
+        if touchscreen == False:
+            print("[WARNING] No touch screen device\n")
+            self.no_touchscreen()
+        else:
+            print("Touch screen device found\n")
+            demo_AI_start()
         print("[ai_event stop]\n")
         rgba = Gdk.RGBA(0.0, 0.0, 0.0, 0.0)
         widget.override_background_color(0,rgba)
