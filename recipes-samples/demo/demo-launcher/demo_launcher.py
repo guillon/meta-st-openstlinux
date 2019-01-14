@@ -247,15 +247,15 @@ class WifiWindow(Gtk.Dialog):
         self.set_border_width(10)
 
         self.title = Gtk.Label()
-        self.title.set_markup("<span font='30' color='#FFFFFFFF'><b>Wifi Hotspot informations</b></span>")
+        self.title.set_markup("<span font='30' color='#FFFFFFFF'><b>Access information to netdata</b></span>")
         self.page_ip.add(self.title)
         self.label_eth = Gtk.Label()
-        self.label_eth.set_markup("<span font='20' color='#FFFFFFFF'>\nNetData over Ethernet:</span>")
+        self.label_eth.set_markup("<span font='20' color='#FFFFFFFF'>\nnetdata over Ethernet:</span>")
         self.label_eth.set_xalign (0.0)
         self.label_ip_eth0 = Gtk.Label()
         self.label_ip_eth0.set_xalign (0.0)
         self.label_wifi = Gtk.Label()
-        self.label_wifi.set_markup("<span font='20' color='#FFFFFFFF'>\nNetData over Wifi:</span>")
+        self.label_wifi.set_markup("<span font='20' color='#FFFFFFFF'>\nnetdata over Wifi:</span>")
         self.label_wifi.set_xalign (0.0)
         self.label_ip_wlan0 = Gtk.Label()
         self.label_ip_wlan0.set_xalign (0.0)
@@ -683,7 +683,7 @@ class MainUIWindow(Gtk.Window):
         logo_info_area.override_background_color(0,rgba)
 
         # Button: Wifi web server icon
-        eventBox_webserv = _load_image_eventBox(self, "%s/pictures/ST12556_Gateway.png" % DEMO_PATH, "Wifi", "Hotspot", -1, self.icon_size)
+        eventBox_webserv = _load_image_eventBox(self, "%s/pictures/netdata-icon-192x192.png" % DEMO_PATH, "netdata", "perf monitor", -1, self.icon_size)
         eventBox_webserv.connect("button_release_event", self.wifi_hotspot_event)
         eventBox_webserv.connect("button_press_event", self.highlight_eventBox)
 
@@ -708,7 +708,7 @@ class MainUIWindow(Gtk.Window):
         eventBox_gpu3d.connect("button_press_event", self.highlight_eventBox)
 
         # Button: BT icon
-        eventBox_bluetooth = _load_image_eventBox(self, "%s/pictures/Bluetooth_speaker_logo.png" % DEMO_PATH, "Bluetooth", "speaker", -1, self.icon_size)
+        eventBox_bluetooth = _load_image_eventBox(self, "%s/pictures/ST11012_bluetooth_speaker_light_green.png" % DEMO_PATH, "Bluetooth", "speaker", -1, self.icon_size)
         eventBox_bluetooth.connect("button_release_event", self.bluetooth_event)
         eventBox_bluetooth.connect("button_press_event", self.highlight_eventBox)
 
