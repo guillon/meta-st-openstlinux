@@ -621,8 +621,8 @@ gboolean draw_callback(GtkWidget *widget, cairo_t *cr, gpointer data)
 				CAIRO_FONT_WEIGHT_BOLD);
 	cairo_set_font_size (cr, 25);
 	cairo_set_source_rgb (cr, 1, 1, 1);
-	cairo_move_to (cr, 20, 20);
-	cairo_show_text (cr, "Hand Writting Character Recognition");
+	cairo_move_to (cr, 20, 25);
+	cairo_show_text (cr, "Hand Writing Character Recognition");
 
 	/* draw the recognize character */
 	cairo_select_font_face (cr, "monospace",
@@ -630,13 +630,13 @@ gboolean draw_callback(GtkWidget *widget, cairo_t *cr, gpointer data)
 				CAIRO_FONT_WEIGHT_BOLD);
 	cairo_set_font_size (cr, 40);
 	cairo_set_source_rgb (cr, 1, 1, 1);
-	cairo_move_to (cr, 20, 60);
+	cairo_move_to (cr, 20, 65);
 	cairo_show_text (cr, character);
 
 	/* draw the hand writen character */
 	cairo_set_source_rgb (cr,  212, 0, 122);
 	cairo_set_line_width (cr, 2);
-	cairo_translate (cr, 10, 70);
+	cairo_translate (cr, 10, 75);
 	for (int i = 0; i < TOUCH_COORDINATE_DEPTH ; i++) {
 		if ((gtk_draw_polygon[i].x != -1) &&
 		    (gtk_draw_polygon[i].y != -1)) {
@@ -673,48 +673,48 @@ gboolean draw_callback(GtkWidget *widget, cairo_t *cr, gpointer data)
 				CAIRO_FONT_WEIGHT_BOLD);
 	cairo_set_font_size (cr, 15);
 	/* return to the origine */
-	cairo_translate (cr, -10, -70);
+	cairo_translate (cr, -10, -75);
 
 	if(strcmp(character, "A") == 0)
 		cairo_set_source_rgb (cr, 212, 0, 122);
 	else
 		cairo_set_source_rgb (cr, 1, 1, 1);
-	cairo_move_to (cr, 20, 140);
+	cairo_move_to (cr, 20, 145);
 	cairo_show_text (cr, "A = Audio");
 
 	if(strcmp(character, "C") == 0)
 		cairo_set_source_rgb (cr, 212, 0, 122);
 	else
 		cairo_set_source_rgb (cr, 1, 1, 1);
-	cairo_move_to (cr, 20, 160);
+	cairo_move_to (cr, 20, 165);
 	cairo_show_text (cr, "C = Camera");
 
 	if(strcmp(character, "P") == 0)
 		cairo_set_source_rgb (cr, 212, 0, 122);
 	else
 		cairo_set_source_rgb (cr, 1, 1, 1);
-	cairo_move_to (cr, 20, 180);
+	cairo_move_to (cr, 20, 185);
 	cairo_show_text (cr, "P = Picture");
 
 	if(strcmp(character, "V") == 0)
 		cairo_set_source_rgb (cr, 212, 0, 122);
 	else
 		cairo_set_source_rgb (cr, 1, 1, 1);
-	cairo_move_to (cr, 20, 200);
+	cairo_move_to (cr, 20, 205);
 	cairo_show_text (cr, "V = Video");
 
 	if(strcmp(character, "S") == 0)
 		cairo_set_source_rgb (cr, 212, 0, 122);
 	else
 		cairo_set_source_rgb (cr, 1, 1, 1);
-	cairo_move_to (cr, 20, 220);
+	cairo_move_to (cr, 20, 225);
 	cairo_show_text (cr, "S = Stop");
 
 	if(strcmp(character, "Q") == 0)
 		cairo_set_source_rgb (cr, 212, 0, 122);
 	else
 		cairo_set_source_rgb (cr, 1, 1, 1);
-	cairo_move_to (cr, 20, 240);
+	cairo_move_to (cr, 20, 245);
 	cairo_show_text (cr, "Q = Quit");
 
 	return FALSE;
