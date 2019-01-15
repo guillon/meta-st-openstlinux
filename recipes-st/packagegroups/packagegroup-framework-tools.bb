@@ -121,6 +121,7 @@ RDEPENDS_packagegroup-framework-tools-network = "\
     ${@bb.utils.contains('DISTRO_FEATURES', 'wifi', 'wireless-regdb-static', '', d)}         \
     openssh-sftp    \
     ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'dhcp-client', '', d)} \
+    curl \
     "
 RDEPENDS_packagegroup-framework-tools-network-extra = "\
     iperf3          \
@@ -160,7 +161,7 @@ RDEPENDS_packagegroup-framework-tools-ui = "\
     ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'xvinfo', '', d)}    \
     ${@bb.utils.contains('DISTRO_FEATURES', 'gplv3', 'glmark2', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'gplv3', 'netdata', '', d)} \
-    ${@bb.utils.contains('DISTRO_FEATURES', 'gplv3', 'lmsensors-libsensors', '', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'gplv3', 'lmsensors-libsensors lmsensors-sensors', '', d)} \
     "
 RDEPENDS_packagegroup-framework-tools-ui-extra = "\
     ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'xvideo-tests', '', d)}  \
