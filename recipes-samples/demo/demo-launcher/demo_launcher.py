@@ -267,6 +267,9 @@ class WifiWindow(Gtk.Dialog):
         self.label_ip_wlan_passwd = Gtk.Label()
         self.label_ip_wlan_passwd.set_xalign (0.0)
 
+        self.label_blank = Gtk.Label()
+        self.label_blank.set_markup('')
+
         self.previous_click_time=0
         self.wifi_ssid=WIFI_DEFAULT_SSID
         self.wifi_passwd=WIFI_DEFAULT_PASSWD
@@ -275,31 +278,34 @@ class WifiWindow(Gtk.Dialog):
         self.info_grid.set_column_spacing(2)
         self.info_grid.set_row_spacing(2)
 
-        self.info_grid.attach(self.label_eth, 0, 1, 2, 1)
-        self.info_grid.attach(self.label_ip_eth0, 0, 2, 2, 1)
-        self.info_grid.attach(self.label_wifi, 0, 4, 1, 1)
+        self.info_grid.attach(self.label_eth, 0, 1, 1, 1)
+        self.info_grid.attach(self.label_ip_eth0, 0, 2, 1, 1)
+
+
+        print ("wifi_credential creation")
+        self.wifi_credential = _load_image_wlan_eventBox(self, "%s/pictures/qr-code_wifi_access.png" % DEMO_PATH, "ssid: STDemoNetwork", "passwd: stm32mp1", -1, ICON_SIZE_SMALL)
+        self.netdata_url = _load_image_wlan_eventBox(self, "%s/pictures/qr-code_netdata_url.png" % DEMO_PATH, "url: http://192.168.72.1:19999", "", -1, ICON_SIZE_SMALL)
 
         if self.is_wifi_available():
             print ("wlan0 is available")
-            self.hostspot_switch = Gtk.Switch()
+            self.hotspot_switch = Gtk.Switch()
             self.get_wifi_config()
 
             # set wlan switch state on first execution
             ip_wlan0 = get_ip_address('wlan0')
             if ip_wlan0 == WIFI_HOTSPOT_IP:
-                self.hostspot_switch.set_active(True)
+                self.hotspot_switch.set_active(True)
             else:
-                self.hostspot_switch.set_active(False)
-            self.hostspot_switch.connect("notify::active", self.on_switch_activated)
+                self.hotspot_switch.set_active(False)
 
-            self.info_grid.attach(self.hostspot_switch, 0, 5, 1, 1)
+            self.hotspot_switch.connect("notify::active", self.on_switch_activated)
+            self.info_grid.attach(self.label_wifi, 0, 4, 1, 1)
+            self.info_grid.attach(self.hotspot_switch, 0, 5, 1, 1)
             self.info_grid.attach(self.label_hotspot, 1, 5, 1, 1)
-            self.info_grid.attach(self.label_ip_wlan0, 0, 6, 2, 1)
-            self.info_grid.attach(self.label_ip_wlan_ssid, 0, 7, 2, 1)
-            self.info_grid.attach(self.label_ip_wlan_passwd, 0, 8, 2, 1)
+
         else:
             print ("wlan0 interface not available")
-            self.info_grid.attach(self.label_hotspot, 0, 5, 2, 1)
+            self.info_grid.attach(self.label_hotspot, 0, 5, 1, 1)
 
         self.page_ip.add(self.info_grid)
         self.refresh_network_page()
@@ -338,38 +344,54 @@ class WifiWindow(Gtk.Dialog):
     def refresh_network_page(self):
         print("[Refresh network page]\n")
 
-        if self.is_wifi_available():
-            print ("wlan0 is available")
-            ip_wlan0 = get_ip_address('wlan0')
-            if ip_wlan0 == "NA":
-                hotspot_status = "<span font='15' color='#FF0000FF'>  Wifi not started</span>"
-                wlan0_status = ''
-                self.label_ip_wlan_ssid.set_markup('')
-                self.label_ip_wlan_passwd.set_markup('')
-            elif ip_wlan0 == WIFI_HOTSPOT_IP:
-                hotspot_status = "<span font='15' color='#00AA00FF'>  Wifi hotspot started</span>"
-                wlan0_status =  "<span font='15' color='#FFFFFFFF'>  http://%s:19999</span>" % ip_wlan0
-                self.label_ip_wlan_ssid.set_markup("<span font='15' color='#FFFFFFFF'>  Wifi SSID : %s</span>" % self.wifi_ssid)
-                self.label_ip_wlan_passwd.set_markup("<span font='15' color='#FFFFFFFF'>  Wifi password : %s</span>" % self.wifi_passwd)
-            else:
-                hotspot_status = "<span font='15' color='#FF0000FF'>Wifi started but not configured as hotspot</span>"
-                wlan0_status = "<span font='15' color='#FFFFFFFF'>NetData over Wifi: http://%s:19999</span>" % ip_wlan0
-                self.label_ip_wlan_ssid.set_markup('')
-                self.label_ip_wlan_passwd.set_markup('')
-
-            self.label_ip_wlan0.set_markup(wlan0_status)
-        else:
-            print ("wlan0 interface not available")
-            hotspot_status = "<span font='15' color='#FF0000FF'>  Wifi not available on board</span>"
-
         ip_eth0 = get_ip_address('eth0')
         if ip_eth0 != "NA":
             eth0_status = "<span font='15' color='#FFFFFFFF'>  http://%s:19999</span>" % ip_eth0
         else:
             eth0_status = "<span font='15' color='#FF0000FF'>  No Ethernet connection</span>"
+        self.label_ip_eth0.set_markup(eth0_status)
+
+        if self.is_wifi_available():
+            print ("wlan0 is available")
+            ip_wlan0 = get_ip_address('wlan0')
+            if ip_wlan0 == "NA":
+                hotspot_status = "<span font='15' color='#FF0000FF'>  Wifi not started</span>"
+                if self.wifi_ssid == WIFI_DEFAULT_SSID:
+                    self.info_grid.remove_row(6)
+                else:
+                    self.label_ip_wlan_ssid.set_markup('')
+                    self.label_ip_wlan_passwd.set_markup('')
+                    self.label_ip_wlan0.set_markup('')
+            elif ip_wlan0 == WIFI_HOTSPOT_IP:
+                hotspot_status = "<span font='15' color='#00AA00FF'>  Wifi hotspot started</span>"
+                if self.wifi_ssid == WIFI_DEFAULT_SSID:
+                    self.info_grid.attach(self.wifi_credential, 0, 6, 1, 1)
+                    self.info_grid.attach(self.netdata_url, 1, 6, 1, 1)
+                else:
+                    self.label_ip_wlan_ssid.set_markup("<span font='15' color='#FFFFFFFF'>  Wifi SSID : %s</span>" % self.wifi_ssid)
+                    self.label_ip_wlan_passwd.set_markup("<span font='15' color='#FFFFFFFF'>  Wifi password : %s</span>" % self.wifi_passwd)
+                    self.label_ip_wlan0.set_markup("<span font='15' color='#FFFFFFFF'>  http://%s:19999</span>" % ip_wlan0)
+                    self.info_grid.attach(self.label_ip_wlan_ssid, 0, 6, 1, 1)
+                    self.info_grid.attach(self.label_ip_wlan_passwd, 0, 7, 1, 1)
+                    self.info_grid.attach(self.label_ip_wlan0, 0, 8, 1, 1)
+                self.show_all()
+            else:
+                hotspot_status = "<span font='15' color='#FF0000FF'>Wifi started but not configured as hotspot</span>"
+                if self.wifi_ssid == WIFI_DEFAULT_SSID:
+                    self.info_grid.remove_row(6)
+                else:
+                    self.label_ip_wlan_ssid.set_markup('')
+                    self.label_ip_wlan_passwd.set_markup('')
+                    self.label_ip_wlan0.set_markup('')
+
+                self.label_ip_wlan0.set_markup("<span font='15' color='#FFFFFFFF'>NetData over Wifi: http://%s:19999</span>" % ip_wlan0)
+                self.info_grid.attach(self.label_ip_wlan0, 0, 6, 1, 1)
+                self.show_all()
+        else:
+            print ("wlan0 interface not available")
+            hotspot_status = "<span font='15' color='#FF0000FF'>  Wifi not available on board</span>"
 
         self.label_hotspot.set_markup(hotspot_status)
-        self.label_ip_eth0.set_markup(eth0_status)
 
     def on_page_press_event(self, widget, event):
         self.click_time = time()
@@ -438,6 +460,36 @@ def _load_image_eventBox(parent, filename, label_text1, label_text2, scale_w, sc
     eventBox.add(box)
 
     return eventBox
+
+
+def _load_image_wlan_eventBox(parent, filename, label_text1, label_text2, scale_w, scale_h):
+    # Create box for xpm and label
+    box = Gtk.HBox(False, 0)
+    # Create an eventBox
+    eventBox = Gtk.EventBox()
+    # Now on to the image stuff
+    pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(
+            filename=filename,
+            width=scale_w,
+            height=scale_h,
+            preserve_aspect_ratio=True)
+    image = Gtk.Image.new_from_pixbuf(pixbuf)
+
+    label = Gtk.Label()
+    label.set_markup("<span font='15' color='#FFFFFFFF'>%s\n</span>"
+                     "<span font='15' color='#FFFFFFFF'>%s</span>" % (label_text1, label_text2))
+    label.set_justify(Gtk.Justification.LEFT)
+    label.set_line_wrap(True)
+
+    # Pack the pixmap and label into the box
+    box.pack_start(image, True, False, 0)
+    box.pack_start(label, True, False, 0)
+
+    # Add the image to the eventBox
+    eventBox.add(box)
+
+    return eventBox
+
 
 def _load_image_Box(parent, filename, label_text, scale_w, scale_h):
     # Create box for xpm and label
@@ -727,7 +779,7 @@ class MainUIWindow(Gtk.Window):
         rgba = Gdk.RGBA(0.31, 0.32, 0.31, 1.0)
         logo_info_area.override_background_color(0,rgba)
 
-        # Button: Wifi web server icon
+        # Button: Netdata icon
         eventBox_webserv = _load_image_eventBox(self, "%s/pictures/netdata-icon-192x192.png" % DEMO_PATH, "netdata", "perf monitor", -1, self.icon_size)
         eventBox_webserv.connect("button_release_event", self.wifi_hotspot_event)
         eventBox_webserv.connect("button_press_event", self.highlight_eventBox)
