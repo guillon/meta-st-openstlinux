@@ -1,5 +1,5 @@
-FIRMWARE_PATH_DK2?="/usr/local/Cube-M4-examples/demonstrations/STM32MP157C-DK2/AI_Character_Recognition/lib/firmware"
-FIRMWARE_PATH_EV1?="/usr/local/Cube-M4-examples/demonstrations/STM32MP157C-EV1/AI_Character_Recognition/lib/firmware"
+FIRMWARE_PATH_DK2?="/usr/local/Cube-M4-examples/STM32MP157C-DK2/Demonstrations/AI_Character_Recognition/lib/firmware"
+FIRMWARE_PATH_EV1?="/usr/local/Cube-M4-examples/STM32MP157C-EV1/Demonstrations/AI_Character_Recognition/lib/firmware"
 FIRMWARE_NAME?="AI_Character_Recognition.elf"
 
 
