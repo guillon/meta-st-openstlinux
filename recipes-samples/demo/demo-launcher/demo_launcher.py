@@ -21,6 +21,8 @@ import struct
 from collections import deque
 from time import sleep, time
 
+from bin.bluetooth_panel import BluetoothWindow
+
 #
 # For simulating UI on PC , please use
 # the variable SIMULATE = 1
@@ -610,7 +612,7 @@ class MainUIWindow(Gtk.Window):
         # page for basic information
         self.create_page_icon()
 
-    def no_camera(self):
+    def display_message(self, message):
         dialog = Gtk.Dialog("Error", self, 0, (Gtk.STOCK_OK, Gtk.ResponseType.OK))
         dialog.set_decorated(False)
         width, height = self.get_size()
@@ -621,8 +623,7 @@ class MainUIWindow(Gtk.Window):
         label0 = Gtk.Label() #for padding
 
         label1 = Gtk.Label()
-        label1.set_markup("<span font='15' color='#FFFFFFFF'>Webcam is not connected:\n</span>"
-                          "<span font='15' color='#FFFFFFFF'>/dev/video0 doesn't exist\n</span>")
+        label1.set_markup(message)
         label1.set_justify(Gtk.Justification.CENTER)
         label1.set_line_wrap(True)
 
@@ -645,40 +646,6 @@ class MainUIWindow(Gtk.Window):
 
         dialog.destroy()
 
-    def no_touchscreen(self):
-        dialog = Gtk.Dialog("Error", self, 0, (Gtk.STOCK_OK, Gtk.ResponseType.OK))
-        dialog.set_decorated(False)
-        width, height = self.get_size()
-        dialog.set_default_size(width, height)
-        rgba = Gdk.RGBA(0.31, 0.32, 0.31, 0.8)
-        dialog.override_background_color(0,rgba)
-
-        label0 = Gtk.Label() #for padding
-
-        label1 = Gtk.Label()
-        label1.set_markup("<span font='15' color='#FFFFFFFF'>No touch screen device connected.\n</span>"
-                          "<span font='15' color='#FFFFFFFF'>The AI application could not be launch\n</span>")
-        label1.set_justify(Gtk.Justification.CENTER)
-        label1.set_line_wrap(True)
-
-        label2 = Gtk.Label() #for padding
-
-        # Create a centering alignment object
-        align = Gtk.Alignment()
-        align.set(0.5, 0, 0, 0)
-
-        dialog.vbox.pack_start(label0, True, False, 0)
-        dialog.vbox.pack_start(label1, True, True,  0)
-        dialog.vbox.pack_start(align,  True, True,  0)
-        dialog.vbox.pack_start(label2, True, False, 0)
-
-        dialog.action_area.reparent(align)
-        dialog.show_all()
-
-        dialog.run()
-        print("INFO dialog closed")
-
-        dialog.destroy()
 
     # Button event of main screen
     def highlight_eventBox(self, widget, event):
@@ -719,7 +686,7 @@ class MainUIWindow(Gtk.Window):
             video_window.destroy()
         else:
             print("[WARNING] camera not detected\n")
-            self.no_camera()
+            self.display_message("<span font='15' color='#FFFFFFFF'>Webcam is not connected:\n/dev/video0 doesn't exist\n</span>")
 
         print("[camera_event stop]\n")
         rgba = Gdk.RGBA(0.0, 0.0, 0.0, 0.0)
@@ -742,7 +709,7 @@ class MainUIWindow(Gtk.Window):
 
         if touchscreen == False:
             print("[WARNING] No touch screen device\n")
-            self.no_touchscreen()
+            self.display_message("<span font='15' color='#FFFFFFFF'>No touch screen device connected.\nThe AI application could not be launch\n</span>")
         else:
             print("Touch screen device found\n")
             demo_AI_start()
@@ -759,9 +726,19 @@ class MainUIWindow(Gtk.Window):
 
     def bluetooth_event(self, widget, event):
         print("[bluetooth_event start]\n")
-        print("[WARNING] bluetooth demo not yet supported\n")
-        #subprocess.call(["python", "%s/bin/bluetooth_panel.py" % DEMO_PATH])
-        print("[bluetooth_event stop]\n")
+
+        # Check that bluetooth is supported on the board
+        self.bluetooth_state = os.system('hciconfig hci0')
+        if self.bluetooth_state != 0:
+            print("[WARNING] No bluetooth controller found on the board\n")
+            self.display_message("<span font='15' color='#FFFFFFFF'>Please connect a bluetooth controller on the board\n</span>")
+            print("[bluetooth_event cancelled : no bluetooth device found]\n")
+        else:
+            bt_window = BluetoothWindow(self, "bluetooth panel")
+            bt_window.show_all()
+            response = bt_window.run()
+            bt_window.destroy()
+            print("[bluetooth_event stop]\n")
         rgba = Gdk.RGBA(0.0, 0.0, 0.0, 0.0)
         widget.override_background_color(0,rgba)
 
