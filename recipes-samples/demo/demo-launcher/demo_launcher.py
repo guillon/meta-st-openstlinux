@@ -650,14 +650,15 @@ class MainUIWindow(Gtk.Window):
     # Button event of main screen
     def highlight_eventBox(self, widget, event):
         ''' highlight the eventBox widget '''
-        print("[highlight_eventBox start]\n")
+        print("[highlight_eventBox start]")
         rgba = Gdk.RGBA(0.0, 0.0, 0.0, 0.1)
         widget.override_background_color(0,rgba)
+        self.button_exit.hide()
         print("[highlight_eventBox stop]\n")
 
     def wifi_hotspot_event(self, widget, event):
         ''' start hotspot wifi on board '''
-        print("[wifi_hotspot_event start]\n")
+        print("[wifi_hotspot_event start]")
         wifi_window = WifiWindow(self, "Wifi hotspot")
         wifi_window.show_all()
         response = wifi_window.run()
@@ -665,9 +666,10 @@ class MainUIWindow(Gtk.Window):
         print("[wifi_hotspot_event stop]\n")
         rgba = Gdk.RGBA(0.0, 0.0, 0.0, 0.0)
         widget.override_background_color(0,rgba)
+        self.button_exit.show()
 
     def videoplay_event(self, widget, event):
-        print("[videoplay_event start]\n");
+        print("[videoplay_event start]");
         video_window = GstVideoWindow(self, "playback")
         video_window.show_all()
         response = video_window.run()
@@ -675,10 +677,10 @@ class MainUIWindow(Gtk.Window):
         print("[videoplay_event stop]\n");
         rgba = Gdk.RGBA(0.0, 0.0, 0.0, 0.0)
         widget.override_background_color(0,rgba)
+        self.button_exit.show()
 
     def camera_event(self, widget, event):
-        print("[camera_event start]\n")
-
+        print("[camera_event start]")
         if os.path.exists("/dev/video0"):
             video_window = GstVideoWindow(self, "camera")
             video_window.show_all()
@@ -691,9 +693,10 @@ class MainUIWindow(Gtk.Window):
         print("[camera_event stop]\n")
         rgba = Gdk.RGBA(0.0, 0.0, 0.0, 0.0)
         widget.override_background_color(0,rgba)
+        self.button_exit.show()
 
     def ai_event(self, widget, event):
-        print("[ai_event start]\n")
+        print("[ai_event start]")
         devices = [evdev.InputDevice(path) for path in evdev.list_devices()]
         for device in devices:
             touchscreen = False
@@ -716,13 +719,13 @@ class MainUIWindow(Gtk.Window):
         print("[ai_event stop]\n")
         rgba = Gdk.RGBA(0.0, 0.0, 0.0, 0.0)
         widget.override_background_color(0,rgba)
+        self.button_exit.show()
 
     def gpu3d_event(self, widget, event):
-        print("[gpu3d_event start]\n")
-
+        print("[gpu3d_event start]")
         exists = os.path.isfile('/dev/galcore')
         if exists:
-            print("[WARNING] No GPU capabilities\n")
+            print("[WARNING] No GPU capabilities")
             self.display_message("<span font='15' color='#FFFFFFFF'>No GPU capabilities to run 3D GPU demo\n</span>")
             print("[gpu3d_event cancelled]\n")
         else:
@@ -730,10 +733,10 @@ class MainUIWindow(Gtk.Window):
             print("[gpu3d_event stop]\n")
         rgba = Gdk.RGBA(0.0, 0.0, 0.0, 0.0)
         widget.override_background_color(0,rgba)
+        self.button_exit.show()
 
     def bluetooth_event(self, widget, event):
-        print("[bluetooth_event start]\n")
-
+        print("[bluetooth_event start]")
         # Check that bluetooth is supported on the board
         self.bluetooth_state = os.system('hciconfig hci0 up')
         if self.bluetooth_state != 0:
@@ -748,6 +751,7 @@ class MainUIWindow(Gtk.Window):
             print("[bluetooth_event stop]\n")
         rgba = Gdk.RGBA(0.0, 0.0, 0.0, 0.0)
         widget.override_background_color(0,rgba)
+        self.button_exit.show()
 
     def create_page_icon(self):
         page_main = Gtk.HBox(False, 0)
@@ -806,14 +810,14 @@ class MainUIWindow(Gtk.Window):
 
         overlay = Gtk.Overlay()
         overlay.add(page_main)
-        button_exit = Gtk.Button()
-        button_exit.connect("clicked", Gtk.main_quit)
-        button_exit_image = _load_image_on_button(self, "%s/pictures/close_70x70_white.png" % DEMO_PATH, "Exit", -1, 50)
-        button_exit.set_halign(Gtk.Align.END)
-        button_exit.set_valign(Gtk.Align.START)
-        button_exit.add(button_exit_image)
-        button_exit.set_relief(Gtk.ReliefStyle.NONE)
-        overlay.add_overlay(button_exit)
+        self.button_exit = Gtk.Button()
+        self.button_exit.connect("clicked", Gtk.main_quit)
+        self.button_exit_image = _load_image_on_button(self, "%s/pictures/close_70x70_white.png" % DEMO_PATH, "Exit", -1, 50)
+        self.button_exit.set_halign(Gtk.Align.END)
+        self.button_exit.set_valign(Gtk.Align.START)
+        self.button_exit.add(self.button_exit_image)
+        self.button_exit.set_relief(Gtk.ReliefStyle.NONE)
+        overlay.add_overlay(self.button_exit)
         self.add(overlay)
 
         self.show_all()
