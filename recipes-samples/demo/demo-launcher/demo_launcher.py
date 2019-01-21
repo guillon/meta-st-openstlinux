@@ -719,8 +719,15 @@ class MainUIWindow(Gtk.Window):
 
     def gpu3d_event(self, widget, event):
         print("[gpu3d_event start]\n")
-        cube_3D_start()
-        print("[gpu3d_event stop]\n")
+
+        exists = os.path.isfile('/dev/galcore')
+        if exists:
+            print("[WARNING] No GPU capabilities\n")
+            self.display_message("<span font='15' color='#FFFFFFFF'>No GPU capabilities to run 3D GPU demo\n</span>")
+            print("[gpu3d_event cancelled]\n")
+        else:
+            cube_3D_start()
+            print("[gpu3d_event stop]\n")
         rgba = Gdk.RGBA(0.0, 0.0, 0.0, 0.0)
         widget.override_background_color(0,rgba)
 
