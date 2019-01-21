@@ -212,7 +212,7 @@ class GstVideoWindow(Gtk.Dialog):
     def on_video_press_event(self, widget, event):
         self.click_time = time()
         print(self.click_time - self.previous_click_time)
-        if (self.click_time - self.previous_click_time) < 0.4:
+        if (self.click_time - self.previous_click_time) < 0.3:
             print ("double click")
             if not self.filename is None:
                 self.video_widget.stop()
@@ -401,7 +401,7 @@ class WifiWindow(Gtk.Dialog):
         # TODO : a fake click is observed, workaround hereafter
         if (self.click_time - self.previous_click_time) < 0.01:
             self.previous_click_time = self.click_time
-        elif (self.click_time - self.previous_click_time) < 0.4:
+        elif (self.click_time - self.previous_click_time) < 0.3:
             print ("double click")
             self.destroy()
         else:
@@ -735,7 +735,7 @@ class MainUIWindow(Gtk.Window):
         print("[bluetooth_event start]\n")
 
         # Check that bluetooth is supported on the board
-        self.bluetooth_state = os.system('hciconfig hci0')
+        self.bluetooth_state = os.system('hciconfig hci0 up')
         if self.bluetooth_state != 0:
             print("[WARNING] No bluetooth controller found on the board\n")
             self.display_message("<span font='15' color='#FFFFFFFF'>Please connect a bluetooth controller on the board\n</span>")

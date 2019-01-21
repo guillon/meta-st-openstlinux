@@ -14,6 +14,8 @@ from time import sleep, time
 
 from bin.wrap_blctl import wrapper_blctl as Bluetoothctl
 
+SCAN_DURATION_IN_S  = 10
+
 regexps_audio = [
    re.compile(r"00001108-(?P<Headset>.+)$"),
    re.compile(r"0000110b-(?P<AudioSink>.+)$"),
@@ -126,27 +128,6 @@ def status_playback(self):
     if mess_bt == "":
         mess_bt = "Device not connected"
 
-    list_streams = scan_streams()
-    streams = parse_streams(list_streams)
-    #print(streams)
-    mess_playback = ""
-    if streams != []:
-       for st in streams:
-          if sinks != []:
-             for sk_elt in sink_ident:
-                 if st['Sink'] == sk_elt['ident']:
-                    mess_playback = mess_playback + "The audio BT " + sk_elt['name'] + " is selected for the playback " + st['Name'] + "\n"
-                 else:
-                    mess_playback = mess_playback + "The audio BT " + sk_elt['name'] + " is not selected for the playback " + st['Name'] + "\n"
-          stream_ident = st['Ident']
-          if mess_playback == "":
-              mess_playback = "The playback " + st['Name'] + "is running\n"
-
-    else:
-       mess_playback = "No playback is running\n"
-       #mess_playback = ""
-
-    #mess = mess_bt + mess_playback
     self.label_audio.set_markup("<span font='20' color='#FFFFFFFF'>%s</span>" % mess_bt)
     self.label_audio.set_justify(Gtk.Justification.LEFT)
     self.label_audio.set_line_wrap(True)
@@ -259,9 +240,6 @@ class BluetoothWindow(Gtk.Dialog):
         self.connect("button-release-event", self.on_page_press_event)
         mainvbox = self.get_content_area()
 
-        self.bluetooth_state = os.system('hciconfig hci0 up')
-        self.bl = Bluetoothctl()
-
         self.dev_selected = {'mac_address':'', 'name':''}
         self.audio_bt_sink = []
         self.list_dev_connect = []
@@ -289,7 +267,7 @@ class BluetoothWindow(Gtk.Dialog):
         self.ButtonBox.add(self.button_scan)
 
         self.lb_button_connect = Gtk.Label()
-        self.lb_button_connect.set_markup("<span font='20'>connect</span>")
+        self.lb_button_connect.set_markup("<span font='20' color='#88888888'>connect</span>")
         self.button_connect = Gtk.Button()
         self.button_connect.add(self.lb_button_connect)
         self.button_connect.connect("clicked", self.on_selection_connect_clicked)
@@ -335,6 +313,11 @@ class BluetoothWindow(Gtk.Dialog):
 
         mainvbox.pack_start(self.page_bluetooth, False, True, 3)
         self.show_all()
+
+        # Bluetooth already anabled by demo_launcher.py
+        #self.bluetooth_state = os.system('hciconfig hci0 up')
+        self.bl = Bluetoothctl()
+
         list_devices(self, paired=True)
         self.audio_bt_sink = status_playback(self)
 
@@ -380,7 +363,7 @@ class BluetoothWindow(Gtk.Dialog):
         # TODO : a fake click is observed, workaround hereafter
         if (self.click_time - self.previous_click_time) < 0.01:
             self.previous_click_time = self.click_time
-        elif (self.click_time - self.previous_click_time) < 0.4:
+        elif (self.click_time - self.previous_click_time) < 0.3:
             print ("double click : exit")
             self.bl.close()
             self.destroy()
@@ -401,7 +384,6 @@ class BluetoothWindow(Gtk.Dialog):
            self.lb_button_scan.set_markup("<span font='20'>start scan</span>")
            self.scan_done = True
            self.update_display()
-           #timer_update_dev = GLib.timeout_add(10000, self.status_playback, None)
            return False
 
         self.scan_progress.set_fraction(new_val)
@@ -418,7 +400,10 @@ class BluetoothWindow(Gtk.Dialog):
             if model[iter][2] == " yes":
                 self.lb_button_connect.set_markup("<span font='20'>disconnect</span>")
             else:
-                self.lb_button_connect.set_markup("<span font='20'>connect</span>")
+                if self.label_audio.get_text() == "Device not connected":
+                    self.lb_button_connect.set_markup("<span font='20'>connect</span>")
+                else:
+                    self.lb_button_connect.set_markup("<span font='20' color='#88888888'>connect</span>")
         return True
 
     def connect_process(self, dev):
@@ -430,36 +415,41 @@ class BluetoothWindow(Gtk.Dialog):
             if connect_res == True:
                 self.lb_button_connect.set_markup("<span font='20'>disconnect</span>")
                 self.update_display()
-        # refresh status_playback after 2s because pulseaudio takes time to update status
+        # refresh status_playback after 2,5s because pulseaudio takes some time to update its status
         timer_update_dev = GLib.timeout_add(2500, self.delayed_status_playback, None)
 
     def on_selection_connect_clicked(self, widget):
         if self.dev_selected['mac_address'] != '':
             device = self.dev_selected
             if self.lb_button_connect.get_text() == "connect":
-               self.bl.set_prompt(device['name'])
-               if device_paired(self.bl, device['mac_address']) == False:
-                   pairing_res=self.bl.blctl_pair(device['mac_address'])
-                   if pairing_res == 0:
-                      self.bl.blctl_session.send("no\n")
-                   else:
-                      if pairing_res == 1:
-                         sleep(5)
-                         self.connect_process(device)
-               else:
-                   self.connect_process(device)
+                if self.label_audio.get_text() == "Device not connected":
+                    self.bl.set_prompt(device['name'])
+                    if device_paired(self.bl, device['mac_address']) == False:
+                        pairing_res=self.bl.blctl_pair(device['mac_address'])
+                        if pairing_res == 0:
+                            self.bl.blctl_session.send("no\n")
+                        else:
+                            if pairing_res == 1:
+                                sleep(5)
+                                self.connect_process(device)
+                    else:
+                        self.connect_process(device)
+                else:
+                    print("[WARNING] A BT device is already connected :\ndisconnect it before connecting a new device\n")
+                    self.display_message("<span font='15' color='#FFFFFFFF'>A BT device is already connected :\nPlease disconnect it before connecting a new device\n</span>")
             else:
-               connect_res=self.bl.blctl_disconnect(device['mac_address'])
-               self.lb_button_connect.set_markup("<span font='20'>connect</span>")
-               self.update_display()
+                connect_res=self.bl.blctl_disconnect(device['mac_address'])
+                self.lb_button_connect.set_markup("<span font='20'>connect</span>")
+                self.update_display()
         else:
             print("[WARNING] Select the BT device to connect\n")
             self.display_message("<span font='15' color='#FFFFFFFF'>Please select a device in the list\n</span>")
 
+
     def on_selection_scan_clicked(self, widget):
         if self.lb_button_scan.get_text() == "start scan":
            self.bl.blctl_scan_on()
-           timer_scan = GLib.timeout_add(50, self.progress_timeout, None)
+           timer_scan = GLib.timeout_add(SCAN_DURATION_IN_S * 10, self.progress_timeout, None)
            self.lb_button_scan.set_markup("<span font='20'>scan progress</span>")
 
     def update_display(self):

@@ -46,7 +46,7 @@ class wrapper_blctl:
         self.blctl_session = pexpect.spawn("bluetoothctl", echo = False, maxread = 3000)
 
         #no prompt expected because a BT device can be connected automatically
-        prompt_expect = self.blctl_session.expect([pexpect.EOF, pexpect.TIMEOUT], timeout = 5)
+        prompt_expect = self.blctl_session.expect([pexpect.EOF, pexpect.TIMEOUT], timeout = 1)
         str_out = str(self.blctl_session.before,"utf-8")
         l_out = str_out.split("\r\n")
 
@@ -64,7 +64,7 @@ class wrapper_blctl:
     #execute a bluetoothctl command and return the result as a list of lines
     #no status cmd expected
     def blctl_command(self, command, pause = 0):
-        print("blctl_command : " + command)
+        #print("blctl_command : " + command)
         self.blctl_session.send(command + "\n")
         time.sleep(pause)
 
