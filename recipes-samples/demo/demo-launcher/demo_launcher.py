@@ -182,7 +182,6 @@ class GstVideoWindow(Gtk.Dialog):
     def __init__(self, parent, pipeline):
         Gtk.Dialog.__init__(self, "Video", parent, 0)
 
-        #self.fullscreen()
         self.maximize()
         self.set_decorated(False)
         rgba = Gdk.RGBA(0.31, 0.32, 0.31, 0.8)
@@ -207,7 +206,6 @@ class GstVideoWindow(Gtk.Dialog):
         self.video_widget.set_valign(Gtk.Align.CENTER)
         mainvbox.pack_start(self.video_widget, True, True, 0)
         self.video_widget.connect("button-press-event", self.on_video_press_event)
-        #self.show_all()
 
     def on_video_press_event(self, widget, event):
         self.click_time = time()
@@ -230,14 +228,52 @@ class GstVideoWindow(Gtk.Dialog):
     def set_video_filename(self, filename):
         self.video_widget.set_file(filename)
 
+# Info view
+class InfoWindow(Gtk.Dialog):
+    def __init__(self, parent, pipeline):
+        Gtk.Dialog.__init__(self, "Wifi", parent, 0)
+        self.previous_click_time=0
+        self.maximize()
+        self.set_decorated(False)
+        rgba = Gdk.RGBA(0.31, 0.32, 0.31, 0.8)
+        self.override_background_color(0,rgba)
 
-# Wifi hotspot view
+        mainvbox = self.get_content_area()
+
+        page_info = Gtk.VBox()
+        page_info.set_border_width(10)
+
+        title = Gtk.Label()
+        title.set_markup("<span font='30' color='#FFFFFFFF'><b>About the application</b></span>")
+        page_info.add(title)
+
+        label1 = Gtk.Label()
+        label1.set_markup("<span font='15' color='#FFFFFFFF'>\n\nSimple tap: pause/resume the video\nDouble tap: exit from demo\n\nAI demo: draw character on touchscreen to launch action</span>")
+        label1.set_justify(Gtk.Justification.LEFT)
+        page_info.add(label1)
+
+        mainvbox.pack_start(page_info, False, False, 3)
+        self.connect("button-release-event", self.on_page_press_event)
+        self.show_all()
+
+    def on_page_press_event(self, widget, event):
+        self.click_time = time()
+        print(self.click_time - self.previous_click_time)
+        # TODO : a fake click is observed, workaround hereafter
+        if (self.click_time - self.previous_click_time) < 0.01:
+            self.previous_click_time = self.click_time
+        elif (self.click_time - self.previous_click_time) < 0.3:
+            print ("double click")
+            self.destroy()
+        else:
+            print ("simple click")
+            self.previous_click_time = self.click_time
+
+# Netdata view
 class WifiWindow(Gtk.Dialog):
     def __init__(self, parent, pipeline):
         Gtk.Dialog.__init__(self, "Wifi", parent, 0)
 
-        #width, height = self.get_size()
-        #self.set_default_size(width, height)
         self.maximize()
         self.set_decorated(False)
         rgba = Gdk.RGBA(0.31, 0.32, 0.31, 0.8)
@@ -268,9 +304,6 @@ class WifiWindow(Gtk.Dialog):
         self.label_ip_wlan_ssid.set_xalign (0.0)
         self.label_ip_wlan_passwd = Gtk.Label()
         self.label_ip_wlan_passwd.set_xalign (0.0)
-
-        self.label_blank = Gtk.Label()
-        self.label_blank.set_markup('')
 
         self.previous_click_time=0
         self.wifi_ssid=WIFI_DEFAULT_SSID
@@ -493,13 +526,10 @@ def _load_image_wlan_eventBox(parent, filename, label_text1, label_text2, scale_
     return eventBox
 
 
-def _load_image_Box(parent, filename, label_text, scale_w, scale_h):
-    # Create box for xpm and label
+def _load_image_Box(parent, mp1filename, infofilename, label_text, scale_w, scale_h):
     box = Gtk.VBox(False, 0)
-    # print("[DEBUG] image: %s " % filename)
-    # Now on to the image stuff
     pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(
-            filename=filename,
+            filename=mp1filename,
             width=scale_w,
             height=scale_h,
             preserve_aspect_ratio=True)
@@ -507,7 +537,6 @@ def _load_image_Box(parent, filename, label_text, scale_w, scale_h):
 
     # Create a label for the button
     label0 = Gtk.Label() #for padding
-
     label1 = Gtk.Label()
     label1.set_markup("<span font='14' color='#FFFFFFFF'><b>%s</b></span>\n"
                       "<span font='10' color='#FFFFFFFF'>Dual Arm&#174; Cortex&#174;-A7</span>\n"
@@ -516,7 +545,16 @@ def _load_image_Box(parent, filename, label_text, scale_w, scale_h):
     label1.set_justify(Gtk.Justification.CENTER)
     label1.set_line_wrap(True)
 
-    label2 = Gtk.Label() #for padding
+    eventBox = Gtk.EventBox()
+    pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(
+        filename=infofilename,
+        width=scale_w,
+        height=(scale_h/4),
+        preserve_aspect_ratio=True)
+    info = Gtk.Image.new_from_pixbuf(pixbuf)
+    eventBox.add(info)
+    eventBox.connect("button_release_event", parent.info_event)
+    eventBox.connect("button_press_event", parent.highlight_eventBox)
 
     label3 = Gtk.Label()
     label3.set_markup("<span font='10' color='#FFFFFFFF'><b>Python GTK launcher</b></span>\n")
@@ -527,7 +565,7 @@ def _load_image_Box(parent, filename, label_text, scale_w, scale_h):
     box.pack_start(label0, True, False, 0)
     box.pack_start(image, True, False, 0)
     box.pack_start(label1, True, False, 0)
-    box.pack_start(label2, True, False, 0)
+    box.pack_start(eventBox, True, False, 0)
     box.pack_start(label3, True, False, 0)
 
     return box
@@ -647,6 +685,18 @@ class MainUIWindow(Gtk.Window):
         dialog.destroy()
 
 
+    def info_event(self, widget, event):
+        print("[info_event start]");
+        info_window = InfoWindow(self, "Informations")
+        info_window.show_all()
+        response = info_window.run()
+        info_window.destroy()
+        print("[info_event stop]\n");
+        rgba = Gdk.RGBA(0.0, 0.0, 0.0, 0.0)
+        widget.override_background_color(0,rgba)
+        self.button_exit.show()
+
+
     # Button event of main screen
     def highlight_eventBox(self, widget, event):
         ''' highlight the eventBox widget '''
@@ -763,7 +813,7 @@ class MainUIWindow(Gtk.Window):
         icon_grid.set_row_spacing(20)
 
         # STM32MP1 Logo and info area
-        logo_info_area = _load_image_Box(self, "%s/pictures/ST11249_Module_STM32MP1_alpha.png" % DEMO_PATH, self.board_name, -1, 160)
+        logo_info_area = _load_image_Box(self, "%s/pictures/ST11249_Module_STM32MP1_alpha.png" % DEMO_PATH, "%s/pictures/ST13340_Info_white.png" % DEMO_PATH, self.board_name, -1, 160)
         rgba = Gdk.RGBA(0.31, 0.32, 0.31, 1.0)
         logo_info_area.override_background_color(0,rgba)
 
