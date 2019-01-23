@@ -118,3 +118,5 @@ IMAGE_INSTALL_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'xf86-vi
 
 # resize tools
 IMAGE_INSTALL_append = " resize-helper systemd-mount-partitions "
+
+PACKAGE_EXCLUDE = "libc6-dbg"
