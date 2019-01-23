@@ -26,10 +26,10 @@ from time import sleep, time
 #
 SIMULATE_SENSORS = 0
 
-ICON_PICTURES_PATH = "/usr/share/sensors_temperature"
+ICON_PICTURES_PATH = "/usr/local/demo/pictures"
 
-WITH_PRESSURE = 1
-WITH_GYRO = 0
+WITH_PRESSURE = 0
+WITH_GYRO = 1
 
 # -------------------------------------------------------------------
 # -------------------------------------------------------------------
@@ -40,8 +40,6 @@ SIMULATE_SCREEN_SIZE_HEIGHT = 800
 DEFAULT_SCREEN_WIDTH = 400
 DEFAULT_SCREEN_HEIGHT = 600
 
-# Maximum of value to display on graph
-NUM_GRAPH_SAMPLE = 112
 # time between each sensor mesearuement (1s)
 TIME_UPATE = 2000
 
@@ -113,233 +111,6 @@ class SplashScreen():
             self.window.destroy()
             return False
         return True
-
-# -------------------------------------------------------------------
-# -------------------------------------------------------------------
-# prerequisite:
-# gstreamer1.0-plugins-base: for gir file
-# gstreamer1.0-plugins-bad-gtk: for sink compliant with wayland
-try:
-    HAVE_VIDEO_SINK = 1
-    gi.require_version('Gst', '1.0')
-    gi.require_version('GstVideo', '1.0')
-    from gi.repository import Gst
-except ImportError:
-    print("[DEBUG]: No gst/gstvideo detected")
-    HAVE_VIDEO_SINK = None
-if HAVE_VIDEO_SINK:
-    try:
-        Gst.init(None)
-        Gst.init_check(None)
-    except Exception as exc:
-        pass
-
-# Gstreamer videotestsrc widget
-class GstVideoTestSrcWidget(Gtk.Box):
-    def __init__(self):
-        super().__init__()
-        self.connect('realize', self._on_realize)
-        self._bin = Gst.parse_bin_from_description('videotestsrc', True)
-
-    def _on_realize(self, widget):
-        self.pipeline = Gst.Pipeline()
-        factory = self.pipeline.get_factory()
-        gtksink = factory.make('gtksink')
-        self.pipeline.add(gtksink)
-        self.pipeline.add(self._bin)
-        self._bin.link(gtksink)
-        self.pack_start(gtksink.props.widget, True, True, 0)
-        gtksink.props.widget.show()
-        self.pipeline.set_state(Gst.State.PLAYING)
-    def set_file(self, filename):
-        ''' '''
-        return True
-    def start(self):
-        print("[DEBUG] [MIR] ask to start")
-        self.pipeline.set_state(Gst.State.PLAYING)
-    def stop(self):
-        print("[DEBUG] [MIR] ask to stop")
-        self.pipeline.set_state(Gst.State.NULL)
-    def pause(self):
-        print("[DEBUG] [MIR] ask to pause")
-        self.pipeline.set_state(Gst.State.PAUSED)
-
-# Gstreamer video playback file widget
-class GstVideoWidget(Gtk.Box):
-    def __init__(self):
-        super().__init__()
-        self.connect('realize', self._on_realize)
-
-        self.player = Gst.ElementFactory.make("playbin", "player")
-        self.gtksink = Gst.ElementFactory.make("gtksink", "gtksink")
-        self.fakesink = Gst.ElementFactory.make("fakesink", "fakesink")
-        self.player.set_property("video-sink", self.gtksink)
-        self.player.set_property("audio-sink", self.fakesink)
-        # TODO: change the audiosink
-
-        bus = self.player.get_bus()
-        bus.add_signal_watch()
-        bus.connect("message", self.on_message)
-
-    def set_file(self, filename):
-        if os.path.isfile(filename):
-            filepath = os.path.realpath(filename)
-            self.player.set_property("uri", "file://%s" % filepath)
-
-    def start(self):
-        self.player.set_state(Gst.State.PLAYING)
-    def stop(self):
-        self.player.set_state(Gst.State.NULL)
-    def pause(self):
-        self.player.set_state(Gst.State.PAUSED)
-
-    def on_message(self, bus, message):
-        t = message.type
-        if t == Gst.MessageType.EOS:
-            self.player.set_state(Gst.State.NULL)
-            Gtk.main_quit()
-        elif t == Gst.MessageType.ERROR:
-            self.player.set_state(Gst.State.NULL)
-            err, debug = message.parse_error()
-            print("Error:           %s" % err, debug)
-            Gtk.main_quit()
-
-    def _on_realize(self, widget):
-        self.pack_start(self.gtksink.props.widget, True, True, 0)
-        self.gtksink.props.widget.show()
-
-# video Window
-class GstVideoWindow(Gtk.Dialog):
-    def __init__(self, parent, pipeline):
-        Gtk.Dialog.__init__(self, "Video", parent, 0)
-
-        self.fullscreen()
-        #self.maximize()
-
-        mainvbox = self.get_content_area()
-
-        button_hbox = Gtk.HBox(False, 0)
-        if "videotestsrc" == pipeline:
-            self.video_widget = GstVideoTestSrcWidget ()
-            self.filename = "videotestsrc"
-        else:
-            self.video_widget = GstVideoWidget()
-            self.filename = None
-
-        mainvbox.pack_start(button_hbox, False, False, 3)
-        mainvbox.pack_start(self.video_widget, True, True, 3)
-
-        #start_button = Gtk.Button().new_with_label("Start")
-        start_button = Gtk.Button()
-        start_button.connect("clicked", self.start_videoplayback)
-        start_image = _load_image_on_button(self, "%s/RS10261_play_button_pink.png" % ICON_PICTURES_PATH, "start", -1, 50)
-        start_button.add(start_image)
-        start_button.show()
-
-        pause_button = Gtk.Button()
-        pause_button.connect("clicked", self.pause_videoplayback)
-        pause_image = _load_image_on_button(self, "%s/RS10258_pause_button_pink.png" % ICON_PICTURES_PATH, "pause", -1, 50)
-        pause_button.add(pause_image)
-        pause_button.show()
-
-        stop_button = Gtk.Button()
-        stop_button.connect("clicked", self.stop_videoplayback)
-        stop_image = _load_image_on_button(self, "%s/RS10259_stop_button_pink.png" % ICON_PICTURES_PATH, "stop", -1, 50)
-        stop_button.add(stop_image)
-        stop_button.show()
-
-        if not "videotestsrc" == pipeline:
-            search_button = Gtk.Button()
-            search_button.connect("clicked", self.search_videoplayback)
-            search_image = _load_image_on_button(self, "%s/RS9890_Icon3_pink.png" % ICON_PICTURES_PATH, "search", -1, 50)
-            search_button.add(search_image)
-            search_button.show()
-
-        quit_button = Gtk.Button()
-        quit_button.connect("clicked", self.quit_videoplayback)
-        quit_image = _load_image_on_button(self, "%s/RS518_house_light_blue.png" % ICON_PICTURES_PATH, "stop", -1, 50)
-        quit_button.add(quit_image)
-        quit_button.show()
-
-        button_hbox.add(start_button)
-        button_hbox.add(pause_button)
-        button_hbox.add(stop_button)
-        if not "videotestsrc" == pipeline:
-            button_hbox.add(search_button)
-        button_hbox.add(quit_button)
-
-        self.show_all()
-
-
-    def set_video_filename(self, filename):
-        self.video_widget.set_file(filename)
-    def start_videoplayback(self, button):
-        if not self.filename is None:
-            self.video_widget.start()
-    def pause_videoplayback(self, button):
-        print("[DEBUG] [VIDEO WIN] ask to pause")
-        print("   filename = ", self.filename)
-        if not self.filename is None:
-            self.video_widget.pause()
-    def stop_videoplayback(self, button):
-        if not self.filename is None:
-            self.video_widget.stop()
-    def search_videoplayback(self, button):
-        ''' '''
-        dialog = Gtk.FileChooserDialog("Please choose a file", self,
-                                       Gtk.FileChooserAction.OPEN,
-                                       (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
-                                        Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
-
-        # TODO: add video filter
-        #self.add_filters(dialog)
-        dialog.fullscreen()
-        response = dialog.run()
-        if response == Gtk.ResponseType.OK:
-            print("File selected: " + dialog.get_filename())
-            self.filename = dialog.get_filename()
-            self.set_video_filename(self.filename)
-        elif response == Gtk.ResponseType.CANCEL:
-            print("Close FileChooser")
-            self.filename = None
-
-        dialog.destroy()
-
-    def add_filters(self, dialog):
-        filter_text = Gtk.FileFilter()
-        filter_text.set_name("Text files")
-        filter_text.add_mime_type("text/plain")
-        dialog.add_filter(filter_text)
-
-        filter_py = Gtk.FileFilter()
-        filter_py.set_name("Python files")
-        filter_py.add_mime_type("text/x-python")
-        dialog.add_filter(filter_py)
-
-        filter_any = Gtk.FileFilter()
-        filter_any.set_name("Any files")
-        filter_any.add_pattern("*")
-        dialog.add_filter(filter_any)
-
-
-    def quit_videoplayback(self, button):
-        ''' '''
-        self.stop_videoplayback(button)
-        self.destroy()
-
-# -------------------------------------------------------------------
-# -------------------------------------------------------------------
-# Get the ip address of board
-def board_get_ip_address():
-    ip = "0.0.0.0"
-    try:
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s.connect(("8.8.8.8", 80))
-        ip =  s.getsockname()[0]
-        s.close()
-    except socket.error:
-        pass
-    return ip
 
 # -------------------------------------------------------------------
 # -------------------------------------------------------------------
@@ -432,6 +203,24 @@ class Sensors():
             pass
         return None
 
+    def found_iio_device_with_name(self, data, name):
+        prefix = "/sys/bus/iio/devices/"
+        of_name = 'OF_NAME=' + name
+        try:
+            for filefolder in os.listdir(prefix):
+                with open(prefix + '/' + filefolder + '/uevent') as f:
+                    for line in f:
+                        if line.split('\n')[0] == of_name:
+                            ''' return directory which contains "data" '''
+                            if os.path.exists(prefix + '/' + filefolder + '/' + data):
+                                return (prefix + '/' + filefolder + '/')
+        except OSError:
+            pass
+        except Exception as exc:
+            pass
+        return None
+
+
     def driver_name_iio_device(self, key):
         if SIMULATE_SENSORS > 0:
             val_name = "-Simulated-"
@@ -447,12 +236,16 @@ class Sensors():
         return val_name
 
     def found_all_sensor_path(self):
-        self.sensor_dictionnary[self.key_temperature] = self.found_iio_device("in_temp_raw")
+        self.sensor_dictionnary[self.key_temperature] = self.found_iio_device_with_name("in_temp_raw", "hts221")
         self.sensor_dictionnary[self.key_humidity]    = self.found_iio_device("in_humidityrelative_raw")
         self.sensor_dictionnary[self.key_pressure]    = self.found_iio_device("in_pressure_raw")
 
         self.sensor_dictionnary[self.key_accelerometer] = self.found_iio_device("in_accel_x_raw")
-        self.sensor_dictionnary[self.key_gyroscope] = self.found_iio_device("in_anglvel_x_raw")
+        if WITH_GYRO:
+            self.sensor_dictionnary[self.key_gyroscope] = self.found_iio_device("in_anglvel_x_raw")
+        else:
+            self.sensor_dictionnary[self.key_gyroscope] = ""
+
         self.sensor_dictionnary[self.key_magnetometer] = "" #TODO
 
         self.sensor_dictionnary[self.driver_name_temperature] = self.driver_name_iio_device(self.key_temperature)
@@ -460,16 +253,16 @@ class Sensors():
         self.sensor_dictionnary[self.driver_name_pressure]    = self.driver_name_iio_device(self.key_pressure)
 
         self.sensor_dictionnary[self.driver_name_accelerometer] = self.driver_name_iio_device(self.key_accelerometer)
-        self.sensor_dictionnary[self.driver_name_gyroscope]     = self.driver_name_iio_device(self.driver_name_humidity)
-        self.sensor_dictionnary[self.driver_name_magnetometer]  = self.driver_name_iio_device(self.driver_name_pressure)
+        self.sensor_dictionnary[self.driver_name_gyroscope]     = self.driver_name_iio_device(self.key_gyroscope)
+        self.sensor_dictionnary[self.driver_name_magnetometer]  = self.driver_name_iio_device(self.key_magnetometer)
 
         self.init_pressure_sampling_frequency()
-        print("[DEBUG] " , self.key_temperature, " -> ", self.sensor_dictionnary[self.key_temperature])
-        print("[DEBUG] " , self.key_humidity, " -> ", self.sensor_dictionnary[self.key_humidity])
-        print("[DEBUG] " , self.key_pressure, " -> ", self.sensor_dictionnary[self.key_pressure])
-        print("[DEBUG] " , self.key_accelerometer, " -> ", self.sensor_dictionnary[self.key_accelerometer])
-        print("[DEBUG] " , self.key_gyroscope, " -> ", self.sensor_dictionnary[self.key_gyroscope])
-        print("[DEBUG] " , self.key_magnetometer, " -> ", self.sensor_dictionnary[self.key_magnetometer])
+        print("[DEBUG] " , self.key_temperature, " -> ", self.sensor_dictionnary[self.key_temperature], "<")
+        print("[DEBUG] " , self.key_humidity, " -> ", self.sensor_dictionnary[self.key_humidity], "<")
+        print("[DEBUG] " , self.key_pressure, " -> ", self.sensor_dictionnary[self.key_pressure], "<")
+        print("[DEBUG] " , self.key_accelerometer, " -> ", self.sensor_dictionnary[self.key_accelerometer], "<")
+        print("[DEBUG] " , self.key_gyroscope, " -> ", self.sensor_dictionnary[self.key_gyroscope], "<")
+        print("[DEBUG] " , self.key_magnetometer, " -> ", self.sensor_dictionnary[self.key_magnetometer], "<")
 
 
     def read_sensor_basic(self, key, prefix):
@@ -482,19 +275,26 @@ class Sensors():
                 return random.uniform(800.0, 1200.0)
         else:
             if self.sensor_dictionnary[key] is None or len(self.sensor_dictionnary[key]) < 5:
-                if self.key_temperature == key:
-                   return random.uniform(0.0, 50.0)
-                elif self.key_humidity == key:
-                    return random.uniform(0.0, 100.0)
-                else:
-                    return random.uniform(800.0, 1200.0)
-            with open(self.sensor_dictionnary[key] + prefix + 'raw', 'r') as f:
-                raw = float(f.read())
-            with open(self.sensor_dictionnary[key] + prefix + 'scale', 'r') as f:
-                scale = float(f.read())
+                return 0.0
+            try:
+                with open(self.sensor_dictionnary[key] + prefix + 'raw', 'r') as f:
+                    raw = float(f.read())
+            except Exception as exc:
+                print("[ERROR] read %s " % self.sensor_dictionnary[key] + prefix + 'raw', exc)
+                raw = 0.0
+            try:
+                with open(self.sensor_dictionnary[key] + prefix + 'scale', 'r') as f:
+                    scale = float(f.read())
+            except Exception as exc:
+                print("[ERROR] read %s " % self.sensor_dictionnary[key] + prefix + 'scale', exc)
+                scale = 0.0
             if self.key_pressure != key:
-                with open(self.sensor_dictionnary[key] + prefix + 'offset', 'r') as f:
-                    offset = float(f.read())
+                try:
+                    with open(self.sensor_dictionnary[key] + prefix + 'offset', 'r') as f:
+                        offset = float(f.read())
+                except Exception as exc:
+                    print("[ERROR] read %s " % self.sensor_dictionnary[key] + prefix + 'offset', exc)
+                    offset = 0.0
             else:
                 offset = 0.0
                 scale = scale * 10
@@ -510,25 +310,26 @@ class Sensors():
             return [in_x, in_y, in_z]
         else:
             if self.sensor_dictionnary[key] is None or len(self.sensor_dictionnary[key]) < 5:
-                in_x = random.randint(-180, 180)
-                in_y = random.randint(-180, 180)
-                in_z = random.randint(-180, 180)
-                return [in_x, in_y, in_z]
-            with open(self.sensor_dictionnary[key] + prefix + 'x_raw', 'r') as f:
-                scale = float(f.read())
-            with open(self.sensor_dictionnary[key] + prefix + 'x_scale', 'r') as f:
-                raw = float(f.read())
-            in_x = int(raw * scale * 256.0 / 9.81)
-            with open(self.sensor_dictionnary[key] + prefix + 'y_raw', 'r') as f:
-                scale = float(f.read())
-            with open(self.sensor_dictionnary[key] + prefix + 'y_scale', 'r') as f:
-                raw = float(f.read())
-            in_y = int(raw * scale * 256.0 / 9.81)
-            with open(self.sensor_dictionnary[key] + prefix + 'z_raw', 'r') as f:
-                scale = float(f.read())
-            with open(self.sensor_dictionnary[key] + prefix + 'z_scale', 'r') as f:
-                raw = float(f.read())
-            in_z = int(raw * scale * 256.0 / 9.81)
+                return [0, 0, 0]
+            try:
+                with open(self.sensor_dictionnary[key] + prefix + 'x_raw', 'r') as f:
+                    scale = float(f.read())
+                with open(self.sensor_dictionnary[key] + prefix + 'x_scale', 'r') as f:
+                    raw = float(f.read())
+                in_x = int(raw * scale * 256.0 / 9.81)
+                with open(self.sensor_dictionnary[key] + prefix + 'y_raw', 'r') as f:
+                    scale = float(f.read())
+                with open(self.sensor_dictionnary[key] + prefix + 'y_scale', 'r') as f:
+                    raw = float(f.read())
+                in_y = int(raw * scale * 256.0 / 9.81)
+                with open(self.sensor_dictionnary[key] + prefix + 'z_raw', 'r') as f:
+                    scale = float(f.read())
+                with open(self.sensor_dictionnary[key] + prefix + 'z_scale', 'r') as f:
+                    raw = float(f.read())
+                in_z = int(raw * scale * 256.0 / 9.81)
+            except Exception as exc:
+                print("[ERROR] read %s " % self.sensor_dictionnary[key] + prefix + '[x_ , y_ , z_ ]', exc)
+                return [0, 0, 0]
             return [in_x, in_y, in_z]
 
     def read_temperature(self):
@@ -562,6 +363,8 @@ class Sensors():
         x = accel[0]
         y = accel[1]
         z = accel[2]
+        if x == 0 and y == 0 and z == 0:
+            return [0, 0, 0]
         pitch = round(math.atan(x / math.sqrt(y * y + z * z)) * 180.0 * math.pi)
         roll  = round(math.atan(y / math.sqrt(x * x + z * z)) * 180.0 * math.pi)
         yaw   = round(math.atan(z / math.sqrt(x * x + z * z)) * 180.0 * math.pi)
@@ -587,6 +390,7 @@ class Sensors():
 class MainUIWindow(Gtk.Window):
     def __init__(self):
         Gtk.Window.__init__(self, title="Sensor usage")
+        self.set_decorated(False)
         if SIMULATE_SENSORS > 0:
             self.screen_width = SIMULATE_SCREEN_SIZE_WIDTH
             self.screen_height = SIMULATE_SCREEN_SIZE_HEIGHT
@@ -616,10 +420,6 @@ class MainUIWindow(Gtk.Window):
         # current temperature / Humidity / Pressure
         self.create_notebook_page_basic_sensor()
 
-        # page for graph
-        # temperature / Humidity / Pressure
-        self.create_notebook_page_graph_sensor()
-
         # page for accel / gyro / magentic
         self.create_notebook_page_basic_accel()
 
@@ -629,13 +429,6 @@ class MainUIWindow(Gtk.Window):
         # page sensor information
         self.create_notebook_page_sensor_information()
 
-        # page to indicate the ip address of board
-        self.create_notebook_page_ip_address()
-
-        # page for video playback
-        if HAVE_VIDEO_SINK:
-            self.create_notebook_page_video()
-
         # page for quitting application
         self.create_notebook_page_exit()
 
@@ -644,12 +437,17 @@ class MainUIWindow(Gtk.Window):
         self.timer = GObject.timeout_add(TIME_UPATE, self.update_ui, None)
         self.timer_enable = True
 
+        self.show_all()
+
     def _set_basic_temperature(self, val):
         self.temperature_basic_label.set_markup("<span font_desc='LiberationSans 25'>%.02f °C</span>" % val)
+        #self.temperature_basic_label.set_text("%.02f °C" % val)
     def _set_basic_humidity(self, val):
         self.humidity_basic_label.set_markup("<span font_desc='LiberationSans 25'>%.02f %c</span>" % (val, '%'))
+        #self.humidity_basic_label.set_text("%.02f %c" % (val, '%'))
     def _set_basic_pressure(self, val):
         self.pressure_basic_label.set_markup("<span font_desc='LiberationSans 25'>%.02f hP</span>" % val)
+        #self.pressure_basic_label.set_text("%.02f hP" % val)
     def _set_basic_accelerometer(self, x, y, z):
         self.liststore[self.accel_store][1] = '%d' % x
         self.liststore[self.accel_store][2] = '%d' % y
@@ -662,18 +460,6 @@ class MainUIWindow(Gtk.Window):
         self.liststore[self.magneto_store][1] = '%d' % x
         self.liststore[self.magneto_store][2] = '%d' % y
         self.liststore[self.magneto_store][3] = '%d' % z
-    def _add_data_to_draw_for_sensor(self, index, val, valmin, valmax):
-        values = self._axis_values.get(index, None)
-        if values is None:
-            values = deque(maxlen=NUM_GRAPH_SAMPLE)
-            self._axis_values[index] = values
-        if len(list(values)) > (NUM_GRAPH_SAMPLE - 1):
-            values. popleft()
-        values.append(val)
-        self._axis_ranges[index] = (valmin, valmax)
-    def _update_ip_address(self):
-        ip = board_get_ip_address()
-        self.label_ip_address.set_markup("<span font_desc='LiberationSans 25'>IP address: %s</span>" % ip)
     def _set_imu_roll(self, val):
         self.imu_liststore[self.roll_store][1] = '%d' % val
     def _set_imu_pitch(self, val):
@@ -681,7 +467,7 @@ class MainUIWindow(Gtk.Window):
     def _set_imu_yaw(self, val):
         self.imu_liststore[self.yaw_store][1] = '%d' % val
     def _update_orientation(self, val):
-        self.orientation_label.set_text("Orientation: %s" % val)
+        self.orientation_label.set_markup("<span font_desc='LiberationSans 25'>Orientation: %s</span>" % val)
 
     def create_notebook_page_basic_sensor(self):
         '''
@@ -692,53 +478,38 @@ class MainUIWindow(Gtk.Window):
         page_basic.set_border_width(10)
 
         # temperature
-        temp_box = Gtk.VBox(False, 0)
-        temp_image = _load_image(self, "RS1069_climate_change_light_blue.png")
+        temp_box = Gtk.VBox(spacing=0)
+        temp_image = _load_image_constrained(self, "RS1069_climate_change_light_blue.png", -1, 100)
         self.temperature_basic_label = Gtk.Label('--.-- °C')
         temp_image.show()
         self.temperature_basic_label.show()
-        temp_box.pack_start(temp_image, True, False, 3)
+        temp_box.pack_start(temp_image, True, False, 1)
         temp_box.add(self.temperature_basic_label)
         # humidity
-        humidity_box = Gtk.VBox(False, 0)
-        humidity_image = _load_image(self, "RS1902_humidity_light_blue.png")
+        humidity_box = Gtk.VBox(spacing=0)
+        humidity_image = _load_image_constrained(self, "RS1902_humidity_light_blue.png", -1, 100)
         self.humidity_basic_label = Gtk.Label('--.-- °C')
         humidity_image.show()
         self.humidity_basic_label.show()
-        humidity_box.pack_start(humidity_image, True, False, 3)
+        humidity_box.pack_start(humidity_image, True, False, 1)
         humidity_box.add(self.humidity_basic_label)
         # Pressure
         if WITH_PRESSURE:
-            pressure_box = Gtk.VBox(False, 0)
-            pressure_image = _load_image(self, "RS6355_FORCE_PRESSURE_light_blue.png")
+            pressure_box = Gtk.VBox(spacing=0)
+            pressure_image = _load_image_constrained(self, "RS6355_FORCE_PRESSURE_light_blue.png", -1, 100)
             self.pressure_basic_label = Gtk.Label('--.-- °C')
             pressure_image.show()
             self.pressure_basic_label.show()
-            pressure_box.pack_start(pressure_image, True, False, 3)
+            pressure_box.pack_start(pressure_image, True, False, 1)
             pressure_box.add(self.pressure_basic_label)
 
         page_basic.add(temp_box)
         page_basic.add(humidity_box)
         if WITH_PRESSURE:
             page_basic.add(pressure_box)
-        self.notebook.append_page(page_basic, Gtk.Label('Sensors'))
-
-    def create_notebook_page_graph_sensor(self):
-        '''
-        create notebook page for displaying graphic of
-        sensor information: temperature, humidity, pressure
-        '''
-        page_graph = Gtk.Box()
-        page_graph.set_border_width(10)
-        self.drawarea = Gtk.DrawingArea()
-
-        self.drawing_area_width = self.screen_width
-        self.drawing_area_height = int(self.screen_height * 1/2)
-        self.drawarea.set_size_request(self.drawing_area_width, self.drawing_area_height)
-        self.drawarea.connect("draw", self.drawarea_draw_event)
-        self.drawarea_window = None
-        page_graph.add(self.drawarea)
-        self.notebook.append_page(page_graph, Gtk.Label('Graph'))
+        notebook_title =  Gtk.Label()
+        notebook_title.set_markup("<span font_desc='LiberationSans 25'>Sensors</span>")
+        self.notebook.append_page(page_basic, notebook_title)
 
     def create_notebook_page_basic_accel(self):
         '''
@@ -773,7 +544,9 @@ class MainUIWindow(Gtk.Window):
         treeview.append_column(column_z)
 
         page_basic_movement.add(treeview)
-        self.notebook.append_page(page_basic_movement, Gtk.Label('Move'))
+        notebook_title =  Gtk.Label()
+        notebook_title.set_markup("<span font_desc='LiberationSans 25'>Move</span>")
+        self.notebook.append_page(page_basic_movement, notebook_title)
 
 
     def create_notebook_page_imu(self):
@@ -793,7 +566,9 @@ class MainUIWindow(Gtk.Window):
 
         page_imu.set_border_width(10)
         # explanation
-        imu_label = Gtk.Label('Inertial Measurement Unit')
+        imu_label = Gtk.Label()
+        imu_label.set_markup("<span font_desc='LiberationSans 25'>Inertial Measurement Unit</span>")
+
         page_imu.add(imu_label)
 
         imu_h_box = Gtk.HBox(False, 0)
@@ -812,24 +587,29 @@ class MainUIWindow(Gtk.Window):
         page_imu.add(imu_h_box)
         imu_frame.add(page_imu)
 
-        self.orientation_label = Gtk.Label("Orientation: --none--")
+        self.orientation_label = Gtk.Label()
+        self.orientation_label.set_markup("<span font_desc='LiberationSans 25'>Orientation: --none--</span>")
         orientation_frame.add(self.orientation_label)
 
         renderer_text = Gtk.CellRendererText()
-        column_imu_text = Gtk.TreeViewColumn("Type", renderer_text, text=0)
+        #renderer_text.set_property("size", 18)
+        column_imu_text = Gtk.TreeViewColumn('Type', renderer_text, text=0)
         imu_treeview.append_column(column_imu_text)
         renderer_val = Gtk.CellRendererText()
         column_val = Gtk.TreeViewColumn("Value", renderer_val, text=1)
         imu_treeview.append_column(column_val)
 
-        self.notebook.append_page(page_imu_all, Gtk.Label('IMU'))
+        notebook_title =  Gtk.Label()
+        notebook_title.set_markup("<span font_desc='LiberationSans 25'>IMU</span>")
+        self.notebook.append_page(page_imu_all, notebook_title)
 
     def _create_frame_with_image_and_label(self, title, img_file_name, label_text):
         frame = Gtk.Frame(label=title)
         box   = Gtk.VBox(False, 0)
         img   = _load_image(self, img_file_name)
         img   = _load_image_constrained(self, img_file_name, -1, 100)
-        label = Gtk.Label(label_text)
+        label = Gtk.Label()
+        label.set_markup("<span font_desc='LiberationSans 18'>%s</span>" % label_text)
         box.add(img)
         box.add(label)
         frame.add(box)
@@ -896,43 +676,9 @@ class MainUIWindow(Gtk.Window):
         #        "dialog-information",
         #        Gtk.IconSize.MENU
         #        ))
-        self.notebook.append_page(page_sensor_info, Gtk.Label('Infos'))
-
-    def create_notebook_page_video(self):
-        '''Display a videotestsrc '''
-        page_video = Gtk.Grid()
-        page_video.set_column_spacing(2)
-        page_video.set_row_spacing(2)
-
-        video_button = Gtk.Button()
-        video_button.connect("clicked", self.video_videoplayback)
-        video_image = _load_image_on_button(self, "%s/RS4898_action_pink.png" % ICON_PICTURES_PATH, "video", -1, 100)
-        video_button.add(video_image)
-        video_button.show()
-
-
-        videotestsrc_button = Gtk.Button()
-        videotestsrc_button.connect("clicked", self.mir_videoplayback)
-        videotestsrc_image = _load_image_on_button(self, "%s/RS157_digital_TV_and_monitor_pink.png" % ICON_PICTURES_PATH, "mir", -1, 100)
-        videotestsrc_button.add(videotestsrc_image)
-        videotestsrc_button.show()
-
-
-        page_video.attach(video_button, 1, 1, 3, 1)
-        page_video.attach_next_to(videotestsrc_button, video_button,
-                                        Gtk.PositionType.RIGHT, 1, 1)
-
-        self.notebook.append_page(page_video, Gtk.Label('Misc'))
-
-    def create_notebook_page_ip_address(self):
-        ''' Display the ip address of board '''
-        page_ip = Gtk.Box()
-        page_ip.set_border_width(10)
-        ip = board_get_ip_address()
-        self.label_ip_address = Gtk.Label('IP address: %s' % ip)
-
-        page_ip.add(self.label_ip_address)
-        self.notebook.append_page(page_ip, Gtk.Label('IP'))
+        notebook_title =  Gtk.Label()
+        notebook_title.set_markup("<span font_desc='LiberationSans 25'>Infos</span>")
+        self.notebook.append_page(page_sensor_info, notebook_title)
 
     def create_notebook_page_exit(self):
         ''' notebook page for quitting application '''
@@ -946,177 +692,20 @@ class MainUIWindow(Gtk.Window):
         lastbutton.show()
 
         page.pack_start(lastbutton, True, True, 0)
-        page.pack_start(Gtk.Label('To exit, click on logo.'), False, False, 0)
-        #page.add(Gtk.Label('To exit, click on logo.'))
+        exit_label = Gtk.Label()
+        exit_label.set_markup("<span font_desc='LiberationSans 25'>To exit, click on logo.</span>")
+        page.pack_start(exit_label, False, False, 0)
 
-        #self.notebook.append_page(
-        #    page,
-        #    Gtk.Image.new_from_icon_name(
-        #        "system-shutdown",
-        #        Gtk.IconSize.MENU
-        #        )
-        #)
-        self.notebook.append_page(page, Gtk.Label('Exit'))
+        notebook_title =  Gtk.Label()
+        notebook_title.set_markup("<span font_desc='LiberationSans 25'>EXIT</span>")
+
+        self.notebook.append_page(page, notebook_title)
     def destroy(self, widget, data=None):
         Gtk.main_quit()
 
     def rearm_timer(self):
         if self.timer_enable:
             self.timer = GObject.timeout_add(TIME_UPATE, self.update_ui, None)
-
-    def video_videoplayback(self, button):
-        ''' Launch a window with video playback '''
-        video_window = GstVideoWindow(self, "playback")
-
-        #put it at diaglog http://python-gtk-3-tutorial.readthedocs.io/en/latest/dialogs.html#example
-        self.hide()
-        self.timer_enable = False
-        #video_window.show_all()
-        response = video_window.run()
-        self.timer_enable = True
-        self.rearm_timer()
-        self.show_all()
-        video_window.destroy()
-
-    def mir_videoplayback(self, button):
-        ''' Launch a window with a mir '''
-        video_window = GstVideoWindow(self, "videotestsrc")
-
-        self.hide()
-        self.timer_enable = False
-        #video_window.show_all()
-        response = video_window.run()
-        self.timer_enable = True
-        self.rearm_timer()
-        self.show_all()
-        video_window.destroy()
-
-    def drawarea_draw_event(self, widget, user_data):
-        ''' Draw graphic data '''
-        try:
-            #self.drawarea_window = self.get_window()
-            self.drawarea_window = widget.get_window()
-            ctx = self.drawarea_window.cairo_create()
-            if self.get_property("visible"):
-                self._draw_cb(self.drawarea_window, ctx)
-        except Exception as exc:
-            pass
-
-    def _draw_cb(self, drawingarea, ctx):
-        ''' '''
-        if SIMULATE_SENSORS > 0:
-            width = SIMULATE_SCREEN_SIZE_WIDTH
-            height = SIMULATE_SCREEN_SIZE_HEIGHT
-        else:
-            width = self.drawing_area_width
-            height = self.drawing_area_height
-        graphheight = height / 3
-
-        axis_ids = set(self._axis_ranges.keys())
-        axis_ids.intersection_update(set(self._axis_values.keys()))
-        offset = 10
-        text_offset = 30
-
-        #activate the following rectangle to see the full drawarea
-        #ctx.set_source_rgb(1.0, 0.0, 0.)
-        #ctx.rectangle(0, 0, width, height)
-        #print("[DEBUG] draw rectangle: 0x0, %dx%d" % (width, height))
-        #ctx.fill()
-
-        for i in sorted(axis_ids):
-            vmin, vmax = self._axis_ranges[i]
-            if i == 1:
-                ''' Temperature value '''
-                #draw rectangle
-                ctx.set_source_rgb(0.8, 0.8, 0.8)
-                ctx.rectangle(0, 5, width, graphheight - offset)
-                ctx.fill()
-                #draw axes
-                ctx.set_source_rgb(0, 1, 1)
-                ctx.move_to(30 + 0.5, graphheight/2)
-                ctx.line_to(width - 0.5, graphheight/2)
-                ctx.stroke()
-                # value (text)
-                ctx.select_font_face("sans-serif")
-                ctx.set_font_size(20.0)
-                ctx.set_source_rgb(0, 0, 0)
-                ctx.move_to(0, 20)
-                ctx.show_text("T (°C)")
-                ctx.set_font_size(10.0)
-                ctx.move_to(0, graphheight/2 + 4)
-                ctx.show_text("%d °C" % int((vmax-vmin)/2 + vmin) )
-                # temperature between vmin and vmax (0, 60)
-                values = self._axis_values[i]
-                ctx.set_source_rgb(0, 0, 0)
-                for x, v in enumerate(values):
-                    val = text_offset + x*4 # GRAPH_H_PADDING = 4
-                    #print("[DEBUG]: temperature %d %d" % (int(v),val))
-                    ctx.move_to(val, graphheight - offset/2)
-                    ctx.line_to(val, graphheight - (((v - vmin) * (graphheight - offset)) / (vmax -vmin)) )
-                    ctx.stroke()
-
-            elif i == 2:
-                ''' Humidity '''
-                #draw rectangle
-                ctx.set_source_rgb(0.8, 0.8, 0.8)
-                ctx.rectangle(0, graphheight + offset/2, width, graphheight - offset)
-                ctx.fill()
-                #draw axes
-                ctx.set_source_rgb(0, 1, 1)
-                ctx.move_to(25 + 0.5, graphheight + graphheight/2)
-                ctx.line_to(width - 0.5, graphheight + graphheight/2)
-                ctx.stroke()
-                # value (text)
-                ctx.select_font_face("sans-serif")
-                ctx.set_font_size(20.0)
-                ctx.set_source_rgb(0, 0, 0)
-                ctx.move_to(0, graphheight + offset + 20)
-                ctx.show_text("H (%)")
-                ctx.set_font_size(10.0)
-                ctx.set_source_rgb(0, 0, 0)
-                ctx.move_to(0, graphheight + graphheight/2 + 4)
-                ctx.show_text("%d %c" % (int((vmax-vmin)/2 + vmin), '%'))
-                # humidity between vmin and vmax (0, 100)
-                values = self._axis_values[i]
-                ctx.set_source_rgb(0, 0, 0)
-                for x, v in enumerate(values):
-                    val = text_offset + x*4 # GRAPH_H_PADDING = 4
-                    ctx.move_to(val, 2 * graphheight - offset/2)
-                    ctx.line_to(val, 2 * graphheight - offset - (((v - vmin) * (graphheight - offset)) / (vmax -vmin)) )
-                    #print("[DEBUG]: humidity %d %d" % (int(v),  ((v - vmin) * (graphheight - offset)) / (vmax -vmin)  ))
-                    ctx.stroke()
-
-            elif i == 3:
-                ''' Pressure '''
-                #draw rectangle
-                ctx.set_source_rgb(0.8, 0.8, 0.8)
-                ctx.rectangle(0, 2 * graphheight + offset/2, width, graphheight - offset)
-                ctx.fill()
-                #draw axes
-                ctx.set_source_rgb(0, 1, 1)
-                ctx.move_to(25 + 0.5, 2 * graphheight + graphheight/2)
-                ctx.line_to(width - 0.5, 2 * graphheight + graphheight/2)
-                ctx.stroke()
-                # value (text)
-                ctx.select_font_face("sans-serif")
-                ctx.set_font_size(20.0)
-                ctx.set_source_rgb(0, 0, 0)
-                ctx.move_to(0, 2*graphheight + offset + 20)
-                ctx.show_text("Pr (hPa)")
-                ctx.set_font_size(10.0)
-                ctx.set_source_rgb(0, 0, 0)
-                ctx.move_to(0, 2*graphheight + graphheight/2 + 4)
-                ctx.show_text("%d" % int((vmax-vmin)/2 + vmin))
-                # pressure between vmin and vmax (900, 1100)
-                values = self._axis_values[i]
-                ctx.set_source_rgb(0, 0, 0)
-                for x, v in enumerate(values):
-                    val = text_offset + x*4 # GRAPH_H_PADDING = 4
-                    ctx.move_to(val, 3 * graphheight - offset/2)
-                    ctx.line_to(val, 3 * graphheight - offset/2 - (((v - vmin) * (graphheight - offset)) / (vmax -vmin)) )
-                    ctx.stroke()
-
-        return False
 
     def update_ui(self, user_data):
         if False == self.timer_enable:
@@ -1125,16 +714,13 @@ class MainUIWindow(Gtk.Window):
         # temperature
         temp = self.sensors.read_temperature()
         self._set_basic_temperature(temp)
-        self._add_data_to_draw_for_sensor(1, temp, 0.0, 60.0)
         # humidity
         hum = self.sensors.read_humidity()
         self._set_basic_humidity(hum)
-        self._add_data_to_draw_for_sensor(2, hum, 0.0, 100.0)
         # pressure
         if WITH_PRESSURE:
             press = self.sensors.read_pressure()
             self._set_basic_pressure(press)
-            self._add_data_to_draw_for_sensor(3, press, 900.0, 1100.0)
 
         # accel
         accel = self.sensors.read_accelerometer()
@@ -1154,18 +740,8 @@ class MainUIWindow(Gtk.Window):
         self._set_imu_roll(roll)
         self._set_imu_yaw(yaw)
         self._update_orientation(self.sensors.get_imu_orientation(pitch, roll))
-        # ip address
-        self._update_ip_address()
 
         #print("[DEBUG] visibility: ", self.get_property("visible"))
-
-        try:
-            if not self.drawarea_window.cairo is None:
-                ctx = self.drawarea_window.cairo_create()
-                if self.get_property("visible"):
-                    self._draw_cb(self.drawarea_window, ctx)
-        except Exception as exc:
-            pass
 
         # As this is a timeout function, return True so that it
         # continues to get called
@@ -1179,8 +755,8 @@ if __name__ == "__main__":
     import signal
     signal.signal(signal.SIGINT, signal.SIG_DFL)
     try:
-        splScr = SplashScreen("%s/RS70_ST_Logo_Qi.png" % ICON_PICTURES_PATH, 5)
-        Gtk.main()
+        #splScr = SplashScreen("%s/RS70_ST_Logo_Qi.png" % ICON_PICTURES_PATH, 5)
+        #Gtk.main()
 
         win = MainUIWindow()
         win.connect("delete-event", Gtk.main_quit)

@@ -16,12 +16,13 @@ do_compile[noexec] = "1"
 
 do_install() {
     install -d ${D}${bindir}
-    install -d ${D}${datadir}/sensors_temperature/
+    install -d ${D}${prefix}/local/demo/pictures
 
-    install -m 0755 ${WORKDIR}/sensors_temperature.py ${D}${bindir}
 
-    install -m 0644 ${WORKDIR}/pictures/* ${D}${datadir}/sensors_temperature/
-    install -m 0644 ${WORKDIR}/README.txt ${D}${datadir}/sensors_temperature/
+    install -m 0755 ${WORKDIR}/sensors_temperature.py ${D}${prefix}/local/demo/
+
+    install -m 0644 ${WORKDIR}/pictures/* ${D}${prefix}/local/demo/pictures
+    install -m 0644 ${WORKDIR}/README.txt ${D}${prefix}/local/demo/README_sensor_iks01a2.txt
 }
 
 FILES_${PN} += "${datadir}/sensors_temperature/"
