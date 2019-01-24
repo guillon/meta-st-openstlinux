@@ -230,12 +230,10 @@ class BluetoothWindow(Gtk.Dialog):
 
         self.screen_width = self.get_screen().get_width()
         self.screen_height = self.get_screen().get_height()
-        if self.screen_width == 720:
+        if self.screen_width >= 720:
             self.treelist_height = 400
-            self.board_name = "Evaluation board"
         else:
             self.treelist_height = 160
-            self.board_name = "Discovery kit"
 
         self.connect("button-release-event", self.on_page_press_event)
         mainvbox = self.get_content_area()
