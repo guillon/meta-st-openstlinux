@@ -106,17 +106,17 @@ class GstCameraSrcWidget(Gtk.Box):
     def __init__(self):
         super().__init__()
         self.connect('realize', self._on_realize)
-        self._bin = Gst.parse_bin_from_description('v4l2src io-mode=4 ! video/x-raw,width=640,height=480 ! queue ! videoconvert', True)
+        self._bin = Gst.parse_bin_from_description('v4l2src io-mode=4 ! video/x-raw,width=640,height=480 ! queue ', True)
 
     def _on_realize(self, widget):
         self.pipeline = Gst.Pipeline()
         factory = self.pipeline.get_factory()
-        gtksink = factory.make('gtksink')
+        gtksink = factory.make('waylandsink')
         self.pipeline.add(gtksink)
         self.pipeline.add(self._bin)
         self._bin.link(gtksink)
-        self.pack_start(gtksink.props.widget, True, True, 0)
-        gtksink.props.widget.show()
+        #self.pack_start(gtksink.props.widget, True, True, 0)
+        #gtksink.props.widget.show()
         self.pipeline.set_state(Gst.State.PLAYING)
     def set_file(self, filename):
         ''' '''
@@ -139,7 +139,7 @@ class GstVideoWidget(Gtk.Box):
 
         self.pipeline = Gst.Pipeline()
         self.player = Gst.ElementFactory.make("playbin", "player")
-        self.gtksink = Gst.ElementFactory.make("gtksink", "gtksink")
+        self.gtksink = Gst.ElementFactory.make("waylandsink", "waylandsink")
         self.bus = self.pipeline.get_bus()
         self.bus.add_signal_watch()
         self.bus.connect("message::eos", self.on_eos)
@@ -149,8 +149,8 @@ class GstVideoWidget(Gtk.Box):
         self.pipeline.add(self.player)
         self.player.set_property("video-sink", self.gtksink)
 
-        self.pack_start(self.gtksink.props.widget, True, True, 0)
-        self.gtksink.props.widget.show()
+        #self.pack_start(self.gtksink.props.widget, True, True, 0)
+        #self.gtksink.props.widget.show()
         self.start()
 
     def set_file(self, filename):
@@ -159,7 +159,6 @@ class GstVideoWidget(Gtk.Box):
             self.player.set_property("uri", "file://%s" % filepath)
             print("VIDEO: set filename %s" % filepath)
             #self.start()
-
     def start(self):
         print("[DEBUG] [Video] ask to start")
         self.pipeline.set_state(Gst.State.PLAYING)
@@ -177,60 +176,115 @@ class GstVideoWidget(Gtk.Box):
         self.stop()
         Gtk.main_quit()
 
+# Back video view
+class BackVideoWindow(Gtk.Dialog):
+    def __init__(self, parent):
+        Gtk.Dialog.__init__(self, "Wifi", parent, 0)
+        self.previous_click_time=0
+        self.maximize()
+        self.set_decorated(False)
+        rgba = Gdk.RGBA(0.31, 0.32, 0.31, 0.8)
+        self.override_background_color(0,rgba)
+
+        self.show_all()
+
 # video Window
 class GstVideoWindow(Gtk.Dialog):
-    def __init__(self, parent, pipeline):
+    def __init__(self, parent):
         Gtk.Dialog.__init__(self, "Video", parent, 0)
 
         self.maximize()
         self.set_decorated(False)
-        rgba = Gdk.RGBA(0.31, 0.32, 0.31, 0.8)
-        self.override_background_color(Gtk.StateType.NORMAL, rgba)
+        rgba = Gdk.RGBA(0, 0, 0, 0)
+        self.override_background_color(0,rgba)
+
+        self.previous_click_time=0
+        self.stream_is_paused=0
+
+        #~ mainvbox = self.get_content_area()
+        #~ self.video_widget = GstVideoWidget()
+        #~ self.filename = "%s/media/ST2297_visionv3.webm" % DEMO_PATH
+        #~ self.set_video_filename("%s/media/ST2297_visionv3.webm" % DEMO_PATH)
+        #~ self.video_widget.set_halign(Gtk.Align.CENTER)
+        #~ self.video_widget.set_valign(Gtk.Align.CENTER)
+        #~ mainvbox.pack_start(self.video_widget, True, True, 0)
+
+        cmd = ["%s/bin/launch_video.sh" % DEMO_PATH]
+        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+
+        self.connect("button-press-event", self.on_video_press_event)
+
+    def on_video_press_event(self, widget, event):
+        self.click_time = time()
+        print(self.click_time - self.previous_click_time)
+        # TODO : a fake click is observed, workaround hereafter
+        if (self.click_time - self.previous_click_time) < 0.01:
+            self.previous_click_time = self.click_time
+        elif (self.click_time - self.previous_click_time) < 0.3:
+            print ("GstVideoWindow double click")
+            #~ self.video_widget.stop()
+            cmd = ["%s/bin/stop_video.sh" % DEMO_PATH]
+            print ("===> CGU : %s" % cmd)
+            proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+            print ("===> CGU : stop_video.sh called")
+            self.destroy()
+        else:
+            print ("GstVideoWindow simple click")
+            self.previous_click_time = self.click_time
+            if (self.stream_is_paused == 1):
+                #~ self.video_widget.start()
+                self.stream_is_paused = 0
+            else:
+                #~ self.video_widget.pause()
+                self.stream_is_paused = 1
+
+    #~ def set_video_filename(self, filename):
+        #~ self.video_widget.set_file(filename)
+
+# Camera Window
+class GstCameraWindow(Gtk.Dialog):
+    def __init__(self, parent):
+        Gtk.Dialog.__init__(self, "Video", parent, 0)
+
+        self.maximize()
+        self.set_decorated(False)
+        rgba = Gdk.RGBA(0, 0, 0, 0)
+        self.override_background_color(0,rgba)
 
         self.previous_click_time=0
         self.stream_is_paused=0
         mainvbox = self.get_content_area()
 
-        if "videotestsrc" == pipeline:
-            self.video_widget = GstVideoTestSrcWidget ()
-            self.filename = "videotestsrc"
-        elif "camera" == pipeline:
-            self.video_widget = GstCameraSrcWidget ()
-            self.filename = "camera"
-        else:
-            self.video_widget = GstVideoWidget()
-            self.filename = "%s/media/ST2297_visionv3.webm" % DEMO_PATH
-            self.set_video_filename("%s/media/ST2297_visionv3.webm" % DEMO_PATH)
+        self.camera_widget = GstCameraSrcWidget ()
 
-        self.video_widget.set_halign(Gtk.Align.CENTER)
-        self.video_widget.set_valign(Gtk.Align.CENTER)
-        mainvbox.pack_start(self.video_widget, True, True, 0)
-        self.video_widget.connect("button-press-event", self.on_video_press_event)
+        self.camera_widget.set_halign(Gtk.Align.CENTER)
+        self.camera_widget.set_valign(Gtk.Align.CENTER)
+        mainvbox.pack_start(self.camera_widget, True, True, 0)
+        self.connect("button-press-event", self.on_camera_press_event)
 
-    def on_video_press_event(self, widget, event):
+    def on_camera_press_event(self, widget, event):
         self.click_time = time()
         print(self.click_time - self.previous_click_time)
-        if (self.click_time - self.previous_click_time) < 0.3:
-            print ("double click")
-            if not self.filename is None:
-                self.video_widget.stop()
-                self.destroy()
+        # TODO : a fake click is observed, workaround hereafter
+        if (self.click_time - self.previous_click_time) < 0.01:
+            self.previous_click_time = self.click_time
+        elif (self.click_time - self.previous_click_time) < 0.3:
+            print ("GstVideoWindow double click")
+            self.camera_widget.stop()
+            self.destroy()
         else:
-            print ("simple click")
+            print ("GstVideoWindow simple click")
             self.previous_click_time = self.click_time
             if (self.stream_is_paused == 1):
-                self.video_widget.start()
+                self.camera_widget.start()
                 self.stream_is_paused = 0
             else:
-                self.video_widget.pause()
+                self.camera_widget.pause()
                 self.stream_is_paused = 1
-
-    def set_video_filename(self, filename):
-        self.video_widget.set_file(filename)
 
 # Info view
 class InfoWindow(Gtk.Dialog):
-    def __init__(self, parent, pipeline):
+    def __init__(self, parent):
         Gtk.Dialog.__init__(self, "Wifi", parent, 0)
         self.previous_click_time=0
         self.maximize()
@@ -248,7 +302,7 @@ class InfoWindow(Gtk.Dialog):
         page_info.add(title)
 
         label1 = Gtk.Label()
-        label1.set_markup("<span font='15' color='#FFFFFFFF'>\n\nSimple tap: pause/resume the video\nDouble tap: exit from demo\n\nAI demo: draw character on touchscreen to launch action</span>")
+        label1.set_markup("<span font='15' color='#FFFFFFFF'>\n\nTo get control of video playback and camera preview,\n  firstly tap outside of the video\nSimple tap: pause/resume the camera preview\nDouble tap: exit from demos\n\nAI demo: draw character on touchscreen to launch action</span>")
         label1.set_justify(Gtk.Justification.LEFT)
         page_info.add(label1)
 
@@ -271,7 +325,7 @@ class InfoWindow(Gtk.Dialog):
 
 # Netdata view
 class WifiWindow(Gtk.Dialog):
-    def __init__(self, parent, pipeline):
+    def __init__(self, parent):
         Gtk.Dialog.__init__(self, "Wifi", parent, 0)
 
         self.maximize()
@@ -687,7 +741,7 @@ class MainUIWindow(Gtk.Window):
 
     def info_event(self, widget, event):
         print("[info_event start]");
-        info_window = InfoWindow(self, "Informations")
+        info_window = InfoWindow(self)
         info_window.show_all()
         response = info_window.run()
         info_window.destroy()
@@ -709,7 +763,7 @@ class MainUIWindow(Gtk.Window):
     def wifi_hotspot_event(self, widget, event):
         ''' start hotspot wifi on board '''
         print("[wifi_hotspot_event start]")
-        wifi_window = WifiWindow(self, "Wifi hotspot")
+        wifi_window = WifiWindow(self)
         wifi_window.show_all()
         response = wifi_window.run()
         wifi_window.destroy()
@@ -720,10 +774,16 @@ class MainUIWindow(Gtk.Window):
 
     def videoplay_event(self, widget, event):
         print("[videoplay_event start]");
-        video_window = GstVideoWindow(self, "playback")
+
+        backvideo_window = BackVideoWindow(self)
+        backvideo_window.show_all()
+
+        video_window = GstVideoWindow(self)
         video_window.show_all()
         response = video_window.run()
         video_window.destroy()
+        backvideo_window.destroy()
+
         print("[videoplay_event stop]\n");
         rgba = Gdk.RGBA(0.0, 0.0, 0.0, 0.0)
         widget.override_background_color(0,rgba)
@@ -732,10 +792,14 @@ class MainUIWindow(Gtk.Window):
     def camera_event(self, widget, event):
         print("[camera_event start]")
         if os.path.exists("/dev/video0"):
-            video_window = GstVideoWindow(self, "camera")
+            backvideo_window = BackVideoWindow(self)
+            backvideo_window.show_all()
+
+            video_window = GstCameraWindow(self)
             video_window.show_all()
             response = video_window.run()
             video_window.destroy()
+            backvideo_window.destroy()
         else:
             print("[WARNING] camera not detected\n")
             self.display_message("<span font='15' color='#FFFFFFFF'>Webcam is not connected:\n/dev/video0 doesn't exist\n</span>")
