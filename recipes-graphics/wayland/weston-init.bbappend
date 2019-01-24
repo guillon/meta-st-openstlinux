@@ -52,12 +52,13 @@ do_install_append() {
     install -m 644 ${WORKDIR}/README-CHECK-GPU ${D}/home/root/
     if ! test -f ${D}${base_sbindir}/check-gpu; then
         install -d ${D}${base_sbindir}
-        echo "" > ${WORKDIR}/check-gpu.empty
+        echo '#!/bin/sh' > ${WORKDIR}/check-gpu.empty
+        echo '/bin/true' >> ${WORKDIR}/check-gpu.empty
         install -m 755 ${WORKDIR}/check-gpu.empty ${D}${base_sbindir}/check-gpu
     fi
 }
 
-do_install_append_stm32mp1() {
+do_install_append_stm32mpcommon() {
     if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
         install -d ${D}${base_sbindir}
         install -m 755 ${WORKDIR}/check-gpu ${D}${base_sbindir}
