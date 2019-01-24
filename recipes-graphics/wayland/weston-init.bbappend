@@ -6,6 +6,7 @@ SRC_URI += " \
             file://ST_1366x768.png \
             file://ST13028_Linux_picto_11_1366x768.png \
             file://ST13345_Products_light_blue_24x24.png \
+            file://space.png \
             file://weston.sh \
             file://weston_profile.sh \
             file://README-CHECK-GPU \
@@ -32,6 +33,8 @@ do_install_append() {
     install -m 0644 ${WORKDIR}/ST13345_Products_light_blue_24x24.png ${D}${datadir}/weston/icon/ST13345_Products_light_blue_24x24.png
     install -m 0644 ${WORKDIR}/ST_1366x768.png ${D}${datadir}/weston/backgrounds/ST_1366x768.png
     install -m 0644 ${WORKDIR}/ST13028_Linux_picto_11_1366x768.png ${D}${datadir}/weston/backgrounds/ST13028_Linux_picto_11_1366x768.png
+
+    install -m 0644 ${WORKDIR}/space.png ${D}${datadir}/weston/icon/
 
     install -d ${D}${systemd_system_unitdir} ${D}${sbindir}
     install -m 0755  ${WORKDIR}/weston.sh ${D}${sbindir}/
