@@ -11,7 +11,7 @@ SRC_URI += " \
             file://weston_profile.sh \
             file://README-CHECK-GPU \
             "
-SRC_URI_append_stm32mp1 = " file://check-gpu "
+SRC_URI_append_stm32mpcommon = " file://check-gpu "
 
 FILES_${PN} += " ${datadir}/weston \
          ${systemd_system_unitdir}/weston.service \
