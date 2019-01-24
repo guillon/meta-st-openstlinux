@@ -10,6 +10,7 @@ SRC_URI_append = " file://0006-waylandsink-increase-max-buffers-to-32-to-enable-
 SRC_URI_append = " file://0007-waylandsink-always-select-dmabuf-buffer-pool.patch "
 SRC_URI_append = " file://0008-waylandsink-do-not-destroy-pool-twice.patch "
 SRC_URI_append = " file://0009-waylandsink-HACK-disable-frame-dropping-while-redraw.patch "
+SRC_URI_append = " file://0011-waylandsink-fullscreen-support.patch "
 
 PACKAGECONFIG_GL ?= "${@bb.utils.contains('DISTRO_FEATURES', 'opengl', 'gles2 egl', '', d)}"
 
