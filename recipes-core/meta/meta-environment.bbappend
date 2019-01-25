@@ -3,5 +3,5 @@
 # sysroots (e.g. need bio.h from openssl)
 
 toolchain_shared_env_script_prepend() {
-    echo 'export HOSTCFLAGS=$OECORE_NATIVE_SYSROOT' >> $script
+    echo 'export HOSTCFLAGS="-I$OECORE_NATIVE_SYSROOT/usr/include"' >> $script
 }
