@@ -936,6 +936,19 @@ class MainUIWindow(Gtk.Window):
 
         self.show_all()
 
+
+lock_handle = None
+lock_file_path = '/var/lock/demo_launcher.lock'
+
+def file_is_locked(file_path):
+    global lock_handle
+    lock_handle= open(file_path, 'w')
+    try:
+        fcntl.lockf(lock_handle, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        return False
+    except IOError:
+        return True
+
 # -------------------------------------------------------------------
 # -------------------------------------------------------------------
 # Main
@@ -943,6 +956,11 @@ if __name__ == "__main__":
     # add signal to catch CRTL+C
     import signal
     signal.signal(signal.SIGINT, signal.SIG_DFL)
+
+    if file_is_locked(lock_file_path):
+        print("[ERROR] another instance is running exiting now\n")
+        exit(0)
+
     try:
         win = MainUIWindow()
         win.connect("delete-event", Gtk.main_quit)
