@@ -224,9 +224,7 @@ class GstVideoWindow(Gtk.Dialog):
             print ("GstVideoWindow double click")
             #~ self.video_widget.stop()
             cmd = ["%s/bin/stop_video.sh" % DEMO_PATH]
-            print ("===> CGU : %s" % cmd)
             proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-            print ("===> CGU : stop_video.sh called")
             self.destroy()
         else:
             print ("GstVideoWindow simple click")

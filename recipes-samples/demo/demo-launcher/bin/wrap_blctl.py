@@ -14,16 +14,16 @@ __all__ = ["wrapper_blctl"]
 device = re.compile(r"Device\s(?P<mac_address>([0-9 A-F][0-9 A-F]:){5}[0-9 A-F][0-9 A-F])(?P<name>.+)$")
 
 re_device_notvalid = [
-   re.compile(r"\\[CHG\\]"),
-   re.compile(r"\\[NEW\\]"),
-   re.compile(r"\\[DEL\\]")
+   re.compile(r"CHG"),
+   re.compile(r"NEW"),
+   re.compile(r"DEL")
 ]
 
 def read_prompt():
     try:
       f = open('/tmp/list_prompt', 'rb')
     except IOError as e:
-        print("Cant not open the file : /usr/local/demo/list_prompt\n")
+        print("Cant not open the file : /tmp/list_prompt\n")
         return None
     else:
         s = pickle.load(f)
@@ -76,7 +76,6 @@ class wrapper_blctl:
         print("blctl_command_with_status : " + command + "\n")
         status = status_expected
         status.extend([pexpect.EOF])
-
         #print("prompt_status : %s\n", status)
 
         self.blctl_session.send(command + "\n")
@@ -103,7 +102,6 @@ class wrapper_blctl:
         except blctl_error as ex:
            print(ex)
            return None
-
 
     #bluetoothctl command : scan off
     def blctl_scan_off(self):
@@ -174,12 +172,10 @@ class wrapper_blctl:
         else:
             return cmd_res
 
-
     #bluetoothctl command : pair <mac_address>
     def blctl_pair(self, mac_address):
         cmd_res = self.blctl_command_with_status("pair " + mac_address, ["confirmation", "Pairing successful", "not available", "Failed to pair"], pause=4)
         return cmd_res
-
 
     #bluetoothctl command : connect <mac_address>
     def blctl_connect(self, mac_address):
@@ -198,6 +194,3 @@ class wrapper_blctl:
         cmd_res = self.blctl_command_with_status("remove " + mac_address, ["not available", "Failed to remove", "Device has been removed"], pause=3)
         passed = True if cmd_res == 2 else False
         return passed
-
-
-

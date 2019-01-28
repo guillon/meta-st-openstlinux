@@ -14,7 +14,7 @@ from time import sleep, time
 
 from bin.wrap_blctl import wrapper_blctl as Bluetoothctl
 
-SCAN_DURATION_IN_S  = 10
+SCAN_DURATION_IN_S  = 15
 
 regexps_audio = [
    re.compile(r"00001108-(?P<Headset>.+)$"),
@@ -161,12 +161,16 @@ def list_devices(self, paired = False):
        else:
           devs = self.bl.blctl_devices()
        for elt in devs:
-          i=i+1
-          self.current_devs.append(elt['mac_address'])
           elt_info = get_device_info(self.bl, elt['mac_address'])
-
+          #print("name===" , elt['name'].encode('utf-8').strip())
+          if elt['name'] == "RSSI is nil":
+              continue
+          if elt['name'] == "TxPower is nil":
+              continue
           #do not list device without real name
           if elt['mac_address'].replace(':','') != elt['name'].replace('-',''):
+              i=i+1
+              self.current_devs.append(elt['mac_address'])
               #print(elt_info)
               l_elt = []
               l_elt.append(i)
@@ -253,7 +257,6 @@ class BluetoothWindow(Gtk.Dialog):
         self.title.set_markup("<span font='30' color='#FFFFFFFF'>Connect bluetooth headset</span>")
         self.page_bluetooth.add(self.title)
 
-
         self.ButtonBox = Gtk.HBox(homogeneous=True)
 
         self.lb_button_scan = Gtk.Label()
@@ -279,7 +282,6 @@ class BluetoothWindow(Gtk.Dialog):
         self.progress_vbox.pack_start(self.scan_progress, False, False, 3)
         self.page_bluetooth.add(self.progress_vbox)
 
-
         self.tree_list_vbox = Gtk.VBox(homogeneous=True)
 
         self.bluetooth_liststore = Gtk.ListStore(int, str, str, str)
@@ -301,7 +303,6 @@ class BluetoothWindow(Gtk.Dialog):
         self.tree_list_vbox.pack_start(self.scroll_treelist, True, True, 3)
 
         self.page_bluetooth.add(self.tree_list_vbox)
-
 
         self.label_audio = Gtk.Label()
         self.label_audio.set_markup("<span font='20' color='#FFFFFFFF'> </span>")
@@ -362,7 +363,7 @@ class BluetoothWindow(Gtk.Dialog):
         if (self.click_time - self.previous_click_time) < 0.01:
             self.previous_click_time = self.click_time
         elif (self.click_time - self.previous_click_time) < 0.3:
-            print ("double click : exit")
+            print ("BluetoothWindow double click : exit")
             self.bl.close()
             self.destroy()
         else:
@@ -411,10 +412,12 @@ class BluetoothWindow(Gtk.Dialog):
         else:
             connect_res=self.bl.blctl_connect(dev['mac_address'])
             if connect_res == True:
-                self.lb_button_connect.set_markup("<span font='20'>disconnect</span>")
+                self.lb_button_connect.set_markup("<span font='20' color='#88888888'>disconnect</span>")
                 self.update_display()
         # refresh status_playback after 2,5s because pulseaudio takes some time to update its status
         timer_update_dev = GLib.timeout_add(2500, self.delayed_status_playback, None)
+        #In some cases, 2.5s is still not enough
+        timer_update_dev = GLib.timeout_add(4000, self.delayed_status_playback, None)
 
     def on_selection_connect_clicked(self, widget):
         if self.dev_selected['mac_address'] != '':
@@ -437,12 +440,11 @@ class BluetoothWindow(Gtk.Dialog):
                     self.display_message("<span font='15' color='#FFFFFFFF'>A BT device is already connected :\nPlease disconnect it before connecting a new device\n</span>")
             else:
                 connect_res=self.bl.blctl_disconnect(device['mac_address'])
-                self.lb_button_connect.set_markup("<span font='20'>connect</span>")
+                self.lb_button_connect.set_markup("<span font='20' color='#88888888'>connect</span>")
                 self.update_display()
         else:
             print("[WARNING] Select the BT device to connect\n")
             self.display_message("<span font='15' color='#FFFFFFFF'>Please select a device in the list\n</span>")
-
 
     def on_selection_scan_clicked(self, widget):
         if self.lb_button_scan.get_text() == "start scan":
@@ -457,4 +459,3 @@ class BluetoothWindow(Gtk.Dialog):
             list_devices(self, True)
         self.dev_selected.update({'mac_address':'', 'name':''})
         self.audio_bt_sink = status_playback(self)
-
