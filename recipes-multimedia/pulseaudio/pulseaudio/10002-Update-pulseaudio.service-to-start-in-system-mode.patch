@@ -17,7 +17,7 @@ index 46897bf..9f175e4 100644
  Requires=pulseaudio.socket
 -ConditionUser=!root
 +Requires=dbus.service
-+After=dbus.service weston.service
++After=dbus.service
 +#ConditionUser=!root
  
  [Service]

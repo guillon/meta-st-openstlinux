@@ -1,6 +1,7 @@
 [Unit]
 Description=Weston Wayland Compositor
 RequiresMountsFor=/run
+After=pulsesaudio.service
 
 [Service]
 User=root
