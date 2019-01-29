@@ -68,7 +68,7 @@ found_devices() {
         done
         ;;
     sdmmc)
-        for f in 1 2 3 4 5 6 7 8 9;
+        for f in 1 2 3 4 5 6 7 8 9 10;
         do
             if [ -r /sys/block/mmcblk0/mmcblk0p$f/uevent ];
             then
@@ -82,7 +82,7 @@ found_devices() {
         done
         ;;
     mmc)
-        for f in 1 2 3 4 5 6 7 8 9;
+        for f in 1 2 3 4 5 6 7 8 9 10;
         do
             if [ -r /sys/block/mmcblk1/mmcblk1p$f/uevent ];
             then
