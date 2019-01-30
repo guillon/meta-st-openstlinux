@@ -268,3 +268,11 @@ PACKAGE_CLASSES = "package_deb"
 
 # Setup environment for builds binary reproducibility
 INHERIT += "reproducible_build_openstlinux"
+
+# =========================================================================
+# Configure STM32MP default version to github
+# =========================================================================
+#STM32MP_SOURCE_SELECTION_pn-linux-stm32mp = "github"
+#STM32MP_SOURCE_SELECTION_pn-optee-os-stm32mp = "github"
+#STM32MP_SOURCE_SELECTION_pn-tf-a-stm32mp = "github"
+#STM32MP_SOURCE_SELECTION_pn-u-boot-stm32mp = "github"
