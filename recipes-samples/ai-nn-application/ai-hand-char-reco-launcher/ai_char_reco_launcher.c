@@ -73,7 +73,7 @@ static volatile int keepRunning = 1;
 static int aiProcessingDone;
 static int aiProcessingRequested;
 static int touchProcessingRequested;
-static int threadClosingRequested;
+static int threadClosingRequested = 0;
 static int defaultInputType;
 static ai_processing_result_t ai_result_state;
 static pthread_mutex_t lock;
@@ -788,14 +788,19 @@ static void *gtk_popup_thread(void *arg)
 static void intHandler(int dummy)
 {
 	keepRunning = 0;
+	threadClosingRequested = 1;
 }
 
 int main(int argc, char **argv)
 {
 	char script_launcher[256];
 	int n;
+	void *ret;
 
+	/* Catch CTRL + C signal*/
 	signal(SIGINT, intHandler);
+	/* Catch kill signal */
+	signal(SIGTERM, intHandler);
 
 	if (argc != 2) {
 		goto usage;
@@ -818,6 +823,7 @@ int main(int argc, char **argv)
 	ai_result_state.character  = 0;
 	ai_result_state.accuracy   = 0;
 	ai_result_state.elapsetime = 0;
+	threadClosingRequested = 0;
 	touchProcessingRequested = 0;
 	aiProcessingRequested = 0;
 	aiProcessingDone = 0;
@@ -893,6 +899,10 @@ int main(int argc, char **argv)
 		}
 	}
 
+	pthread_join(thread_copro, &ret);
+	pthread_kill(thread_touch, 10);
+	pthread_kill(thread_gtk, 10);
+
 	timer_finalize();
 
 end:
@@ -903,9 +913,9 @@ end:
 	}
 
 	/* delete the firmware symbolic link */
-	char symlink[256];
-	sprintf(symlink, "/lib/firmware/%s", FIRMWARE_NAME);
-	remove(symlink);
+	//char symlink[256];
+	//sprintf(symlink, "/lib/firmware/%s", FIRMWARE_NAME);
+	//remove(symlink);
 	return EXIT_SUCCESS;
 
 usage:
