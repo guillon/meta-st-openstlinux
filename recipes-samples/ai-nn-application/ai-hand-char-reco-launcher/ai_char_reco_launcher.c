@@ -40,8 +40,8 @@
 #define DISPLAY_EVAL_WIDTH         1280
 #define DISPLAY_EVAL_HEIGHT        720
 
-#define DRAW_AREA_WIDTH            280
-#define DRAW_AREA_HEIGHT           280
+#define DRAW_AREA_WIDTH            250
+#define DRAW_AREA_HEIGHT           250
 #define DRAW_AREA_MARGIN           20
 
 #define TOUCH_DOWN                 1
