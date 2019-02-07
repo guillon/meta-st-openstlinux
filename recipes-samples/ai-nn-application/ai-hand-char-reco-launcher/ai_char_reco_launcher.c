@@ -53,9 +53,6 @@
 #define INPUT_IS_LETTER            1
 #define INPUT_IS_DIGIT             2
 
-#define GTK_DRAW_AREA_WIDTH        300
-#define GTK_DRAW_AREA_HEIGHT       300
-
 
 typedef struct {
 	int16_t x;
@@ -175,10 +172,8 @@ void timer_callback(size_t timer_id, void * user_data)
 void timer_gtk_callback(size_t timer_id, void * user_data)
 {
 	ai_result_state.character = 0;
-	gtk_widget_queue_draw_area(window, 0, 0,
-				   GTK_DRAW_AREA_WIDTH,
-				   GTK_DRAW_AREA_HEIGHT);
-	//printf("timer_gtk_callback\n");
+	gtk_widget_queue_draw(window);
+	printf("timer_gtk_callback\n");
 }
 
 void process_touch_coordinate()
@@ -461,6 +456,11 @@ static void *read_touch_event_thread(void *arg)
 				draw_touch_coordinate[touch_idx].y = LINE_BREAK;
 				touch_idx++;
 			} else {
+				if (defaultInputType == 0) {
+					/* configure default AI naural network input type */
+					copro_send_input_type(INPUT_IS_LETTER);
+					defaultInputType = 1;
+				}
 				timer = timer_start(500, timer_callback, NULL);
 			}
 		}
@@ -651,7 +651,7 @@ gboolean draw_callback(GtkWidget *widget, cairo_t *cr, gpointer data)
 
 	/* draw the hand writen character */
 	cairo_set_source_rgb (cr,  212, 0, 122);
-	cairo_set_line_width (cr, 2);
+	cairo_set_line_width (cr, 4);
 	cairo_translate (cr, 10, 115);
 	for (int i = 0; i < TOUCH_COORDINATE_DEPTH ; i++) {
 		if ((gtk_draw_polygon[i].x != -1) &&
@@ -681,7 +681,7 @@ gboolean draw_callback(GtkWidget *widget, cairo_t *cr, gpointer data)
 	}
 	cairo_stroke_preserve(cr);
 
-	memset(&gtk_draw_polygon, -1, sizeof(draw_touch_coordinate));
+	memset(&gtk_draw_polygon, -1, sizeof(gtk_draw_polygon));
 
 	/* display help */
 	cairo_select_font_face (cr, "monospace",
@@ -759,7 +759,6 @@ static void *gtk_popup_thread(void *arg)
 
 	background_drawing_area= gtk_drawing_area_new();
 	gtk_container_add (GTK_CONTAINER (background), background_drawing_area);
-	gtk_widget_set_size_request (background_drawing_area, GTK_DRAW_AREA_WIDTH, GTK_DRAW_AREA_HEIGHT);
 	g_signal_connect(G_OBJECT(background_drawing_area),"draw", G_CALLBACK(background_draw_callback),NULL);
 
 	gtk_widget_show_all (background);
@@ -775,7 +774,6 @@ static void *gtk_popup_thread(void *arg)
 
 	drawing_area= gtk_drawing_area_new();
 	gtk_container_add (GTK_CONTAINER (window), drawing_area);
-	gtk_widget_set_size_request (drawing_area, GTK_DRAW_AREA_WIDTH, GTK_DRAW_AREA_HEIGHT);
 	g_signal_connect(G_OBJECT(drawing_area),"draw", G_CALLBACK(draw_callback),NULL);
 
 	gtk_widget_show_all (window);
@@ -850,12 +848,6 @@ int main(int argc, char **argv)
 	while(keepRunning) {
 		sleep_ms(1);
 
-		if (defaultInputType == 0) {
-			/* configure default AI naural network input type */
-			copro_send_input_type(INPUT_IS_LETTER);
-			defaultInputType = 1;
-		}
-
 		if (touchProcessingRequested == 1) {
 			pthread_mutex_lock(&lock);
 			/* Process touch events */
@@ -884,9 +876,7 @@ int main(int argc, char **argv)
 			       ai_result_state.accuracy,
 			       ai_result_state.elapsetime);
 
-			gtk_widget_queue_draw_area(window, 0, 0,
-						   GTK_DRAW_AREA_WIDTH,
-						   GTK_DRAW_AREA_WIDTH);
+			gtk_widget_queue_draw(window);
 			timer = timer_start(2000, timer_gtk_callback, NULL);
 
 			/* Call the script that will launch applications based
