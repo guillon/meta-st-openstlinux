@@ -79,10 +79,12 @@ static char mByteBuffer[100];
 static touch_screen_coordinate_t draw_touch_coordinate[TOUCH_COORDINATE_DEPTH];
 static touch_screen_coordinate_t gtk_draw_polygon[TOUCH_COORDINATE_DEPTH];
 static int touch_idx;
-static size_t timer;
+static size_t timer1 = 0, timer2 = 0, timer3 = 0;
 static bool timer_running;
 static uint16_t displayWidth;
 static uint16_t displayHeight;
+static char script_launcher[256];
+static int script_launcher_nb_char;
 
 static GtkWidget *window;
 
@@ -91,12 +93,24 @@ static void sleep_ms(int milliseconds)
 	usleep(milliseconds * 1000);
 }
 
+void rpmsg_timeout_callback(size_t timer_id, void * user_data)
+{
+	/* in case we face an issue with the RPMsg communication => safely quit
+	 * the application. */
+	printf("rpmsg timeout callback\n");
+	sprintf(script_launcher + script_launcher_nb_char, "%c", 0x51);
+	printf("script to launch => %s\n", script_launcher);
+	system(script_launcher);
+}
+
 static void copro_send_input_type(uint8_t input_type)
 {
 	char TXbuffer[] = {0x20, 0x01, input_type, 0x00};
 	int len = sizeof(TXbuffer);
 	char crc = copro_computeCRC(TXbuffer, len);
 	int ret = 0;
+
+	timer3 = timer_start(500, rpmsg_timeout_callback, NULL);
 
 	TXbuffer[3] = crc;
 	ret = copro_writeTtyRpmsg(len, TXbuffer);
@@ -142,6 +156,8 @@ static void copro_send_touch_screen_coordinate(touch_screen_coordinate_t* draw_t
 	crc = copro_computeCRC(TXbuffer, len);
 	TXbuffer[len - 1] = crc;
 
+	timer3 = timer_start(500, rpmsg_timeout_callback, NULL);
+
 	ret = copro_writeTtyRpmsg(len, TXbuffer);
 	if (ret != len)
 		printf("send touch screen coordinate fails\n");
@@ -153,6 +169,8 @@ static void copro_start_ai_nn(void)
 	int len = sizeof(TXbuffer);
 	char crc = copro_computeCRC(TXbuffer, len);
 	int ret = 0;
+
+	timer3 = timer_start(500, rpmsg_timeout_callback, NULL);
 
 	TXbuffer[3] = crc;
 	ret = copro_writeTtyRpmsg(len, TXbuffer);
@@ -168,12 +186,11 @@ void timer_callback(size_t timer_id, void * user_data)
 	//printf("timer callback\n");
 }
 
-
 void timer_gtk_callback(size_t timer_id, void * user_data)
 {
 	ai_result_state.character = 0;
 	gtk_widget_queue_draw(window);
-	printf("timer_gtk_callback\n");
+	//printf("timer_gtk_callback\n");
 }
 
 void process_touch_coordinate()
@@ -302,6 +319,9 @@ static void copro_virtual_tty_process_read_data(char *data, int size)
 {
 	char uartRx[] = {0,0,0,0,0,0,0,0,0,0};
 	int uartRxCnt = 0;
+
+	/* stop the rpmsg timeout callback */
+	timer_stop(timer3);
 
 	for (int i = 0; i < size; i++) {
 		uartRx[uartRxCnt++] = data[i];
@@ -450,7 +470,19 @@ static void *read_touch_event_thread(void *arg)
 
 		if (ev.type == EVENT_TYPE_KEY && ev.code == EVENT_TOUCH) {
 			if (ev.value == TOUCH_DOWN) {
-				timer_stop(timer);
+				if (timer1) {
+					timer_stop(timer1);
+					timer1= 0;
+				}
+
+				/*  Be sure that the timer 2 is stopped */
+				if (timer2) {
+					timer_stop(timer2);
+					timer2 = 0;
+					ai_result_state.character = 0;
+					gtk_widget_queue_draw(window);
+				}
+
 				/* enter a line break */
 				draw_touch_coordinate[touch_idx].x = LINE_BREAK;
 				draw_touch_coordinate[touch_idx].y = LINE_BREAK;
@@ -461,7 +493,7 @@ static void *read_touch_event_thread(void *arg)
 					copro_send_input_type(INPUT_IS_LETTER);
 					defaultInputType = 1;
 				}
-				timer = timer_start(500, timer_callback, NULL);
+				timer1 = timer_start(500, timer_callback, NULL);
 			}
 		}
 
@@ -791,8 +823,6 @@ static void intHandler(int dummy)
 
 int main(int argc, char **argv)
 {
-	char script_launcher[256];
-	int n;
 	void *ret;
 
 	/* Catch CTRL + C signal*/
@@ -804,7 +834,7 @@ int main(int argc, char **argv)
 		goto usage;
 	}
 
-	n = sprintf(script_launcher, "%s ",  argv[1]);
+	script_launcher_nb_char = sprintf(script_launcher, "%s ",  argv[1]);
 	printf("script_launcher = %s\n", script_launcher);
 	printf("firmware path DK2=%s\n", FIRMWARE_PATH_DK2);
 	printf("firmware path EV1=%s\n", FIRMWARE_PATH_EV1);
@@ -877,12 +907,12 @@ int main(int argc, char **argv)
 			       ai_result_state.elapsetime);
 
 			gtk_widget_queue_draw(window);
-			timer = timer_start(2000, timer_gtk_callback, NULL);
+			timer2 = timer_start(2000, timer_gtk_callback, NULL);
 
 			/* Call the script that will launch applications based
 			 * on the letter recognized.
 			 */
-			sprintf(script_launcher + n, "%c", (char)ai_result_state.character);
+			sprintf(script_launcher + script_launcher_nb_char, "%c", (char)ai_result_state.character);
 			printf("script to launch => %s\n", script_launcher);
 			system(script_launcher);
 			printf("script launched\n");
@@ -890,8 +920,8 @@ int main(int argc, char **argv)
 	}
 
 	pthread_join(thread_copro, &ret);
-	pthread_kill(thread_touch, 10);
-	pthread_kill(thread_gtk, 10);
+	pthread_kill(thread_touch, 0);
+	pthread_kill(thread_gtk, 0);
 
 	timer_finalize();
 
