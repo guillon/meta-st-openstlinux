@@ -58,7 +58,7 @@ found_devices() {
             do
                 if [ -r $f/name ];
                 then
-                    cat $f/name | grep -sq "^${_search}$"
+                    cat $f/name | grep -sq "^${_search}"
                     if [ "$?" -eq 0 ];
                     then
                         _device="/dev/$(basename $f)"
@@ -74,7 +74,7 @@ found_devices() {
             do
                 if [ -r $f/uevent ];
                 then
-                    cat $f/uevent | grep PARTNAME | sed "s/PARTNAME=//" | grep -sq "^${_search}$"
+                    cat $f/uevent | grep PARTNAME | sed "s/PARTNAME=//" | grep -sq "^${_search}"
                     if [ "$?" -eq 0 ];
                     then
                         _device="/dev/$(basename $f)"
@@ -89,7 +89,7 @@ found_devices() {
             do
                 if [ -r $f/uevent ];
                 then
-                    cat $f/uevent | grep PARTNAME | sed "s/PARTNAME=//" | grep -sq "^${_search}$"
+                    cat $f/uevent | grep PARTNAME | sed "s/PARTNAME=//" | grep -sq "^${_search}"
                     if [ "$?" -eq 0 ];
                     then
                         _device="/dev/$(basename $f)"
