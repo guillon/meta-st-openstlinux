@@ -12,8 +12,11 @@ IMAGE_LINGUAS = "en-us"
 
 IMAGE_FEATURES += "splash package-management x11-base x11-sato ssh-server-dropbear hwcodecs tools-profile"
 
-# Define to null ROOTFS_MAXSIZE to avoid partition size restriction
-IMAGE_ROOTFS_MAXSIZE = ""
+# Define ROOTFS_MAXSIZE to 3GB
+IMAGE_ROOTFS_MAXSIZE = "3145728"
+
+# Set ST_EXAMPLE_IMAGE property to '1' to allow specific use in image creation process
+ST_EXAMPLE_IMAGE = "1"
 
 # make sure we boot to desktop
 # by default and without x11-base in IMAGE_FEATURES we default to multi-user.target
