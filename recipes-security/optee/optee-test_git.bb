@@ -15,6 +15,7 @@ SRC_URI = "git://github.com/OP-TEE/optee_test.git \
            file://0002-Correct-support-of-32bits.patch \
            file://0003-xtest-prevent-unexpected-build-warning-with-strncpy.patch \
            file://0004-regression-4011-correct-potential-overflow.patch \
+           file://0005-regression_8100-use-null-terminated-strings-with-fil.patch \
           "
 S = "${WORKDIR}/git"
 
