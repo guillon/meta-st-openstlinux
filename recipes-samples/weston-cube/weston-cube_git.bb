@@ -6,7 +6,7 @@ SRC_URI = "git://gerrit.st.com:29418/oeivi/oe/st/st-openstlinux-application;prot
 
 # Modify these as desired
 PV = "1.0+git${SRCPV}"
-SRCREV = "4d12ca471f2b652906c581de535e595b5922b53b"
+SRCREV = "fbc11e8dc489c8a107d59945604af60554238b76"
 
 DEPENDS += "wayland wayland-native wayland-protocols libdrm pixman libpng libjpeg-turbo \
 	virtual/egl virtual/libgles2 gstreamer1.0 gstreamer1.0-plugins-base"
