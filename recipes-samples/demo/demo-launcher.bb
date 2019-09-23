@@ -12,9 +12,10 @@ DEPENDS += "weston-cube"
 SRC_URI = " \
     file://demo_launcher.py \
     file://start_up_demo_launcher.sh \
-    file://bin \
     file://pictures \
     file://media \
+    file://application \
+    file://hostapd \
     "
 
 do_configure[noexec] = "1"
@@ -25,10 +26,17 @@ do_install() {
     install -d ${D}${prefix}/local/demo/bin
     install -d ${D}${prefix}/local/demo/pictures
     install -d ${D}${prefix}/local/demo/media
+    install -d ${D}${prefix}/local/demo/application
+
     install -m 0755 ${WORKDIR}/demo_launcher.py ${D}${prefix}/local/demo/
-    install -m 0755 ${WORKDIR}/bin/* ${D}${prefix}/local/demo/bin
     install -m 0644 ${WORKDIR}/pictures/* ${D}${prefix}/local/demo/pictures/
     install -m 0644 ${WORKDIR}/media/* ${D}${prefix}/local/demo/media/
+    cp -r ${WORKDIR}/application/* ${D}${prefix}/local/demo/application/
+
+
+    # for netdata install default login/password for wifi hotspot
+    install -d ${D}${sysconfdir}/default
+    install -m 0644 ${WORKDIR}/hostapd ${D}${sysconfdir}/default
 
     # start at startup
     install -d ${D}${prefix}/local/weston-start-at-startup/
