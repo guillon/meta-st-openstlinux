@@ -45,6 +45,6 @@ do_install() {
 
 FILES_${PN} += "${prefix}/local/demo/ ${prefix}/local/weston-start-at-startup/"
 
-RDEPENDS_${PN} += "python3 python3-pygobject gtk+3 gstreamer1.0-plugins-base python3-ptyprocess python3-pexpect python3-terminal python3-resource"
+RDEPENDS_${PN} += "python3-pygobject gtk+3 gstreamer1.0-plugins-base python3-ptyprocess python3-pexpect python3-terminal python3-resource"
 RDEPENDS_${PN} += "demo-hotspot-wifi ai-hand-char-reco-launcher weston-cube event-gtk-player"
 
