@@ -1,14 +1,25 @@
+LIC_FILES_CHKSUM = "file://COPYING;md5=f8fee3d59797546cffab04f3b88b2d44"
+
 DEPENDS += "jsoncpp openssl curl jq"
+DEPENDS += "tbb"
 DEPENDS += "libb64"
 DEPENDS += "elfutils"
 
 SRC_URI = "git://github.com/draios/sysdig.git;protocol=https"
-SRCREV = "153e3951f7c0fb449a5ed23949eceaf2c25d3877"
+SRCREV = "aa82b2fb329ea97a8ade31590954ddaa675e1728"
 
-PV = "0.22.1+git${SRCPV}"
+PV = "0.24.2+git${SRCPV}"
 
-EXTRA_OECMAKE += ' -DUSE_BUNDLED_JSONCPP="OFF" '
-EXTRA_OECMAKE += ' -DUSE_BUNDLED_OPENSSL="OFF" '
-EXTRA_OECMAKE += ' -DUSE_BUNDLED_CURL="OFF" '
-EXTRA_OECMAKE += ' -DUSE_BUNDLED_B64="OFF" '
-EXTRA_OECMAKE += ' -DUSE_BUNDLED_JQ="OFF" '
+EXTRA_OECMAKE += ' -DUSE_BUNDLED_LUAJIT="OFF" \
+                   -DUSE_BUNDLED_ZLIB="OFF" \
+                   -DUSE_BUNDLED_NCURSES="OFF" \
+                   -DUSE_BUNDLED_JSONCPP="OFF" \
+                   -DUSE_BUNDLED_OPENSSL="OFF" \
+                   -DUSE_BUNDLED_CURL="OFF" \
+                   -DUSE_BUNDLED_B64="OFF" \
+                   -DUSE_BUNDLED_JQ="OFF" \
+                   -DUSE_BUNDLED_TBB="OFF" \
+                 '
+FILES_${PN}_remove = "${prefix}/src/*"
+
+FILES_${PN}-dev += "${prefix}/src/*"
