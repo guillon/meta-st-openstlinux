@@ -78,7 +78,6 @@ RDEPENDS_packagegroup-framework-tools-extra-audio = "\
 
 SUMMARY_packagegroup-framework-tools-extra-ui = "Framework tools extra components for ui"
 RDEPENDS_packagegroup-framework-tools-extra-ui = "\
-    ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'xvideo-tests', '', d)}  \
     ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'x11perf', '', d)}       \
     ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'gtkperf', '', d)}       \
     "

@@ -22,7 +22,7 @@ RDEPENDS_packagegroup-framework-core-extra = "\
 SUMMARY_packagegroup-framework-core-extra-display = "Framework core extra components for display"
 RDEPENDS_packagegroup-framework-core-extra-display = "\
     ${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'weston', '', d)}                        \
-    ${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'weston-init', '', d)}                   \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'weston-conf weston-init', '', d)}                   \
     ${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'weston-examples', '', d)}               \
     ${@bb.utils.contains_any('DISTRO_FEATURES', '${GTK3DISTROFEATURES}', 'gtk+3', '', d)}       \
     ${@bb.utils.contains_any('DISTRO_FEATURES', '${GTK3DISTROFEATURES}', 'gtk+3-demo', '', d)}  \
