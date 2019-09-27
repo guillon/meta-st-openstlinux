@@ -45,7 +45,6 @@ RDEPENDS_packagegroup-framework-tools-core = "\
     ntp             \
     systemtap       \
     gptfdisk        \
-    lsb-openstlinux \
     rng-tools       \
     "
 
