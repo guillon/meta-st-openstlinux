@@ -8,7 +8,7 @@ import os
 import re
 from subprocess import Popen, PIPE
 
-from base import SimpleService
+from bases.FrameworkServices.SimpleService import SimpleService
 
 update_every = 5
 priority = 90000
@@ -65,14 +65,3 @@ class Service(SimpleService):
         data = float(on * 100 / (stop - start) )
         return { 'usage': int(data)*100 }
 
-    def create(self):
-        self.chart_name = "gpu"
-        status = SimpleService.create(self)
-        self.chart_name = self._orig_name
-        return status
-
-    def update(self, interval):
-        self.chart_name = "gpu"
-        status = SimpleService.update(self, interval=interval)
-        self.chart_name = self._orig_name
-        return status
