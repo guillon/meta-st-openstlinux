@@ -575,6 +575,7 @@ class MainUIWindow(Gtk.Window):
         self.back_box = self.create_eventbox_back_next(1)
         self.next_box = self.create_eventbox_back_next(0)
 
+        number_of_application = 0
         for file in sorted(os.listdir(self.application_path)):
             if os.path.isfile(os.path.join(self.application_path, file)) and file.endswith(".yaml"):
                 print("[DEBUG] create event box for ", file)
@@ -582,6 +583,13 @@ class MainUIWindow(Gtk.Window):
                 if application_button.is_compatible():
                     self.application_list.append(os.path.join(self.application_path, file))
                     self.application_eventbox_list.append(application_button.get_event_box())
+                number_of_application = number_of_application + 1
+        print("[DEBUG] there is %d application(s) detected " % number_of_application)
+        if number_of_application == 0:
+            self.set_default_size(self.screen_width, self.screen_height)
+            self.display_message("<span font='15' color='#FFFFFFFF'>There is no application detected\n</span>")
+            self.destroy()
+
         self.application_end = len(self.application_list)
 
         #print("[DEBUG] application list:\n", self.application_list)
@@ -738,7 +746,7 @@ if __name__ == "__main__":
         win = MainUIWindow()
         win.connect("delete-event", Gtk.main_quit)
         win.show_all()
+        Gtk.main()
     except Exception as exc:
         print("Main Exception: ", exc )
 
-    Gtk.main()
