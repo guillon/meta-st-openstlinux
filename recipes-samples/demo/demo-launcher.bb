@@ -5,7 +5,7 @@ LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/BSD-3-Clause;md5=550794465ba0ec5312d6919e203a55f9"
 
 DEPENDS += "demo-hotspot-wifi"
-DEPENDS += "ai-hand-char-reco-launcher"
+DEPENDS_append_stm32mpcommon += " ai-hand-char-reco-launcher "
 DEPENDS += "qrenc"
 DEPENDS += "weston-cube"
 
@@ -46,6 +46,7 @@ do_install() {
 FILES_${PN} += "${prefix}/local/demo/ ${prefix}/local/weston-start-at-startup/"
 
 RDEPENDS_${PN} += "python3-pygobject gtk+3 gstreamer1.0-plugins-base python3-ptyprocess python3-pexpect python3-terminal python3-resource"
-RDEPENDS_${PN} += "demo-hotspot-wifi ai-hand-char-reco-launcher weston-cube event-gtk-player"
+RDEPENDS_${PN} += "demo-hotspot-wifi weston-cube event-gtk-player"
+RDEPENDS_${PN}_append_stm32mpcommon += " ai-hand-char-reco-launcher "
 #since zeus
 RDEPENDS_${PN} += " python3-core "
