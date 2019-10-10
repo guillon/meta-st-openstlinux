@@ -86,7 +86,6 @@ SUMMARY_packagegroup-framework-tools-extra-python2 = "Framework tools extra comp
 RDEPENDS_packagegroup-framework-tools-extra-python2 = "\
     python-lxml         \
     python-modules      \
-    python-nose         \
     python-pip          \
     python-pkgutil      \
     python-pytest       \
