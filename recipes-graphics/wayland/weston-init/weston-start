@@ -95,4 +95,5 @@ if [ -d "$start_local_application_dir" ]; then
 fi
 
 
-exec openvt $openvt_args -- $launcher $weston_args --log=@LOCALSTATEDIR@/log/weston.log
+#exec openvt $openvt_args -- $launcher $weston_args --log=@LOCALSTATEDIR@/log/weston.log
+exec /usr/bin/weston --log=/var/log/weston.log  $weston_args
