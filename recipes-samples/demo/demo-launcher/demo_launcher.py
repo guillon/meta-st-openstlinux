@@ -330,10 +330,12 @@ class ApplicationButton():
 
     def is_exist(self, data):
         try:
+            #print("[DEBUG][is_exist] ", data)
             if (data):
                 for masterkey in data:
-                    if key == "Exist" and len(data["File"].rstrip()):
-                        for masterkey in data["Exist"]:
+                    #print("[DEBUG][is_exist] key available: ", masterkey)
+                    if masterkey == "Exist":
+                        for key in data["Exist"]:
                             #print("[DEBUG][is_exist] key detected: %s" % key)
                             if key == "File" and len(data["Exist"]["File"].rstrip()):
                                 if (os.path.exists(data["Exist"]["File"].rstrip())):
