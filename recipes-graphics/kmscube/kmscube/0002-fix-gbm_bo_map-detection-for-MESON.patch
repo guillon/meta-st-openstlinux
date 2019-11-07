@@ -1,7 +1,7 @@
-From f2cdacc0ab0477858cfbe83af7feca95f7c70a28 Mon Sep 17 00:00:00 2001
-From: Pierre-Yves MORDRET <pierre-yves.mordret@st.com>
-Date: Thu, 5 Sep 2019 15:54:10 +0200
-Subject: [PATCH 2/2] fix gbm_bo_map detection for MESON
+From d739cb61a525b96d01889e4c459b3258ff123232 Mon Sep 17 00:00:00 2001
+From: Christophe Priouzeau <christophe.priouzeau@st.com>
+Date: Thu, 7 Nov 2019 15:05:30 +0100
+Subject: [PATCH] fix gbm_bo_map detection for MESON
 
 The HAVE_GBM_BO_MAP flag was not created as a #define macro
 for the source code
@@ -14,10 +14,10 @@ Signed-off-by: Pierre-Yves MORDRET <pierre-yves.mordret@st.com>
  1 file changed, 7 insertions(+)
 
 diff --git a/meson.build b/meson.build
-index 8f1eed9..175e89f 100644
+index ed51a6d..87517e4 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -86,4 +86,11 @@ else
+@@ -91,6 +91,13 @@ else
    message('Building without gstreamer support')
  endif
  
@@ -29,6 +29,8 @@ index 8f1eed9..175e89f 100644
 +endif
 +
  executable('kmscube', sources, dependencies : dep_common, install : true)
+ 
+ 
 -- 
-2.7.4
+2.17.1
 
