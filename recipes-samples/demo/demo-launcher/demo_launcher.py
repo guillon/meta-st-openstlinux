@@ -306,7 +306,7 @@ class ApplicationButton():
         self._compatible = True
 
         with open(yaml_file) as fp:
-            self.yaml_configuration = yaml.load(fp)
+            self.yaml_configuration = yaml.load(fp, Loader=yaml.FullLoader)
         #print(self.yaml_configuration)
         #print("Name ", self.yaml_configuration["Application"]["Name"])
 
@@ -347,11 +347,28 @@ class ApplicationButton():
                                     return True
                                 else:
                                     return False
+                return True
             else:
                 return True
         except:
             print("is_exist exception return true")
             return True
+
+    def exist_MSG_present(self, data):
+        try:
+            #print("[DEBUG][is_exist] ", data)
+            if (data):
+                for masterkey in data:
+                    #print("[DEBUG][is_exist] key available: ", masterkey)
+                    if masterkey == "Exist":
+                        for key in data["Exist"]:
+                            #print("[DEBUG][is_exist] key detected: %s" % key)
+                            if key == "Msg_false" and len(data["Exist"]["Msg_false"].rstrip()):
+                                return True
+                return False
+        except:
+            return False
+
 
     def is_compatible(self):
         return self._compatible
@@ -407,7 +424,7 @@ class ApplicationButton():
             response = script_window.run()
             script_window.destroy()
             backscript_window.destroy()
-        else:
+        elif (self.exist_MSG_present(self.yaml_configuration["Application"]["Script"])):
             print("[WARNING] %s not detected\n" % self.yaml_configuration["Application"]["Script"]["Exist"]["Msg_false"])
             self._parent.display_message("<span font='15' color='#FFFFFFFF'>%s\n</span>" % self.yaml_configuration["Application"]["Script"]["Exist"]["Msg_false"])
 
