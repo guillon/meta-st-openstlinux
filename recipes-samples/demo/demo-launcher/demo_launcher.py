@@ -730,10 +730,12 @@ class MainUIWindow(Gtk.Window):
     def on_back_menu_event(self, widget, event):
         self.create_page_icon_by_page(self.application_start_previous)
         widget.set_name("normal_bg")
+        widget.set_name("transparent_bg")
         self.button_exit.show()
     def on_next_menu_event(self, widget, event):
         self.create_page_icon_by_page(self.application_start_next)
         widget.set_name("normal_bg")
+        widget.set_name("transparent_bg")
         self.button_exit.show()
 
 # -------------------------------------------------------------------
