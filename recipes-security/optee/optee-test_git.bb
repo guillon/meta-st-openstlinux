@@ -4,7 +4,7 @@ HOMEPAGE = "https://github.com/OP-TEE/optee_test"
 LICENSE = "BSD-2-Clause & GPLv2"
 LIC_FILES_CHKSUM = "file://${S}/LICENSE.md;md5=daa2bcccc666345ab8940aab1315a4fa"
 
-DEPENDS = "optee-client optee-os python-pycrypto-native"
+DEPENDS = "optee-client virtual/optee-os python-pycrypto-native"
 
 inherit pythonnative
 
