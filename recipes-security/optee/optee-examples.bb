@@ -4,9 +4,9 @@ HOMEPAGE = "https://github.com/linaro-swg/optee_examples"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://${S}/LICENSE;md5=cd95ab417e23b94f381dafc453d70c30"
 
-DEPENDS = "optee-client virtual/optee-os python-pycrypto-native"
+DEPENDS = "optee-client virtual/optee-os python3-pycrypto-native"
 
-inherit pythonnative
+inherit python3native
 
 SRC_URI = "git://github.com/linaro-swg/optee_examples.git"
 SRCREV = "559b2141c16bf0f57ccd72f60e4deb84fc2a05b0"
@@ -35,6 +35,9 @@ do_install () {
     install -D -p -m0755 ${S}/out/ca/* ${D}${bindir}
     install -D -p -m0444 ${S}/out/ta/* ${D}${nonarch_base_libdir}/optee_armtz
 }
+
+# Avoid QA Issue: No GNU_HASH in the elf binary
+INSANE_SKIP_${PN} += "ldflags"
 
 FILES_${PN} += "${nonarch_base_libdir}/optee_armtz/"
 
