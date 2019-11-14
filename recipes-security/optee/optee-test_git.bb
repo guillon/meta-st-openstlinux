@@ -4,22 +4,17 @@ HOMEPAGE = "https://github.com/OP-TEE/optee_test"
 LICENSE = "BSD-2-Clause & GPLv2"
 LIC_FILES_CHKSUM = "file://${S}/LICENSE.md;md5=daa2bcccc666345ab8940aab1315a4fa"
 
-DEPENDS = "optee-client virtual/optee-os python-pycrypto-native"
+DEPENDS = "optee-client virtual/optee-os python3-pycrypto-native"
 
-inherit pythonnative
+inherit python3native
 
-PV = "3.3.0+git${SRCPV}"
+PV = "3.7.0+git${SRCPV}"
 
 SRC_URI = "git://github.com/OP-TEE/optee_test.git \
-           file://fix-build-failure-with-GCC6.patch \
-           file://0002-Correct-support-of-32bits.patch \
-           file://0003-xtest-prevent-unexpected-build-warning-with-strncpy.patch \
-           file://0004-regression-4011-correct-potential-overflow.patch \
-           file://0005-regression_8100-use-null-terminated-strings-with-fil.patch \
           "
 S = "${WORKDIR}/git"
 
-SRCREV = "5659bceaa001cf8271327d8c0005c8ef3371fdfc"
+SRCREV = "227d6f4c40eaa6f84fe049b9e48c7b27ad7fab08"
 
 OPTEE_CLIENT_EXPORT = "${STAGING_DIR_HOST}${prefix}"
 TEEC_EXPORT         = "${STAGING_DIR_HOST}${prefix}"
