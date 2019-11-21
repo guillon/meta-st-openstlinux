@@ -1,0 +1,5 @@
+The package repository service provided by STMicroelectronics is provided as
+evaluation and not as a supported distribution.
+Packages have been generated from source code (via OpenEmbedded/Yocto) with
+associated licenses. The detailed content licenses can be found at
+https://wiki.st.com/stm32mpu/wiki/OpenSTLinux_licenses

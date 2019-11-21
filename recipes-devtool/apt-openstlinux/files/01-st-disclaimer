@@ -1,0 +1,2 @@
+DPkg::Pre-Invoke {"echo ; cat /etc/apt/disclaimer ; echo ; ";};
+APT::Update::Pre-Invoke {"echo ; cat /etc/apt/disclaimer ; echo ;";};
