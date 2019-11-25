@@ -60,4 +60,10 @@ for device in ${DEVICES}; do
     fi
 done
 
+sync
+echo "RESIZE-HELPER: For integrity of file-system after a resize2fs, the system need to be rebooted" > /dev/kmsg
+echo "RESIZE-HELPER REBOOTING of system" > /dev/kmsg
+# disable service before to reboot to prevent reboot-loop
+/bin/systemctl disable resize-helper.service
+/bin/systemctl reboot
 echo "RESIZE-HELPER FINISH" > /dev/kmsg
