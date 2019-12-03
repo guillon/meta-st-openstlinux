@@ -343,7 +343,7 @@ class ApplicationButton():
                                 else:
                                     return False
                             elif (key == "Command" and len(data["Exist"]["Command"].rstrip())):
-                                if (os.system(data["Exist"]["Command"].rstrip()) != 0):
+                                if (os.system(data["Exist"]["Command"].rstrip()) == 0):
                                     return True
                                 else:
                                     return False
