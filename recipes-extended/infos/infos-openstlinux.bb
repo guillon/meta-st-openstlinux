@@ -12,5 +12,9 @@ do_install() {
 		printf "LIBGLES1=${PREFERRED_PROVIDER_virtual/libgles1}\n" > ${D}${sysconfdir}/st-info.d/graphics-${PV}
 	fi
 }
+
+# Make sure to update package as soon as EULA is accepted or not
+do_install[vardeps] += "${@d.getVar('ACCEPT_EULA_'+d.getVar('MACHINE'))}"
+
 FILES_${PN} = "${sysconfdir}/st-info.d"
 ALLOW_EMPTY_${PN} = "1"
