@@ -11,27 +11,10 @@ include recipes-st/images/st-image-weston.bb
 # let's make sure we have a good image...
 REQUIRED_DISTRO_FEATURES = "wayland"
 
-#
-# Introduce specific function to disable 'do_image' and 'do_image_complete' tasks
-#
-python __anonymous () {
-    # Gather all current tasks
-    tasks = filter(lambda k: d.getVarFlag(k, "task", True), d.keys())
-    for task in tasks:
-        # Check that we are dealing with image recipe
-        if task == 'do_image_complete':
-            # Init current image name
-            current_image_name = d.getVar('PN') or ""
-            # Init RAMFS image if any
-            initramfs = d.getVar('INITRAMFS_IMAGE') or ""
-            # We want to disable 'do_image' and 'do_image_complete' tasks to avoid
-            # wasting time as we're only interested in package generation.
-            # We anyway need to execute these tasks for InitRAMFS image unless we
-            # may get issue with kernel generation
-            if current_image_name not in initramfs:
-                d.setVarFlag('do_image', 'noexec', '1')
-                d.setVarFlag('do_image_complete', 'noexec', '1')
-}
+# Define ROOTFS_MAXSIZE to unlimited size
+IMAGE_ROOTFS_MAXSIZE = ""
+IMAGE_FSTYPES = "tar"
+ENABLE_FLASHLAYOUT_CONFIG = "0"
 
 #
 # IMAGE_FEATURES addons
