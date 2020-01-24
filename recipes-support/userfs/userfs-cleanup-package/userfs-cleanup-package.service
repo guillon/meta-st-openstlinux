@@ -1,13 +1,12 @@
 [Unit]
-Description=Resize root filesystem to fit available disk space
-Wants=systemd-udevd.service systemd-udev-trigger.service
-After=systemd-remount-fs.service systemd-udevd.service
+Description=Userfs cleanup package
+After=systemd-logind.service
 
 [Service]
 Type=oneshot
 ExecStart=-@sbindir@/userfs-cleanup-package.sh start
-ExecStartPost=/bin/systemctl disable userfs-cleanup-package.service
+ExecStartPost=-/bin/systemctl disable userfs-cleanup-package.service
 WatchdogSec=30
 
 [Install]
-WantedBy=basic.target
+WantedBy=multi-user.target
