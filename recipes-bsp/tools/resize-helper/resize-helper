@@ -53,7 +53,11 @@ DEVICES=$(ls /sys/fs/ext4/)
 #${PARTPROBE}
 
 # disable service to be sure it will be executed only one time
-/bin/systemctl disable resize-helper.service
+if [ -f /bin/systemctl ]; then
+    /bin/systemctl disable resize-helper.service
+else
+    rm /etc/rc[35].d/S22resize-helper.sh &> /dev/null
+fi
 sync
 
 if `grep -q nfsroot /proc/cmdline` ; then
@@ -72,7 +76,12 @@ for device in ${DEVICES}; do
     fi
 done
 
-/bin/systemctl reboot
+if [ -f /bin/systemctl ]; then
+    /bin/systemctl reboot
+else
+    /sbin/reboot
+fi
+
 echo "RESIZE-HELPER: For integrity of file-system after a resize2fs, the system need to be rebooted" > /dev/kmsg
 echo "RESIZE-HELPER REBOOTING of system" > /dev/kmsg
 echo "RESIZE-HELPER FINISH" > /dev/kmsg
