@@ -2,7 +2,7 @@
 Description=Resize root filesystem to fit available disk space
 Wants=systemd-udevd.service systemd-udev-trigger.service
 After=systemd-remount-fs.service systemd-udevd.service
-Before=serial-getty@ttySTM0.service
+Before=serial-getty@ttySTM0.service netdata.service
 
 [Service]
 Type=oneshot

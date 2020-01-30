@@ -54,7 +54,7 @@ DEVICES=$(ls /sys/fs/ext4/)
 
 # disable service to be sure it will be executed only one time
 if [ -f /bin/systemctl ]; then
-    /bin/systemctl disable resize-helper.service
+    /bin/systemctl --no-reload disable resize-helper.service
 else
     rm /etc/rc[35].d/S22resize-helper.sh &> /dev/null
 fi
