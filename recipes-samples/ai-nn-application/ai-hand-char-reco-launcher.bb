@@ -17,6 +17,8 @@ SRC_URI = " file://ai_char_reco_launcher.c \
             file://timer.h \
             \
             file://media \
+            \
+            file://demo \
           "
 
 S = "${WORKDIR}"
@@ -33,13 +35,16 @@ EXTRA_OEMAKE += 'FIRMWARE_NAME="AI_Character_Recognition.elf"'
 do_install() {
     install -d ${D}${prefix}/local/demo/bin/
     install -d ${D}${prefix}/local/demo/media/
+    install -d ${D}${prefix}/local/demo/application/m4_ai/bin
+    install -d ${D}${prefix}/local/demo/application/m4_ai/pictures
 
-    install -m 0755 ${B}/ai_char_reco_launcher      ${D}${STM32MP_USERFS_MOUNTPOINT_IMAGE}/demo/bin/
-    install -m 0755 ${B}/apps_launcher_example.sh   ${D}${STM32MP_USERFS_MOUNTPOINT_IMAGE}/demo/bin/
-    install -m 0644 ${B}/media/*                    ${D}${STM32MP_USERFS_MOUNTPOINT_IMAGE}/demo/media/
+    install -m 0755 ${B}/ai_char_reco_launcher      ${D}${prefix}/local/demo/bin/
+    install -m 0755 ${B}/apps_launcher_example.sh   ${D}${prefix}/local/demo/bin/
+    install -m 0644 ${B}/media/*                    ${D}${prefix}/local/demo/media/
+    install -m 0755 -D ${WORKDIR}/demo/application/m4_ai/bin/* ${D}${prefix}/local/demo/application/m4_ai/bin/
+    install -m 0755 -D ${WORKDIR}/demo/application/m4_ai/pictures/* ${D}${prefix}/local/demo/application/m4_ai/pictures/
+    install -m 0644 -D ${WORKDIR}/demo/application/*.yaml ${D}${prefix}/local/demo/application/
 }
 
-FILES_${PN} += "${prefix}/local/demo/bin/"
-FILES_${PN} += "${prefix}/local/demo/media/"
-FILES_${PN} += "${prefix}/local/demo/lib/"
+FILES_${PN} += "${prefix}/local/demo/"
 RDEPENDS_${PN} += "gtk+3 gstreamer1.0-plugins-base"
