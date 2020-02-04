@@ -343,7 +343,8 @@ class ApplicationButton():
                                 else:
                                     return False
                             elif (key == "Command" and len(data["Exist"]["Command"].rstrip())):
-                                if (os.system(data["Exist"]["Command"].rstrip()) == 0):
+                                retcode = subprocess.call(data["Exist"]["Command"].rstrip(), shell=True);
+                                if (int(retcode) == 0):
                                     return True
                                 else:
                                     return False
@@ -409,6 +410,12 @@ class ApplicationButton():
                     print("[Python_event stop]\n")
                     widget.set_name("transparent_bg")
                     self._parent.button_exit.show()
+        elif (self.exist_MSG_present(self.yaml_configuration["Application"]["Python"])):
+            print("[WARNING] %s not detected\n" % self.yaml_configuration["Application"]["Python"]["Exist"]["Msg_false"])
+            self._parent.display_message("<span font='15' color='#FFFFFFFF'>%s\n</span>" % self.yaml_configuration["Application"]["Python"]["Exist"]["Msg_false"])
+        widget.set_name("transparent_bg")
+        self._parent.button_exit.show()
+
 
     def script_start(self, widget, event):
         if (self.is_exist(self.yaml_configuration["Application"]["Script"])):
