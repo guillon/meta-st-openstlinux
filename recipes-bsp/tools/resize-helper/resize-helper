@@ -35,22 +35,6 @@ RESIZE2FS=$(which resize2fs) || { echo "E: You must have resize2fs" && exit 1; }
 # find root device
 # ROOT_DEVICE=$(findmnt --noheadings --output=SOURCE / | cut -d'[' -f1)
 DEVICES=$(ls /sys/fs/ext4/)
-# prune root device (for example UUID)
-#ROOT_DEVICE=$(realpath ${ROOT_DEVICE})
-# get the partition number and type
-#PART_ENTRY_NUMBER=$(udevadm info --query=property --name=${ROOT_DEVICE} | grep '^ID_PART_ENTRY_NUMBER=' | cut -d'=' -f2)
-#PART_TABLE_TYPE=$(udevadm info --query=property --name=${ROOT_DEVICE} | grep '^ID_PART_TABLE_TYPE=' | cut -d'=' -f2)
-# find the block device
-#DEVICE=$(udevadm info --query=path --name=${ROOT_DEVICE} | awk -F'/' '{print $(NF-1)}')
-#DEVICE="/dev/${DEVICE}"
-
-#if [ "$PART_TABLE_TYPE" = "gpt" ]; then
-#        ${SGDISK} -e ${DEVICE}
-#        ${PARTPROBE}
-#fi
-
-#${PARTED} ${DEVICE} resizepart ${PART_ENTRY_NUMBER} Yes 100%
-#${PARTPROBE}
 
 # disable service to be sure it will be executed only one time
 if [ -f /bin/systemctl ]; then
@@ -64,17 +48,24 @@ if `grep -q nfsroot /proc/cmdline` ; then
     exit 0;
 fi
 
-# umount partition before to resize it
-[ -f /sbin/mount-partitions.sh ] && /sbin/mount-partitions.sh stop
-for device in ${DEVICES}; do
-    PART_TABLE_TYPE=$(udevadm info --query=property --name=/dev/${device} | grep '^ID_PART_TABLE_TYPE=' | cut -d'=' -f2)
-    if [ -e /dev/${device} ]; then
-        if [ "$PART_TABLE_TYPE" = "gpt" ]; then
-            echo "Resize /dev/${device}"
-            ${RESIZE2FS} "/dev/${device}"
+if [ -f /lib/systemd/systemd-growfs ]; then
+    /lib/systemd/systemd-growfs /boot
+    /lib/systemd/systemd-growfs /
+    /lib/systemd/systemd-growfs /vendor
+    /lib/systemd/systemd-growfs /usr/local/
+else
+    # umount partition before to resize it
+    [ -f /sbin/mount-partitions.sh ] && /sbin/mount-partitions.sh stop
+    for device in ${DEVICES}; do
+        PART_TABLE_TYPE=$(udevadm info --query=property --name=/dev/${device} | grep '^ID_PART_TABLE_TYPE=' | cut -d'=' -f2)
+        if [ -e /dev/${device} ]; then
+            if [ "$PART_TABLE_TYPE" = "gpt" ]; then
+                echo "Resize /dev/${device}"
+                ${RESIZE2FS} "/dev/${device}"
+            fi
         fi
-    fi
-done
+    done
+fi
 
 if [ -f /bin/systemctl ]; then
     /bin/systemctl reboot
