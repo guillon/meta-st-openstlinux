@@ -33,21 +33,22 @@ def license_create_summary(d):
     pkgdata_dir = d.expand("${TMPDIR}/pkgdata/${MACHINE}")
 
     image_list_arrray = []
-    for img in d.getVar("IMAGE_SUMMARY_LIST").split(':'):
+    for img in d.getVar("IMAGE_SUMMARY_LIST").split(';'):
         if img.startswith("#IMAGE#"):
             for fi in os.listdir(temp_deploy_image_dir):
                 if fi.startswith(ref_image_name) and fi.endswith(".ext4"):
                     r = re.compile("(.*)-(\d+)")
                     mi = r.match(os.path.basename(fi))
                     if mi:
-                        image_list_arrray.append([mi.group(1), mi.group(2), img ])
+                        image_list_arrray.append([mi.group(1), mi.group(2), img, '/' ])
         else:
             for fi in os.listdir(deploy_image_dir):
-                if fi.startswith(img) and fi.endswith(".ext4"):
+                img_name, img_mount = img.split(':')
+                if fi.startswith(img_name) and fi.endswith(".ext4"):
                     r = re.compile("(.*)-(\d+)")
                     mi = r.match(os.path.basename(fi))
                     if mi:
-                        image_list_arrray.append([mi.group(1), mi.group(2), img])
+                        image_list_arrray.append([mi.group(1), mi.group(2), img_name, img_mount])
     if tab.startswith("1"):
         with_tab = 1
     else:
@@ -79,6 +80,9 @@ def license_create_summary(d):
         border_format = "border: 1;"
         wrap_format = ""
         wrap_red_format = "background-color: #ff0000;"
+
+        blue = "background-color: #0000ff;"
+        green = "background-color: #00ff00;"
 
         opened_file = None
 
@@ -525,6 +529,7 @@ def license_create_summary(d):
         for img in image_list_arrray:
             _image_prefix = img[0]
             _image_date = img[1]
+            _image_mount_point = img[3]
 
             html.addNewLine()
             html.addNewLine()
@@ -560,6 +565,7 @@ def license_create_summary(d):
                 package_summary = None
                 package_file = pkgdata_dir + "/runtime-reverse/" + package_name
                 package_file_content = private_open(package_file)
+                file_info = None
                 r = re.compile("([^:]+):\s*(.*)")
                 for line in package_file_content:
                     m = r.match(line)
@@ -574,12 +580,18 @@ def license_create_summary(d):
                             package_description = m.group(2)
                         elif m.group(1).startswith("SUMMARY"):
                             package_summary = m.group(2)
+                        elif m.group(1).startswith("FILES_INFO"):
+                            file_info = m.group(2)
                 if findWholeWord("GPLv3")(package_license):
                     style = html.red
                     style_wrapped = html.wrap_red_format
                 else:
                     style = None
                     style_wrapped = None
+                # remove package which are dependency of installed package but
+                # not present on this mount point
+                if file_info.find(_image_mount_point) < 0:
+                    continue;
                 html.startRow(style)
                 if package_recipe:
                     html.addColumnContent(package_recipe, style)
@@ -604,6 +616,18 @@ def license_create_summary(d):
                         html.addColumnContent(package_description, style_wrapped)
                     else:
                         html.addColumnContent("", style)
+                # display file installed
+                #if file_info:
+                #    b = re.compile("{(.*)}")
+                #    b_info = b.match(file_info)
+                #    data_file = ""
+                #    for t in b_info.group(1).split(','):
+                #        if t.find(_image_mount_point) > -1:
+                #            data_file += t.split(':')[0].replace('\"', '') + " <br/>"
+                #    html.addColumnContent(data_file, style)
+                #else:
+                #   html.addColumnContent("", style)
+
                 html.stopRow()
                 package_license = None
                 package_parent = None
