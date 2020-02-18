@@ -11,12 +11,14 @@ PACKAGES = "\
             packagegroup-framework-core-base            \
             packagegroup-framework-core-base-display    \
             packagegroup-framework-core-base-mm         \
+            packagegroup-framework-core-base-fs         \
             "
 
 # Manage to provide all framework core base packages with overall one
 RDEPENDS_packagegroup-framework-core-base = "\
     packagegroup-framework-core-base-display    \
     packagegroup-framework-core-base-mm         \
+    packagegroup-framework-core-base-fs         \
     "
 
 SUMMARY_packagegroup-framework-core-base-display = "Framework core base components for display"
@@ -27,4 +29,10 @@ RDEPENDS_packagegroup-framework-core-base-display = "\
 
 SUMMARY_packagegroup-framework-core-base-mm = "Framework core base components for multimedia"
 RDEPENDS_packagegroup-framework-core-base-mm = "\
+    "
+
+SUMMARY_packagegroup-framework-core-base-fs = "Framework core base components for filesystem"
+RDEPENDS_packagegroup-framework-core-base-fs = "\
+    systemd-mount-partitions \
+    userfs-cleanup-package \
     "

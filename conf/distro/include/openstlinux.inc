@@ -125,5 +125,3 @@ LICENSE_FLAGS_WHITELIST += " non-commercial commercial"
 # X11 addons
 IMAGE_INSTALL_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'xf86-video-modesetting', '', d)} "
 
-# resize tools
-IMAGE_INSTALL_append = " resize-helper systemd-mount-partitions userfs-cleanup-package "
