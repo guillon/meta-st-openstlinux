@@ -33,6 +33,6 @@ RDEPENDS_packagegroup-framework-core-base-mm = "\
 
 SUMMARY_packagegroup-framework-core-base-fs = "Framework core base components for filesystem"
 RDEPENDS_packagegroup-framework-core-base-fs = "\
-    systemd-mount-partitions \
-    userfs-cleanup-package \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'systemd-mount-partitions', '', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'userfs-cleanup-package', '', d)} \
     "
