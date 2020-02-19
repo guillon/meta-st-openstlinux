@@ -4,7 +4,7 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/MIT;md5=0835ad
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-inherit packagegroup distro_features_check
+inherit packagegroup features_check
 
 REQUIRED_DISTRO_FEATURES = "opengl"
 
