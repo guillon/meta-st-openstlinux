@@ -11,7 +11,9 @@ inherit python3native
 PV = "3.7.0+git${SRCPV}"
 
 SRC_URI = "git://github.com/OP-TEE/optee_test.git \
-          "
+          file://0001-use-python3-instead-of-python.patch \
+    "
+
 S = "${WORKDIR}/git"
 
 SRCREV = "227d6f4c40eaa6f84fe049b9e48c7b27ad7fab08"
