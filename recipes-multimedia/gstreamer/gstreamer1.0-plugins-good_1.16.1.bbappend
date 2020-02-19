@@ -8,8 +8,9 @@ PACKAGECONFIG ?= " \
     ${@bb.utils.contains_any('DISTRO_FEATURES', '${GTK3DISTROFEATURES}', 'gtk', '', d)} \
 "
 
-EXTRA_OECONF += " \
-    --enable-v4l2-probe \
+EXTRA_OEMESON += " \
+    -Dv4l2-probe=enabled \
+    -Dv4l2-libv4l2=enabled \
     "
 
 do_configure_prepend() {
