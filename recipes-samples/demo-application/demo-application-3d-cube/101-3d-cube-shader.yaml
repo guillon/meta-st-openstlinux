@@ -1,6 +1,6 @@
 Application:
     Name: 3D Color
-    Description: GPU
+    Description: GPU Shader
     Icon: application/3d-cube-extra/pictures/ST153_cube_purple.png
     Board: all
     Type: script
