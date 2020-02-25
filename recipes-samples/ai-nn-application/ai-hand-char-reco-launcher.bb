@@ -3,7 +3,7 @@ DESCRIPTION = "Hand writing character recognition launcher based on HCR Neural N
 LICENSE = "GPLv2 & BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"
 
-DEPENDS = "gtk+3 "
+DEPENDS = "gtk+3 gstreamer1.0-plugins-base demo-launcher"
 DEPENDS_append_stm32mpcommon += " m4projects-stm32mp1 "
 
 inherit pkgconfig
@@ -47,4 +47,5 @@ do_install() {
 }
 
 FILES_${PN} += "${prefix}/local/demo/"
-RDEPENDS_${PN} += "gtk+3 gstreamer1.0-plugins-base"
+RDEPENDS_${PN} += "gtk+3 gstreamer1.0-plugins-base demo-launcher"
+RDEPENDS_${PN}_append_stm32mpcommon += " m4projects-stm32mp1 "
