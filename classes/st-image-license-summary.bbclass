@@ -37,7 +37,7 @@ def license_create_summary(d):
         if img.startswith("#IMAGE#"):
             for fi in os.listdir(temp_deploy_image_dir):
                 if fi.startswith(ref_image_name) and fi.endswith(".ext4"):
-                    r = re.compile("(.*)-(\d+)")
+                    r = re.compile("(.*)-(\d\d\d\d+)")
                     mi = r.match(os.path.basename(fi))
                     if mi:
                         image_list_arrray.append([mi.group(1), mi.group(2), img, '/' ])
@@ -45,7 +45,7 @@ def license_create_summary(d):
             for fi in os.listdir(deploy_image_dir):
                 img_name, img_mount = img.split(':')
                 if fi.startswith(img_name) and fi.endswith(".ext4"):
-                    r = re.compile("(.*)-(\d+)")
+                    r = re.compile("(.*)-(\d\d\d\d+)")
                     mi = r.match(os.path.basename(fi))
                     if mi:
                         image_list_arrray.append([mi.group(1), mi.group(2), img_name, img_mount])
