@@ -27,9 +27,6 @@
 [ $(whoami) = "root" ] || { echo "E: You must be root" && exit 1; }
 
 # we must have few tools
-#SGDISK=$(which sgdisk) || { echo "E: You must have sgdisk" && exit 1; }
-#PARTED=$(which parted) || { echo "E: You must have parted" && exit 1; }
-#PARTPROBE=$(which partprobe) || { echo "E: You must have partprobe" && exit 1; }
 RESIZE2FS=$(which resize2fs) || { echo "E: You must have resize2fs" && exit 1; }
 
 # find root device
@@ -50,12 +47,20 @@ fi
 
 if [ -f /lib/systemd/systemd-growfs ]; then
     /lib/systemd/systemd-growfs /boot
-    /lib/systemd/systemd-growfs /
     /lib/systemd/systemd-growfs /vendor
     /lib/systemd/systemd-growfs /usr/local/
+    # remount the root partition in read write mode
+    roottmp=$(lsblk -l -o NAME,MOUNTPOINT | grep '/$')
+    rootpart=/dev/${roottmp%% */}
+    mount -o remount,rw $rootpart
+    /lib/systemd/systemd-growfs /
 else
     # umount partition before to resize it
     [ -f /sbin/mount-partitions.sh ] && /sbin/mount-partitions.sh stop
+    # remove on readonly /
+    roottmp=$(lsblk -l -o NAME,MOUNTPOINT | grep '/$')
+    rootpart=/dev/${roottmp%% */}
+    mount -o remount,rw $rootpart
     for device in ${DEVICES}; do
         PART_TABLE_TYPE=$(udevadm info --query=property --name=/dev/${device} | grep '^ID_PART_TABLE_TYPE=' | cut -d'=' -f2)
         if [ -e /dev/${device} ]; then
