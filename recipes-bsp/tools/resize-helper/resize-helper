@@ -52,7 +52,7 @@ if [ -f /lib/systemd/systemd-growfs ]; then
     # remount the root partition in read write mode
     roottmp=$(lsblk -l -o NAME,MOUNTPOINT | grep '/$')
     rootpart=/dev/${roottmp%% */}
-    mount -o remount,rw $rootpart
+    mount -o remount,ro $rootpart
     /lib/systemd/systemd-growfs /
 else
     # umount partition before to resize it
@@ -60,7 +60,7 @@ else
     # remove on readonly /
     roottmp=$(lsblk -l -o NAME,MOUNTPOINT | grep '/$')
     rootpart=/dev/${roottmp%% */}
-    mount -o remount,rw $rootpart
+    mount -o remount,ro $rootpart
     for device in ${DEVICES}; do
         PART_TABLE_TYPE=$(udevadm info --query=property --name=/dev/${device} | grep '^ID_PART_TABLE_TYPE=' | cut -d'=' -f2)
         if [ -e /dev/${device} ]; then
