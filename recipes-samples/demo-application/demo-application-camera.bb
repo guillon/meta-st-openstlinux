@@ -28,7 +28,7 @@ do_install() {
     # install pictures
     install -m 0644 ${WORKDIR}/*.png ${D}${prefix}/local/demo/application/camera/pictures
     # script
-    install -m 0644 ${WORKDIR}/*.sh ${D}${prefix}/local/demo/application/camera/bin
+    install -m 0755 ${WORKDIR}/*.sh ${D}${prefix}/local/demo/application/camera/bin
     # shaders
     install -m 0644 ${WORKDIR}/*.fs ${D}${prefix}/local/demo/application/camera/shaders
 }
