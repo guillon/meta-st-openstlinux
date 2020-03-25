@@ -46,10 +46,10 @@ if `grep -q nfsroot /proc/cmdline` ; then
 fi
 
 if [ -f /lib/systemd/systemd-growfs ]; then
+    /lib/systemd/systemd-growfs /
     /lib/systemd/systemd-growfs /boot
     /lib/systemd/systemd-growfs /vendor
     /lib/systemd/systemd-growfs /usr/local/
-    /lib/systemd/systemd-growfs /
 else
     # umount partition before to resize it
     [ -f /sbin/mount-partitions.sh ] && /sbin/mount-partitions.sh stop
@@ -64,9 +64,7 @@ else
     done
 fi
 
-if [ -f /bin/systemctl ]; then
-    /bin/systemctl reboot
-else
+if [ ! -f /bin/systemctl ]; then
     /sbin/reboot
 fi
 
