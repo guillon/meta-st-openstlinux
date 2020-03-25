@@ -277,7 +277,7 @@ class BluetoothWindow(Gtk.Dialog):
         except:
             self.screen_width = self.get_screen().get_width()
             self.screen_height = self.get_screen().get_height()
-        if self.screen_height > 480:
+        if self.screen_width > 480:
             self.treelist_height = 400
         else:
             self.treelist_height = 160
