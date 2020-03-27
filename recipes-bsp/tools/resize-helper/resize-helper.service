@@ -1,7 +1,7 @@
 [Unit]
 Description=Resize root filesystem to fit available disk space
-DefaultDependencies=no
-After=mount-partitions.service
+Wants=systemd-udevd.service systemd-udev-trigger.service
+After=systemd-remount-fs.service systemd-udevd.service
 Before=serial-getty@ttySTM0.service netdata.service
 
 [Service]
@@ -11,4 +11,4 @@ ExecStart=-/sbin/resize-helper
 WatchdogSec=45
 
 [Install]
-WantedBy=local-fs.target
+WantedBy=basic.target
