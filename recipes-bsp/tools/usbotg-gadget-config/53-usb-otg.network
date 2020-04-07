@@ -11,4 +11,5 @@ UseTimezone=false
 
 [DHCPServer]
 EmitTimezone=no
+EmitRouter=no
 
