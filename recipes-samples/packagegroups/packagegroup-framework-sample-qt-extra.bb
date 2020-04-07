@@ -46,18 +46,6 @@ RDEPENDS_packagegroup-framework-sample-qt-extra = "\
 
 SUMMARY_packagegroup-framework-sample-qt-extra-examples = "Framework sample qt extra components for examples"
 RDEPENDS_packagegroup-framework-sample-qt-extra-examples = "\
-    \
-    qtquickcontrols-examples    \
-    \
-    qtsensors-examples          \
-    qtserialport-examples       \
-    \
-    qtcharts-examples           \
-    \
-    qt3d-examples               \
-    \
-    qtlocation-examples         \
-    \
     qt5nmapcarousedemo          \
     cinematicexperience         \
     qtsmarthome                 \

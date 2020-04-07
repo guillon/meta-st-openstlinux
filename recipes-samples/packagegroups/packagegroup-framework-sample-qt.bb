@@ -38,10 +38,4 @@ RDEPENDS_packagegroup-framework-sample-qt = "\
 SUMMARY_packagegroup-framework-sample-qt-examples = "Framework sample qt components for examples"
 RDEPENDS_packagegroup-framework-sample-qt-examples = "\
     qtbase-examples         \
-    \
-    qtdeclarative-examples  \
-    \
-    qtmultimedia-examples   \
-    \
-    qtscript-examples       \
 "
