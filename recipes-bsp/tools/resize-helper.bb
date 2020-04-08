@@ -15,11 +15,13 @@ SRC_URI = " file://resize-helper.service file://resize-helper file://resize-help
 
 S = "${WORKDIR}/git"
 
+START_RESIZE_HELPER_SERVICE ?= "1"
+
 inherit systemd update-rc.d
 
 SYSTEMD_PACKAGES += " resize-helper "
 SYSTEMD_SERVICE_${PN} = "resize-helper.service"
-SYSTEMD_AUTO_ENABLE_${PN} = "enable"
+SYSTEMD_AUTO_ENABLE_${PN} = "${@bb.utils.contains('START_RESIZE_HELPER_SERVICE','1','enable','disable',d)}"
 
 do_install() {
     install -d ${D}${systemd_unitdir}/system ${D}${base_sbindir}
@@ -33,5 +35,5 @@ do_install() {
 ${D}${sysconfdir}/init.d/resize-helper.sh
 }
 
-INITSCRIPT_NAME = "resize-helper.sh"
-INITSCRIPT_PARAMS = "start 22 5 3 ."
+INITSCRIPT_NAME = "${@bb.utils.contains('START_RESIZE_HELPER_SERVICE','1','resize-helper.sh','',d)}"
+INITSCRIPT_PARAMS = "${@bb.utils.contains('START_RESIZE_HELPER_SERVICE','1','start 22 5 3 .','',d)}"
