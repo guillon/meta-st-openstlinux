@@ -14,7 +14,6 @@ PACKAGES = "\
             packagegroup-framework-tools-base-network   \
             packagegroup-framework-tools-base-audio     \
             packagegroup-framework-tools-base-ui        \
-            packagegroup-framework-tools-base-python2   \
             packagegroup-framework-tools-base-python3   \
             "
 
@@ -25,7 +24,6 @@ RDEPENDS_packagegroup-framework-tools-base = "\
     packagegroup-framework-tools-base-network   \
     packagegroup-framework-tools-base-audio     \
     packagegroup-framework-tools-base-ui        \
-    packagegroup-framework-tools-base-python2   \
     packagegroup-framework-tools-base-python3   \
     "
 
@@ -68,10 +66,6 @@ RDEPENDS_packagegroup-framework-tools-base-audio = "\
 
 SUMMARY_packagegroup-framework-tools-base-ui = "Framework tools base components for ui"
 RDEPENDS_packagegroup-framework-tools-base-ui = "\
-    "
-
-SUMMARY_packagegroup-framework-tools-base-python2 = "Framework tools base components for python2"
-RDEPENDS_packagegroup-framework-tools-base-python2 = "\
     "
 
 SUMMARY_packagegroup-framework-tools-base-python3 = "Framework tools base components for python3"

@@ -1,4 +1,4 @@
-SUMMARY = "Framework tools components (core,kernel,network,audio,ui,python2,python3)"
+SUMMARY = "Framework tools components (core,kernel,network,audio,ui,python3)"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"
 
@@ -14,7 +14,6 @@ PACKAGES = "\
             packagegroup-framework-tools-network    \
             packagegroup-framework-tools-audio      \
             packagegroup-framework-tools-ui         \
-            packagegroup-framework-tools-python2    \
             packagegroup-framework-tools-python3    \
             "
 
@@ -25,7 +24,6 @@ RDEPENDS_packagegroup-framework-tools = "\
     packagegroup-framework-tools-network    \
     packagegroup-framework-tools-audio      \
     packagegroup-framework-tools-ui         \
-    packagegroup-framework-tools-python2    \
     packagegroup-framework-tools-python3    \
     "
 
@@ -92,10 +90,6 @@ RDEPENDS_packagegroup-framework-tools-ui = "\
     ${@bb.utils.contains('DISTRO_FEATURES', 'gplv3', 'glmark2', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'gplv3', 'netdata', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'gplv3', 'lmsensors-libsensors lmsensors-sensors', '', d)} \
-    "
-
-SUMMARY_packagegroup-framework-tools-python2 = "Framework tools components for python2"
-RDEPENDS_packagegroup-framework-tools-python2 = "\
     "
 
 SUMMARY_packagegroup-framework-tools-python3 = "Framework tools components for python3"
