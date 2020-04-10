@@ -24,7 +24,7 @@ SYSTEMD_SERVICE_${PN} = "${MOUNT_BASENAME}.service"
 SYSTEMD_AUTO_ENABLE_${PN} = "enable"
 
 # This list should be set with partition label and associated mountpoint
-# <partition_label1>;<partition_mountpoint1> <partition_label2>;<partition_mountpoint2>
+# <partition_label1>,<partition_mountpoint1> <partition_label2>,<partition_mountpoint2>
 MOUNT_PARTITIONS_LIST ?= ""
 
 do_install() {
