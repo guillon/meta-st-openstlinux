@@ -33,6 +33,8 @@ RESIZE2FS=$(which resize2fs) || { echo "E: You must have resize2fs" && exit 1; }
 # ROOT_DEVICE=$(findmnt --noheadings --output=SOURCE / | cut -d'[' -f1)
 DEVICES=$(ls /sys/fs/ext4/)
 
+echo "RESIZE-HELPER START" > /dev/kmsg
+
 # disable service to be sure it will be executed only one time
 if [ -f /bin/systemctl ]; then
     /bin/systemctl --no-reload disable resize-helper.service
@@ -46,11 +48,14 @@ if `grep -q nfsroot /proc/cmdline` ; then
 fi
 
 if [ -f /lib/systemd/systemd-growfs ]; then
+    echo "Using systemd-growfs" > /dev/kmsg
+    /lib/systemd/systemd-growfs /
     /lib/systemd/systemd-growfs /
     /lib/systemd/systemd-growfs /boot
     /lib/systemd/systemd-growfs /vendor
     /lib/systemd/systemd-growfs /usr/local/
 else
+    echo "Using directly resize2fs" > /dev/kmsg
     # umount partition before to resize it
     [ -f /sbin/mount-partitions.sh ] && /sbin/mount-partitions.sh stop
     for device in ${DEVICES}; do
@@ -64,10 +69,12 @@ else
     done
 fi
 
+df -h > /dev/kmsg
+
 if [ ! -f /bin/systemctl ]; then
     /sbin/reboot
 fi
 
-echo "RESIZE-HELPER: For integrity of file-system after a resize2fs, the system need to be rebooted" > /dev/kmsg
-echo "RESIZE-HELPER REBOOTING of system" > /dev/kmsg
+#echo "RESIZE-HELPER: For integrity of file-system after a resize2fs, the system need to be rebooted" > /dev/kmsg
+#echo "RESIZE-HELPER REBOOTING of system" > /dev/kmsg
 echo "RESIZE-HELPER FINISH" > /dev/kmsg
