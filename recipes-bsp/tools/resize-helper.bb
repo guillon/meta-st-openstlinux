@@ -33,7 +33,12 @@ do_install() {
 
     sed -i -e "s:@sbindir@:${base_sbindir}:; s:@sysconfdir@:${sysconfdir}:" \
 ${D}${sysconfdir}/init.d/resize-helper.sh
+    if [ "${START_RESIZE_HELPER_SERVICE}" -eq 0 ]; then
+        rm ${D}${sysconfdir}/init.d/resize-helper.sh
+        echo "#!/bin/sh" > ${D}${sysconfdir}/init.d/resize-helper.sh
+        chmod +x ${D}${sysconfdir}/init.d/resize-helper.sh
+    fi
 }
 
-INITSCRIPT_NAME = "${@bb.utils.contains('START_RESIZE_HELPER_SERVICE','1','resize-helper.sh','',d)}"
-INITSCRIPT_PARAMS = "${@bb.utils.contains('START_RESIZE_HELPER_SERVICE','1','start 22 5 3 .','',d)}"
+INITSCRIPT_NAME = "resize-helper.sh"
+INITSCRIPT_PARAMS = "start 22 5 3 ."
