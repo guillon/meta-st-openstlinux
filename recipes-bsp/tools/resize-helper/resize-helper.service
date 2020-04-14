@@ -1,8 +1,8 @@
 [Unit]
 Description=Resize root filesystem to fit available disk space
-DefaultDependencies=no
+DefaultDependencies=false
 After=mount-partitions.service
-Before=serial-getty@ttySTM0.service netdata.service
+Before=local-fs.target serial-getty@ttySTM0.service netdata.service
 
 [Service]
 Type=oneshot

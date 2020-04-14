@@ -49,7 +49,11 @@ fi
 
 if [ -f /lib/systemd/systemd-growfs ]; then
     echo "Using systemd-growfs" > /dev/kmsg
-    /lib/systemd/systemd-growfs /
+    # force to mount partitions
+    if [ -z $(findmnt --noheadings --output=SOURCE /boot|cut  -d'[' -f1) ];
+    then
+        [ -f /sbin/mount-partitions.sh ] && /sbin/mount-partitions.sh stop
+    fi
     /lib/systemd/systemd-growfs /
     /lib/systemd/systemd-growfs /boot
     /lib/systemd/systemd-growfs /vendor
