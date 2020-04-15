@@ -21,6 +21,20 @@ get_type() {
         /dev/mmcblk1*)
             ROOT_TYPE="mmc"
             ;;
+        /dev/disk/by-partlabel/*)
+            LINK=$(/usr/bin/readlink $ROOT_DEVICE | tr '/' ' ' | tr '.' ' ' | sed "s/ //g")
+            case $LINK in
+            ubi*)
+                ROOT_TYPE="nand"
+                ;;
+            mmcblk0*)
+                ROOT_TYPE="sdmmc"
+                ;;
+            mmcblk1*)
+                ROOT_TYPE="mmc"
+                ;;
+            esac
+            ;;
         esac
     else
         if [ `cat /proc/cmdline | sed "s/.*mmcblk0.*/mmcblk0/" ` == "mmcblk0" ]; then
