@@ -14,3 +14,10 @@ PREFERRED_PROVIDER_console-tools = "kbd"
 # splash
 SPLASH = "${@bb.utils.contains('COMBINED_FEATURES', 'splashscreen', 'psplash-drm', '', d)}"
 PREFERRED_PROVIDER_virtual/psplash = "${@bb.utils.contains('COMBINED_FEATURES', 'splashscreen', 'psplash-drm', '', d)}"
+
+
+# INITRD to resize file system
+INITRD_IMAGE = "st-image-resize-initrd"
+INITRD_SHORTNAME = "uInitrd"
+# extlinux: force to add initrd
+UBOOT_EXTLINUX_INITRD_target-default = "/${INITRD_SHORTNAME}"
