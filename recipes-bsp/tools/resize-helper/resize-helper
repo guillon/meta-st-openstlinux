@@ -58,22 +58,6 @@ if [ -f /lib/systemd/systemd-growfs ]; then
     /lib/systemd/systemd-growfs /boot
     /lib/systemd/systemd-growfs /vendor
     /lib/systemd/systemd-growfs /usr/local/
-
-   if [ -f /usr/bin/findmnt ];
-   then
-        if [ -f /sbin/blockdev ];
-        then
-            ROOT_DEVICE=$(findmnt --noheadings --output=SOURCE / | cut -d'[' -f1)
-            ROOT_BLOCK_SIZE_ON_B=$(blockdev --getsize64 $ROOT_DEVICE)
-            ROOT_FS_SIZE_ON_MB=$(df -h | grep "/dev/root" | awk '{print $2;}' | sed "s/M//")
-            ROOT_BLOCK_SIZE_ON_MB=$(( $ROOT_BLOCK_SIZE_ON_B / 1048576 - 64 ))
-            if [ $ROOT_FS_SIZE_ON_MB -lt $ROOT_BLOCK_SIZE_ON_MB ];
-            then
-                echo "RESIZE-HELPER: Make a new resize2fs" > /dev/kmsg
-                ${RESIZE2FS} $ROOT_DEVICE
-            fi
-        fi
-   fi
 else
     echo "RESIZE-HELPER: Using directly resize2fs" > /dev/kmsg
     # umount partition before to resize it
@@ -90,10 +74,6 @@ else
 fi
 
 df -h > /dev/kmsg
-
-if [ ! -f /bin/systemctl ]; then
-    /sbin/reboot
-fi
 
 #echo "RESIZE-HELPER: For integrity of file-system after a resize2fs, the system need to be rebooted" > /dev/kmsg
 #echo "RESIZE-HELPER REBOOTING of system" > /dev/kmsg
