@@ -31,7 +31,7 @@ get_type() {
         /dev/mmcblk1*)
             ROOT_TYPE="mmc"
             ;;
-        /dev/disk/by-partlabel/*)
+        /dev/disk/by-*)
             LINK=$(/usr/bin/readlink $ROOT_DEVICE | tr '/' ' ' | tr '.' ' ' | sed "s/ //g")
             case $LINK in
             ubi*)
