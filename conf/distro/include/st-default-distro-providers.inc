@@ -20,4 +20,5 @@ PREFERRED_PROVIDER_virtual/psplash = "${@bb.utils.contains('COMBINED_FEATURES', 
 INITRD_IMAGE = "st-image-resize-initrd"
 INITRD_SHORTNAME = "uInitrd"
 # extlinux: force to add initrd
-UBOOT_EXTLINUX_INITRD_target-default = "/${INITRD_SHORTNAME}"
+UBOOT_EXTLINUX_INITRD_target-emmc   = "/${INITRD_SHORTNAME}"
+UBOOT_EXTLINUX_INITRD_target-sdcard = "/${INITRD_SHORTNAME}"
