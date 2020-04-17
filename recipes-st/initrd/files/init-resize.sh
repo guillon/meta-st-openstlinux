@@ -20,16 +20,16 @@ BOOTFS=
                 if [ -e $DEVICE ]; then
                     label=$(/sbin/e2label $DEVICE)
                     case $label in
-                    userfs)
+                    user*)
                         USERFS=$DEVICE
                         ;;
-                    rootfs)
+                    root*)
                         ROOTFS=$DEVICE
                         ;;
-                    vendorfs)
+                    vendor*)
                         VENDORFS=$DEVICE
                         ;;
-                    bootfs)
+                    boot*)
                         BOOTFS=$DEVICE
                         ;;
                      esac
