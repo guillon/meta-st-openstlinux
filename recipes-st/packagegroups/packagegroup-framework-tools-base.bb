@@ -35,6 +35,7 @@ RDEPENDS_packagegroup-framework-tools-base-core = "\
     libiio-tests    \
     lrzsz           \
     libgpiod        \
+    libgpiod-tools  \
     ${@bb.utils.contains('DISTRO_FEATURES', 'usbgadget', 'usbotg-gadget-config', '', d)} \
     "
 
