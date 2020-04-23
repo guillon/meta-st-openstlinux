@@ -70,6 +70,7 @@ RDEPENDS_packagegroup-framework-tools-network = "\
     ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'dhcp-client', '', d)}                       \
     ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'systemd-networkd-configuration', '', d)}    \
     curl            \
+    usbip           \
     "
 
 SUMMARY_packagegroup-framework-tools-audio = "Framework tools components for audio"
