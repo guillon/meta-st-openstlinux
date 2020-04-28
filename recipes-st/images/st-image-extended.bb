@@ -23,12 +23,7 @@ IMAGE_FEATURES_append = " \
     x11-base        \
     x11-sato        \
     tools-debug     \
-    tools-sdk       \
-    dbg-pkgs        \
-    dev-pkgs        \
-    doc-pkgs        \
     nfs-server      \
-    staticdev-pkgs  \
     "
 
 #
