@@ -97,6 +97,9 @@ DISTRO_FEATURES_append = " systemd polkit "
 # add support of efi
 DISTRO_FEATURES_append = " efi "
 
+# add support of autoresize through InitRD
+DISTRO_FEATURES_append = " autoresize "
+
 # add support of tpm2
 #DISTRO_FEATURES_append = " tpm2 "
 
@@ -123,5 +126,7 @@ VIRTUAL-RUNTIME_initscripts = "systemd-compat-units"
 LICENSE_FLAGS_WHITELIST += " non-commercial commercial"
 
 # X11 addons
-IMAGE_INSTALL_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'xf86-video-modesetting', '', d)} "
+DISTRO_EXTRA_RDEPENDS_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'xf86-video-modesetting', '', d)} "
 
+# INITRD addons to resize file system
+DISTRO_EXTRA_RRECOMMENDS_append = " ${@bb.utils.contains('COMBINED_FEATURES', 'autoresize', '${AUTORESIZE}', '', d)} "

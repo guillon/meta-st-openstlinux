@@ -51,6 +51,17 @@ def license_create_summary(d):
                 mi = r.match(os.path.basename(fi))
                 if mi:
                     image_list_arrray.append([mi.group(1), mi.group(2), img_name, img_mount])
+    # Append any INITRD image to image_list_arrray
+    img_name = d.getVar('INITRD_IMAGE') or ""
+    if img_name:
+        img_ext = d.getVar('INITRAMFS_FSTYPES') or ""
+        img_mount = '/'
+        for fi in os.listdir(deploy_image_dir):
+            if fi.startswith(img_name) and fi.endswith(img_ext):
+                r = re.compile("(.*)-(\d\d\d\d+)")
+                mi = r.match(os.path.basename(fi))
+                if mi:
+                    image_list_arrray.append([mi.group(1), mi.group(2), img_name, img_mount])
 
     if tab.startswith("1"):
         with_tab = 1

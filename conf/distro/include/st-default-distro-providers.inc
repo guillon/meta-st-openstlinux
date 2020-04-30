@@ -15,10 +15,8 @@ PREFERRED_PROVIDER_console-tools = "kbd"
 SPLASH = "${@bb.utils.contains('COMBINED_FEATURES', 'splashscreen', 'psplash-drm', '', d)}"
 PREFERRED_PROVIDER_virtual/psplash = "${@bb.utils.contains('COMBINED_FEATURES', 'splashscreen', 'psplash-drm', '', d)}"
 
-
-# INITRD to resize file system
+#--------------------------
+# Autoresize file system through InitRD
+AUTORESIZE = "st-initrd"
 INITRD_IMAGE = "st-image-resize-initrd"
 INITRD_SHORTNAME = "uInitrd"
-# extlinux: force to add initrd
-UBOOT_EXTLINUX_INITRD_target-emmc   = "/${INITRD_SHORTNAME}"
-UBOOT_EXTLINUX_INITRD_target-sdcard = "/${INITRD_SHORTNAME}"

@@ -27,9 +27,6 @@ ENABLE_IMAGE_LICENSE_SUMMARY = "0"
 # supposed to be done only for complete image
 ENABLE_MULTIVOLUME_UBI = "0"
 
-
-export IMAGE_BASENAME = "st-image-resize-initrd"
-
 PACKAGE_INSTALL = " \
     busybox \
     e2fsprogs \
