@@ -35,5 +35,4 @@ SUMMARY_packagegroup-framework-core-base-fs = "Framework core base components fo
 RDEPENDS_packagegroup-framework-core-base-fs = "\
     ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'systemd-mount-partitions', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'userfs-cleanup-package', '', d)} \
-    ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'kernel-date', '', d)} \
     "
