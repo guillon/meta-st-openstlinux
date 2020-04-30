@@ -128,6 +128,7 @@ case "$1" in
             mountpoint=$(echo $part | cut -d',' -f2)
             found_devices DEVICE DEVICE_OPTION $TYPE $part_label
             echo "$part_label device: $DEVICE"
+            [ -d $mountpoint ] || mkdir -p $mountpoint
             [ -e $DEVICE ] && mount $DEVICE_OPTION $DEVICE $mountpoint
         done
         ;;
