@@ -27,6 +27,17 @@ SUBMODULE_PATH = "application/bluetooth"
 DEMO_PATH = "/usr/local/demo"
 # -------------------------------------------------------------------
 # -------------------------------------------------------------------
+TREELIST_HEIGHT_720 = 400
+TREELIST_HEIGHT_480 = 160
+def get_treelist_height_from_screen_size(width, height):
+    minsize =  min(width, height)
+    if minsize == 720:
+        return TREELIST_HEIGHT_720
+    elif minsize == 480:
+        return TREELIST_HEIGHT_480
+
+# -------------------------------------------------------------------
+# -------------------------------------------------------------------
 
 SCAN_DURATION_IN_S  = 15
 
@@ -277,10 +288,7 @@ class BluetoothWindow(Gtk.Dialog):
         except:
             self.screen_width = self.get_screen().get_width()
             self.screen_height = self.get_screen().get_height()
-        if min(self.screen_width, self.screen_height) > 480:
-            self.treelist_height = 400
-        else:
-            self.treelist_height = 160
+        self.treelist_height = get_treelist_height_from_screen_size(self.screen_width, self.screen_height)
 
         self.connect("button-release-event", self.on_page_press_event)
         mainvbox = self.get_content_area()

@@ -58,10 +58,6 @@ else:
 SIMULATE_SCREEN_SIZE_WIDTH  = 800
 SIMULATE_SCREEN_SIZE_HEIGHT = 480
 
-ICON_SIZE_BIG = 180
-ICON_SIZE_MEDIUM = 160
-ICON_SIZE_SMALL = 128
-
 def popenAndCall(onExit, *popenArgs, **popenKWArgs):
     """
     Runs a subprocess.Popen, and then calls the function onExit when the
@@ -83,6 +79,26 @@ def popenAndCall(onExit, *popenArgs, **popenKWArgs):
 
     return thread # returns immediately after the thread starts
 
+# -------------------------------------------------------------------
+# -------------------------------------------------------------------
+ICON_SIZE_720 = 180
+ICON_SIZE_480 = 128
+def get_screen_size_management_type(width, height):
+    minsize =  min(width, height)
+    if minsize == 720:
+        return 720
+    elif minsize == 480:
+        return 480
+    return 480
+def get_icon_size_from_screen_size(width, height):
+    minsize =  min(width, height)
+    if minsize == 720:
+        return ICON_SIZE_720
+    elif minsize == 480:
+        return ICON_SIZE_480
+
+# -------------------------------------------------------------------
+# -------------------------------------------------------------------
 # Back video view
 class BackVideoWindow(Gtk.Dialog):
     def __init__(self, parent):
@@ -501,15 +517,9 @@ class MainUIWindow(Gtk.Window):
                 self.screen_width = self.get_screen().get_width()
                 self.screen_height = self.get_screen().get_height()
 
-        if self.screen_width == 720:
-            self.board_name = "Evaluation board"
-        else:
-            self.board_name = "Discovery kit"
+        self.board_name = "STM32MP board"
 
-        if min(self.screen_width, self.screen_height) >= 720:
-            self.icon_size = ICON_SIZE_BIG
-        else:
-            self.icon_size = ICON_SIZE_SMALL
+        self.icon_size = get_icon_size_from_screen_size(self.screen_width, self.screen_height)
 
         self.set_default_size(self.screen_width, self.screen_height)
         print("[DEBUG] screen size: %dx%d" % (self.screen_width, self.screen_height))

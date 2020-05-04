@@ -34,11 +34,19 @@ WIFI_HOTSPOT_IP="192.168.72.1"
 WIFI_DEFAULT_SSID="STDemoNetwork"
 WIFI_DEFAULT_PASSWD="stm32mp1"
 
-
-ICON_SIZE_MEDIUM = 160
-
 if SIMULATE > 0:
     WIFI_LINUX_INTERFACE_NAME = "wlp8s0"
+
+# -------------------------------------------------------------------
+# -------------------------------------------------------------------
+ICON_SIZE_720 = 160
+ICON_SIZE_480 = 160
+def get_icon_size_from_screen_size(width, height):
+    minsize =  min(width, height)
+    if minsize == 720:
+        return ICON_SIZE_720
+    elif minsize == 480:
+        return ICON_SIZE_480
 
 # -------------------------------------------------------------------
 # -------------------------------------------------------------------
@@ -102,6 +110,18 @@ class NetdataWebserver(Gtk.Dialog):
             self.set_default_size(self.screen_width, self.screen_height)
         else:
             self.maximize()
+            try:
+                display = Gdk.Display.get_default()
+                monitor = display.get_primary_monitor()
+                geometry = monitor.get_geometry()
+                scale_factor = monitor.get_scale_factor()
+                self.screen_width = scale_factor * geometry.width
+                self.screen_height = scale_factor * geometry.height
+            except:
+                self.screen_width = self.get_screen().get_width()
+                self.screen_height = self.get_screen().get_height()
+
+        self.icon_size = get_icon_size_from_screen_size(self.screen_width, self.screen_height)
 
         self.set_decorated(False)
         rgba = Gdk.RGBA(0.31, 0.32, 0.31, 0.8)
@@ -238,8 +258,8 @@ class NetdataWebserver(Gtk.Dialog):
                 proc = subprocess.Popen(cmd2, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 result = proc.stdout.read().decode('utf-8')
 
-                self.wifi_credential = _load_image_wlan_eventBox(self, "/tmp/qr-code_wifi_access.png", "ssid: %s" % self.wifi_ssid, "passwd: %s" % self.wifi_passwd, -1, ICON_SIZE_MEDIUM)
-                self.netdata_url = _load_image_wlan_eventBox(self, "/tmp/qr-code_netdata_url.png", "url: http://%s:19999" % ip_wlan0, "", -1, ICON_SIZE_MEDIUM)
+                self.wifi_credential = _load_image_wlan_eventBox(self, "/tmp/qr-code_wifi_access.png", "ssid: %s" % self.wifi_ssid, "passwd: %s" % self.wifi_passwd, -1, self.icon_size)
+                self.netdata_url = _load_image_wlan_eventBox(self, "/tmp/qr-code_netdata_url.png", "url: http://%s:19999" % ip_wlan0, "", -1, self.icon_size)
                 self.info_grid.attach(self.wifi_credential, 0, 6, 1, 1)
                 self.info_grid.attach(self.netdata_url, 1, 6, 1, 1)
 
