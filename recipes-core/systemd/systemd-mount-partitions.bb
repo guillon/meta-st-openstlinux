@@ -26,6 +26,28 @@ SYSTEMD_AUTO_ENABLE_${PN} = "enable"
 # This list should be set with partition label and associated mountpoint
 # <partition_label1>,<partition_mountpoint1> <partition_label2>,<partition_mountpoint2>
 MOUNT_PARTITIONS_LIST ?= ""
+PARTITIONS_CONFIG ?= ""
+
+# Update MOUNT_PARTITIONS_LIST var with input from PARTITIONS_CONFIG enabled
+python set_partitions_list() {
+    partitionsconfig = (d.getVar('PARTITIONS_CONFIG') or "").split()
+
+    if len(partitionsconfig) > 0:
+        partitionsconfigflags = d.getVarFlags('PARTITIONS_CONFIG')
+        # The "doc" varflag is special, we don't want to see it here
+        partitionsconfigflags.pop('doc', None)
+
+        for config in partitionsconfig:
+            for f, v in partitionsconfigflags.items():
+                if config == f:
+                    items = v.split(',')
+                    # Make sure a mount point is available
+                    if len(items) > 2 and items[1] and items[2]:
+                        bb.debug(1, "Appending '%s,%s' to MOUNT_PARTITIONS_LIST." % (items[1], items[2]))
+                        d.appendVar('MOUNT_PARTITIONS_LIST', ' ' + items[1] + ',' + items[2])
+                    break
+}
+do_install[prefuncs] += "set_partitions_list"
 
 do_install() {
     if [ -n "${MOUNT_PARTITIONS_LIST} " ] ; then
