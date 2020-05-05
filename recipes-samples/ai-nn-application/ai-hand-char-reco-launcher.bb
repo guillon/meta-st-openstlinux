@@ -26,8 +26,8 @@ S = "${WORKDIR}"
 do_configure[noexec] = "1"
 
 #Provides the firmware location for DK2 and EV1 boards
-EXTRA_OEMAKE  = 'FIRMWARE_PATH_DK2="${STM32MP_USERFS_MOUNTPOINT_IMAGE}/Cube-M4-examples/STM32MP157C-DK2/Demonstrations/AI_Character_Recognition/lib/firmware"'
-EXTRA_OEMAKE += 'FIRMWARE_PATH_EV1="${STM32MP_USERFS_MOUNTPOINT_IMAGE}/Cube-M4-examples/STM32MP157C-EV1/Demonstrations/AI_Character_Recognition/lib/firmware"'
+EXTRA_OEMAKE  = 'FIRMWARE_PATH_DK2="${STM32MP_USERFS_MOUNTPOINT}/Cube-M4-examples/STM32MP157C-DK2/Demonstrations/AI_Character_Recognition/lib/firmware"'
+EXTRA_OEMAKE += 'FIRMWARE_PATH_EV1="${STM32MP_USERFS_MOUNTPOINT}/Cube-M4-examples/STM32MP157C-EV1/Demonstrations/AI_Character_Recognition/lib/firmware"'
 
 #Provides the firmware name
 EXTRA_OEMAKE += 'FIRMWARE_NAME="AI_Character_Recognition.elf"'
