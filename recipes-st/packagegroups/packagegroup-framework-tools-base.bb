@@ -56,6 +56,7 @@ SUMMARY_packagegroup-framework-tools-base-network = "Framework tools base compon
 RDEPENDS_packagegroup-framework-tools-base-network = "\
     ethtool         \
     iproute2        \
+    curl            \
     "
 
 SUMMARY_packagegroup-framework-tools-base-audio = "Framework tools base components for audio"
