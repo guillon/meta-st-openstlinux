@@ -67,15 +67,6 @@ do_install() {
 
             # Update script
             sed 's:^MOUNT_PARTITIONS_LIST=.*$:MOUNT_PARTITIONS_LIST=\"'"${MOUNT_PARTITIONS_LIST}"'\":' -i ${D}/${base_sbindir}/${MOUNT_BASENAME}.sh
-            # Update service
-            for part in ${MOUNT_PARTITIONS_LIST}
-            do
-                mountpoint=$(echo ${part} | cut -d',' -f2)
-                # Append line with mountpoint
-                sed '/^ConditionPathExists=##mountpoint##/ i ConditionPathExists='"${mountpoint}"'' -i ${D}/${systemd_unitdir}/system/${MOUNT_BASENAME}.service
-            done
-            # Clean pattern insertion
-            sed 's/^ConditionPathExists=##mountpoint##//' -i ${D}/${systemd_unitdir}/system/${MOUNT_BASENAME}.service
         fi
         install -d ${D}/${INIT_D_DIR}
         install -m 755 ${WORKDIR}/${MOUNT_BASENAME}.sh ${D}/${INIT_D_DIR}/
