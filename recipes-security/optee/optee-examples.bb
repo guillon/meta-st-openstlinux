@@ -4,12 +4,12 @@ HOMEPAGE = "https://github.com/linaro-swg/optee_examples"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://${S}/LICENSE;md5=cd95ab417e23b94f381dafc453d70c30"
 
-DEPENDS = "optee-client virtual/optee-os python3-pycrypto-native"
+DEPENDS = "optee-client virtual/optee-os python3-pycryptodomex-native python3-pycrypto-native"
 
 inherit python3native
 
 SRC_URI = "git://github.com/linaro-swg/optee_examples.git"
-SRCREV = "559b2141c16bf0f57ccd72f60e4deb84fc2a05b0"
+SRCREV = "f7f5a3ad2e8601bf2f846992d0b10aae3e3e5530"
 
 S = "${WORKDIR}/git"
 

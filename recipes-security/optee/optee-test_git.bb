@@ -4,19 +4,19 @@ HOMEPAGE = "https://github.com/OP-TEE/optee_test"
 LICENSE = "BSD-2-Clause & GPLv2"
 LIC_FILES_CHKSUM = "file://${S}/LICENSE.md;md5=daa2bcccc666345ab8940aab1315a4fa"
 
-DEPENDS = "optee-client virtual/optee-os python3-pycrypto-native"
+DEPENDS = "optee-client virtual/optee-os python3-pycryptodomex-native python3-pycrypto-native"
 
 inherit python3native
 
-PV = "3.7.0+git${SRCPV}"
+PV = "3.9.0+git${SRCPV}"
 
 SRC_URI = "git://github.com/OP-TEE/optee_test.git \
-          file://0001-use-python3-instead-of-python.patch \
+          file://0001-xtest-regression-1027-1028-skip-test.patch \
     "
 
 S = "${WORKDIR}/git"
 
-SRCREV = "227d6f4c40eaa6f84fe049b9e48c7b27ad7fab08"
+SRCREV = "30dd0878bf5378b2913397bebfcd7208cd11084e"
 
 OPTEE_CLIENT_EXPORT = "${STAGING_DIR_HOST}${prefix}"
 TEEC_EXPORT         = "${STAGING_DIR_HOST}${prefix}"
