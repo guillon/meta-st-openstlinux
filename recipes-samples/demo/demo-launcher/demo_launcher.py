@@ -103,7 +103,7 @@ def get_icon_size_from_screen_size(width, height):
 class BackVideoWindow(Gtk.Dialog):
     def __init__(self, parent):
         Gtk.Dialog.__init__(self, "Wifi", parent, 0)
-        self.previous_click_time=0
+        self.previous_click_time=time()
         self.maximize()
         self.set_decorated(False)
         self.set_name("backed_bg")
@@ -113,7 +113,7 @@ class BackVideoWindow(Gtk.Dialog):
 class InfoWindow(Gtk.Dialog):
     def __init__(self, parent):
         Gtk.Dialog.__init__(self, "Wifi", parent, 0)
-        self.previous_click_time=0
+        self.previous_click_time=time()
         self.maximize()
         self.set_decorated(False)
         self.set_name("backed_bg")
@@ -268,7 +268,7 @@ class ScriptWindow(Gtk.Dialog):
         self.set_decorated(False)
         self.set_name("transparent_bg")
 
-        self.previous_click_time=0
+        self.previous_click_time=time()
         self.stream_is_paused=0
 
         self.connect("button-press-event", self.on_script_press_event)
@@ -526,7 +526,7 @@ class MainUIWindow(Gtk.Window):
         self.set_position(Gtk.WindowPosition.CENTER)
         self.connect('destroy', Gtk.main_quit)
 
-        self.previous_click_time=0
+        self.previous_click_time=time()
 
         self.application_file = os.path.join(DEMO_PATH,"./application/application.yaml.saved")
         self.application_path = os.path.join(DEMO_PATH,"./application/")
