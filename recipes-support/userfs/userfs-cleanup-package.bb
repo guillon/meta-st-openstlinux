@@ -14,7 +14,9 @@ S = "${WORKDIR}/git"
 
 inherit systemd update-rc.d
 
-SYSTEMD_PACKAGES += " userfs-cleanup-package "
+ST_USERFS ?= "1"
+
+SYSTEMD_PACKAGES += " ${@bb.utils.contains('ST_USERFS', '1', 'userfs-cleanup-package', '', d)} "
 SYSTEMD_SERVICE_${PN} = "userfs-cleanup-package.service"
 SYSTEMD_AUTO_ENABLE_${PN} = "enable"
 
