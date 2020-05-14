@@ -27,7 +27,6 @@ Application:
             <File|Command>: <file or command to verify>
             Msg_false: <Message to display if <File|Command> are not true
         Start: <script or application to launch application>
-        Stop: <script or application to stop application>
     Python:
         Exist:
             <File|Command>: <file or command to verify>
@@ -54,7 +53,6 @@ Explaination:
   This section have several sub section:
     Exist: verify some requirement before to launch start command
     Start: command to start the application
-    Stop: command to stop the application
 
     Exist section:
         File: <verify presence of specific file>
@@ -100,8 +98,7 @@ application/
 │   └── wrap_blctl.py
 ├── camera
 │   ├── bin
-│   │   ├── launch_camera_preview.sh
-│   │   └── stop_camera.sh
+│   │   └── launch_camera_preview.sh
 │   ├── pictures
 │   │   └── ST1077_webcam_dark_blue.png
 │   └── shaders
@@ -157,7 +154,6 @@ Application:
             Msg_false: Webcam is not connected,
                     /dev/video0 doesn't exist
         Start: application/camera/bin/launch_camera_shader.sh
-        Stop: application/camera/bin/stop_camera.sh
     Action:
         button_release_event: script_management
         button_press_event: highlight_eventBox
