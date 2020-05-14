@@ -51,6 +51,8 @@ if SIMULATE > 0:
 else:
     DEMO_PATH = "/usr/local/demo"
 
+lock = threading.Lock()
+
 # -------------------------------------------------------------------
 # -------------------------------------------------------------------
 # CONSTANT VALUES
@@ -270,6 +272,7 @@ class ScriptWindow(Gtk.Dialog):
 
         self.previous_click_time=time()
         self.stream_is_paused=0
+        self.script_is_started=False
 
         self.connect("button-press-event", self.on_script_press_event)
         self.process_pipe_read, self.process_pipe_write =  os.pipe()
@@ -282,21 +285,25 @@ class ScriptWindow(Gtk.Dialog):
 
     def on_script_press_event(self, widget, event):
         self.click_time = time()
-        print(self.click_time - self.previous_click_time)
-        # TODO : a fake click is observed, workaround hereafter
-        if (self.click_time - self.previous_click_time) < 0.01:
-            self.previous_click_time = self.click_time
-        elif (self.click_time - self.previous_click_time) < 0.3:
-            os.write(self.process_pipe_write, b"q")
-            os.close(self.process_pipe_write)
-            self.destroy()
-        else:
-            self.previous_click_time = self.click_time
-            os.write(self.process_pipe_write, b"p")
-            if (self.stream_is_paused == 1):
-                self.stream_is_paused = 0
+        print("click delay: ", self.click_time - self.previous_click_time)
+        if (self.click_time - self.previous_click_time) > 3:
+            self.script_is_started=True
+        if (self.script_is_started):
+            # TODO : a fake click is observed, workaround hereafter
+            if (self.click_time - self.previous_click_time) < 0.01:
+                self.previous_click_time = self.click_time
+            elif (self.click_time - self.previous_click_time) < 0.3:
+                print("double click", self.click_time - self.previous_click_time)
+                os.write(self.process_pipe_write, b"q")
+                os.close(self.process_pipe_write)
+                self.destroy()
             else:
-                self.stream_is_paused = 1
+                self.previous_click_time = self.click_time
+                os.write(self.process_pipe_write, b"p")
+                if (self.stream_is_paused == 1):
+                    self.stream_is_paused = 0
+                else:
+                    self.stream_is_paused = 1
 
 # -------------------------------------------------------------------
 # -------------------------------------------------------------------
@@ -335,7 +342,7 @@ class ApplicationButton():
                                                   self.yaml_configuration["Application"]["Description"],
                                                   -1, self.icon_size)
                 if (self.yaml_configuration["Application"]["Type"].rstrip() == "script"):
-                    self.event_box.connect("button_release_event", self.script_start)
+                    self.event_box.connect("button_release_event", self.script_handle)
                     self.event_box.connect("button_press_event", self._parent.highlight_eventBox)
                 elif (self.yaml_configuration["Application"]["Type"].rstrip() == "python"):
                     self.event_box.connect("button_release_event", self.python_start)
@@ -343,6 +350,7 @@ class ApplicationButton():
             else:
                 self._compatible = False
                 print("     %s NOT compatible" % self.yaml_configuration["Application"]["Name"])
+
 
     def is_exist(self, data):
         try:
@@ -432,13 +440,14 @@ class ApplicationButton():
         widget.set_name("transparent_bg")
         self._parent.button_exit.show()
 
-
-    def script_start(self, widget, event):
-        if (self.is_exist(self.yaml_configuration["Application"]["Script"])):
+    def script_start(self):
+        global lock
+        with lock:
+            print("Lock Acquired")
             backscript_window = BackVideoWindow(self._parent)
             backscript_window.show_all()
 
-            print("[DEBUG][ApplicationButton][script_start]:")
+            print("[DEBUG][ApplicationButton][script_handle]:")
             print("    Name: ", self.yaml_configuration["Application"]["Name"])
             print("    Start script: ", self.yaml_configuration["Application"]["Script"]["Start"])
 
@@ -447,6 +456,13 @@ class ApplicationButton():
             response = script_window.run()
             script_window.destroy()
             backscript_window.destroy()
+            print("Lock Released")
+
+    def script_handle(self, widget, event):
+        if (self.is_exist(self.yaml_configuration["Application"]["Script"])):
+            print("Acquiring lock")
+            self.script_start()
+
         elif (self.exist_MSG_present(self.yaml_configuration["Application"]["Script"])):
             print("[WARNING] %s not detected\n" % self.yaml_configuration["Application"]["Script"]["Exist"]["Msg_false"])
             self._parent.display_message("<span font='15' color='#FFFFFFFF'>%s\n</span>" % self.yaml_configuration["Application"]["Script"]["Exist"]["Msg_false"])
