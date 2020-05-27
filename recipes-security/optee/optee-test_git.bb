@@ -10,13 +10,14 @@ inherit python3native
 
 PV = "3.9.0+git${SRCPV}"
 
-SRC_URI = "git://github.com/OP-TEE/optee_test.git \
-          file://0001-xtest-regression-1027-1028-skip-test.patch \
+SRC_URI = "git://github.com/OP-TEE/optee_test.git;protocol=https \
+        file://0001-xtest-regression-1027-1028-skip-test.patch \
+        file://0002-xtest-fix-generic-argument-handling.patch \
     "
 
 S = "${WORKDIR}/git"
 
-SRCREV = "30dd0878bf5378b2913397bebfcd7208cd11084e"
+SRCREV = "f461e1d47fcc82eaa67508a3d796c11b7d26656e"
 
 OPTEE_CLIENT_EXPORT = "${STAGING_DIR_HOST}${prefix}"
 TEEC_EXPORT         = "${STAGING_DIR_HOST}${prefix}"
