@@ -14,7 +14,7 @@ SRC_URI = "git://github.com/OP-TEE/optee_client.git \
 
 S = "${WORKDIR}/git"
 
-SRCREV = "128b8f58c2856f0b62ccd1f562096b591609387f"
+SRCREV = "e9e55969d76ddefcb5b398e592353e5c7f5df198"
 
 SYSTEMD_SERVICE_${PN} = "tee-supplicant.service"
 
