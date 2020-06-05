@@ -94,6 +94,6 @@ if [ -d "$start_local_application_dir" ]; then
     done
 fi
 
-
+export WL_EGL_GBM_FENCE=0
 #exec openvt $openvt_args -- $launcher $weston_args --log=@LOCALSTATEDIR@/log/weston.log
 exec /usr/bin/weston --log=/var/log/weston.log  $weston_args
