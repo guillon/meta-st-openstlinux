@@ -52,6 +52,7 @@ RDEPENDS_packagegroup-framework-tools-core = "\
     cracklib        \
     db              \
     sqlite3         \
+    rt-tests        \
     "
 
 SUMMARY_packagegroup-framework-tools-kernel = "Framework tools components for kernel"
