@@ -30,8 +30,9 @@ EXTRA_OEMAKE = " TA_DEV_KIT_DIR=${TA_DEV_KIT_DIR} \
                  CROSS_COMPILE_TA=${TARGET_PREFIX} \
                  V=1 \
                  CFG_TEE_CLIENT_LOAD_PATH=${libdir} \
-                 CLFAGS='--sysroot=${STAGING_DIR_HOST}' \
-                 "
+                 CFLAGS32='--sysroot=${STAGING_DIR_HOST}' \
+                 arch-bits-ta_arm32='32' \
+               "
 
 
 do_compile() {
