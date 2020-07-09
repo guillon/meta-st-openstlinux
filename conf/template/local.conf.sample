@@ -267,6 +267,7 @@ PACKAGE_CLASSES = "package_deb"
 #ST_ARCHIVER_ENABLE = "1"
 
 # Setup environment for builds binary reproducibility
+REPRODUCIBLE_TIMESTAMP_ROOTFS = ""
 INHERIT += "reproducible_build"
 
 # Setup eSDK
