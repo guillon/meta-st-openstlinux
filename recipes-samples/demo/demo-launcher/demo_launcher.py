@@ -283,7 +283,7 @@ def read_board_compatibility_name():
         try:
             with open("/proc/device-tree/compatible") as fp:
                 string = fp.read()
-                return string.split(',')[-1]
+                return string.split(',')[-1].rstrip('\x00')
         except:
             return "all"
 # -------------------------------------------------------------------
