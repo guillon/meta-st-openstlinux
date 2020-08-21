@@ -9,7 +9,10 @@ SRC_URI = " \
     file://start_up_demo_launcher.sh \
     file://pictures \
     file://application \
+    file://board \
     "
+
+PV = "2.1"
 
 do_configure[noexec] = "1"
 do_compile[noexec] = "1"
