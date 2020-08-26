@@ -342,7 +342,7 @@ class ScriptWindow(Gtk.Dialog):
         self.connect("button-press-event", self.on_script_press_event)
         self.process_pipe_read, self.process_pipe_write =  os.pipe()
         cmd = [os.path.join(DEMO_PATH,script)]
-        self.proc = popenAndCall(self.on_script_on_exit, cmd, stdin =self.process_pipe_read, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+        self.proc = popenAndCall(self.on_script_on_exit, cmd, stdin =self.process_pipe_read, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, shell=True)
 
     def on_script_on_exit(self):
         if self:
