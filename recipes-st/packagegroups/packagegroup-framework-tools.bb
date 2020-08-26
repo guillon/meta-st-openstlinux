@@ -78,7 +78,7 @@ RDEPENDS_packagegroup-framework-tools-network = "\
     openssh-sftp    \
     ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'dhcp-client', '', d)}                       \
     ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'systemd-networkd-configuration', '', d)}    \
-    usbip           \
+    usbip uhubctl   \
     bridge-utils    \
     "
 
