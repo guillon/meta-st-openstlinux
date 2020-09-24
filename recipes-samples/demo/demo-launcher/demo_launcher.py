@@ -62,27 +62,6 @@ SIMULATE_SCREEN_SIZE_HEIGHT = 480
 #SIMULATE_SCREEN_SIZE_WIDTH  = 480
 #SIMULATE_SCREEN_SIZE_HEIGHT = 272
 
-def popenAndCall(onExit, *popenArgs, **popenKWArgs):
-    """
-    Runs a subprocess.Popen, and then calls the function onExit when the
-    subprocess completes.
-
-    Use it exactly the way you'd normally use subprocess.Popen, except include a
-    callable to execute as the first argument. onExit is a callable object, and
-    *popenArgs and **popenKWArgs are simply passed up to subprocess.Popen.
-    """
-    def runInThread(onExit, popenArgs, popenKWArgs):
-        process = subprocess.Popen(*popenArgs, **popenKWArgs)
-        process.wait()
-        onExit()
-        return
-
-    thread = threading.Thread(target=runInThread,
-                              args=(onExit, popenArgs, popenKWArgs))
-    thread.start()
-
-    return thread # returns immediately after the thread starts
-
 # -------------------------------------------------------------------
 # -------------------------------------------------------------------
 ICON_SIZE_720 = 180
@@ -327,52 +306,6 @@ def read_configuration_board_file(search_path):
 # -------------------------------------------------------------------
 # -------------------------------------------------------------------
 
-class ScriptWindow(Gtk.Dialog):
-    def __init__(self, parent, name, script):
-        Gtk.Dialog.__init__(self, name, parent, 0)
-
-        self.maximize()
-        self.set_decorated(False)
-        self.set_name("transparent_bg")
-
-        self.previous_click_time=time()
-        self.stream_is_paused=0
-        self.script_is_started=False
-
-        self.connect("button-press-event", self.on_script_press_event)
-        self.process_pipe_read, self.process_pipe_write =  os.pipe()
-        cmd = [os.path.join(DEMO_PATH,script)]
-        self.proc = popenAndCall(self.on_script_on_exit, cmd, stdin =self.process_pipe_read, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, shell=True)
-
-    def on_script_on_exit(self):
-        if self:
-            self.destroy()
-
-    def on_script_press_event(self, widget, event):
-        self.click_time = time()
-        print("click delay: ", self.click_time - self.previous_click_time)
-        if (self.click_time - self.previous_click_time) > 3:
-            self.script_is_started=True
-        if (self.script_is_started):
-            # TODO : a fake click is observed, workaround hereafter
-            if (self.click_time - self.previous_click_time) < 0.01:
-                self.previous_click_time = self.click_time
-            elif (self.click_time - self.previous_click_time) < 0.3:
-                print("double click", self.click_time - self.previous_click_time)
-                os.write(self.process_pipe_write, b"q")
-                os.close(self.process_pipe_write)
-                self.destroy()
-            else:
-                self.previous_click_time = self.click_time
-                os.write(self.process_pipe_write, b"p")
-                if (self.stream_is_paused == 1):
-                    self.stream_is_paused = 0
-                else:
-                    self.stream_is_paused = 1
-
-# -------------------------------------------------------------------
-# -------------------------------------------------------------------
-
 def import_module_by_name(module_name):
     ''' module example:0application.netdata.netdata
         (corresponding to application/netdata/netdata.py file)
@@ -522,10 +455,8 @@ class ApplicationButton():
             print("    Name: ", self.yaml_configuration["Application"]["Name"])
             print("    Start script: ", self.yaml_configuration["Application"]["Script"]["Start"])
 
-            script_window = ScriptWindow(self._parent, self.yaml_configuration["Application"]["Name"], self.yaml_configuration["Application"]["Script"]["Start"])
-            script_window.show_all()
-            response = script_window.run()
-            script_window.destroy()
+            cmd = [os.path.join(DEMO_PATH,self.yaml_configuration["Application"]["Script"]["Start"])]
+            subprocess.run(cmd, stdin=subprocess.PIPE, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, shell=True)
             backscript_window.destroy()
             print("Lock Released")
 
