@@ -34,7 +34,7 @@ CORE_IMAGE_EXTRA_INSTALL_append = " \
     \
     packagegroup-framework-sample-x11               \
     packagegroup-framework-sample-xfce              \
-    packagegroup-framework-sample-qt                \
+    packagegroup-framework-sample-qtwayland         \
     packagegroup-framework-sample-qt-examples       \
     packagegroup-framework-sample-qt-extra          \
     packagegroup-framework-sample-qt-extra-examples \
