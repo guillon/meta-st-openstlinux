@@ -39,6 +39,6 @@ CORE_IMAGE_EXTRA_INSTALL += " \
     \
     packagegroup-framework-core-extra   \
     \
-    packagegroup-framework-sample-qt            \
+    packagegroup-framework-sample-qt-eglfs      \
     packagegroup-framework-sample-qt-examples   \
     "
