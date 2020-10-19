@@ -2,6 +2,10 @@
 
 PATH=/sbin:/bin:/usr/sbin:/usr/bin
 
+resize_enabled() {
+    return 0
+}
+
 ln -s /proc/mounts /etc/mtab
 
 if [ -n "$ROOTFS_DIR" ]; then
