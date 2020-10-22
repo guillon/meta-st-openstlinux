@@ -3,6 +3,7 @@ SECTION = "graphics"
 LICENSE = "LGPL-2.1"
 
 DEPENDS = "pkgconfig intltool-native libpng jpeg"
+DEPENDS += "xmlto-native"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=4015840237ca7f0175cd626f78714ca8"
 
