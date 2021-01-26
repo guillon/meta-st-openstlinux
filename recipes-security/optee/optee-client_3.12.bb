@@ -4,7 +4,7 @@ HOMEPAGE = "https://github.com/OP-TEE/optee_client"
 LICENSE = "BSD-2-Clause"
 LIC_FILES_CHKSUM = "file://${S}/LICENSE;md5=69663ab153298557a59c67a60a743e5b"
 
-PV = "3.11.0+git${SRCPV}"
+PV = "3.12.0+git${SRCPV}"
 
 inherit python3native systemd
 
@@ -14,7 +14,7 @@ SRC_URI = "git://github.com/OP-TEE/optee_client.git \
 
 S = "${WORKDIR}/git"
 
-SRCREV = "b061b4139d3c065a3414b283bedf897af378b415"
+SRCREV = "347144b79964233e718347e3f0fbe89ab5be46ae"
 
 SYSTEMD_SERVICE_${PN} = "tee-supplicant.service"
 

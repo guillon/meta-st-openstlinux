@@ -8,13 +8,13 @@ DEPENDS = "optee-client virtual/optee-os python3-pycryptodomex-native python3-py
 
 inherit python3native
 
-PV = "3.11.0+git${SRCPV}"
+PV = "3.12.0+git${SRCPV}"
 
 SRC_URI = "git://github.com/OP-TEE/optee_test.git;protocol=https"
 
 S = "${WORKDIR}/git"
 
-SRCREV = "659e221d3aa43ce6ef38f592d38a9820df155ef8"
+SRCREV = "7be42398e8848f09995abf8a9e9d8bb8840cc19a"
 
 OPTEE_CLIENT_EXPORT = "${STAGING_DIR_HOST}${prefix}"
 TEEC_EXPORT         = "${STAGING_DIR_HOST}${prefix}"
