@@ -4,7 +4,8 @@ AUTHOR = "Bartosz Golaszewski <bgolaszewski@baylibre.com>"
 LICENSE = "LGPLv2.1+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=2caced0b25dfefd4c601d92bd15116de"
 
-SRC_URI = "https://www.kernel.org/pub/software/libs/${BPN}/${BP}.tar.xz"
+SRC_URI = "https://mirrors.edge.kernel.org/pub/software/libs/libgpiod/libgpiod-1.6.2.tar.xz"
+SRC_URI[sha256sum] = "c601e71846f5ab140c83bc757fdd62a4fda24a9cee39cc5e99c96ec2bf1b06a9"
 
 inherit autotools pkgconfig python3native
 
