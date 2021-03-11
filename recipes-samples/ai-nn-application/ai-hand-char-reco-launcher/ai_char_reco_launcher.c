@@ -591,6 +591,11 @@ static void *read_touch_event_thread(void *arg)
 	if (d) {
 		while ((dir = readdir(d)) != NULL) {
 			//printf("%s\n", dir->d_name);
+			if (EndsWith(dir->d_name, "i2c-event")) {
+				printf("%s is a touchscreen\n",  dir->d_name);
+				touchscreen_found = 1;
+				break;
+			}
 			if (EndsWith(dir->d_name, "-event-mouse")) {
 				printf("%s is a mouse\n",  dir->d_name);
 				/* As mouse returned relative coordonates, need to init cursor position */
@@ -598,12 +603,6 @@ static void *read_touch_event_thread(void *arg)
 				cursor_y = displayHeight / 2;
 				set_cursor_position(cursor_x, cursor_y);
 				mouse_found = 1;
-				break;
-			}
-			if (EndsWith(dir->d_name, "i2c-event")) {
-				printf("%s is a touchscreen\n",  dir->d_name);
-				touchscreen_found = 1;
-				break;
 			}
 		}
 		closedir(d);
@@ -611,6 +610,9 @@ static void *read_touch_event_thread(void *arg)
 		if ((touchscreen_found == 0) && (mouse_found == 0)) {
 			printf("ERROR: no input device found\n");
 			exit(0);
+		} else if ((touchscreen_found == 1) && (mouse_found == 1)) {
+			printf("Mouse and Touchscreen found : use Touchscreen\n");
+			mouse_found = 0;
 		}
 
 		strcpy(event_dev_file, input_path);
@@ -686,9 +688,11 @@ static void *read_touch_event_thread(void *arg)
 				 * absolute position and cursor position given by Wayland
 				 * TODO : get mouse coordinates from libinput to avoid that
 				 */
-				cursor_x = displayWidth / 2;
-				cursor_y = displayHeight / 2;
-				set_cursor_position(cursor_x, cursor_y);
+				if (mouse_found) {
+					cursor_x = displayWidth / 2;
+					cursor_y = displayHeight / 2;
+					set_cursor_position(cursor_x, cursor_y);
+				}
 			}
 		}
 
@@ -754,7 +758,6 @@ static void *read_touch_event_thread(void *arg)
 			}
 			gtk_widget_queue_draw(window);
 		}
-
 		pthread_mutex_unlock(&lock);
 	}
 
