@@ -52,7 +52,7 @@ def get_sizes_from_screen_size(width, height):
     button_height = None
     if minsize == 720:
         icon_size = ICON_SIZE_720
-        font_size = 205
+        font_size = 25
         treelist_height = TREELIST_HEIGHT_720
         button_height = 60
     elif minsize == 480:
