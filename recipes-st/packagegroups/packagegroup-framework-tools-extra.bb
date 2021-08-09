@@ -53,6 +53,9 @@ RDEPENDS_packagegroup-framework-tools-extra-kernel = "\
     formfactor      \
     \
     lirc            \
+    \
+    cpuburn-arm     \
+    dhrystone       \
     "
 
 SUMMARY_packagegroup-framework-tools-extra-network = "Framework tools extra components for network"
