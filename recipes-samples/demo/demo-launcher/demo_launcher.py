@@ -413,7 +413,7 @@ class ApplicationButton():
                                     return True
                         return False
                     elif key == "NotList" and len(data["NotList"].rstrip()):
-                        if data["NotList"].find(board_compatibility_name):
+                        if data["NotList"].find(board_compatibility_name) > -1:
                             return False
                         return True
             else:
