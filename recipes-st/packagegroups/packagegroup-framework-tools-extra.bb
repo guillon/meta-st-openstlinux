@@ -54,8 +54,11 @@ RDEPENDS_packagegroup-framework-tools-extra-kernel = "\
     \
     lirc            \
     \
-    cpuburn-arm     \
     dhrystone       \
+    "
+
+RDEPENDS_packagegroup-framework-tools-extra-kernel_append_arm = "\
+    cpuburn-arm     \
     "
 
 SUMMARY_packagegroup-framework-tools-extra-network = "Framework tools extra components for network"
